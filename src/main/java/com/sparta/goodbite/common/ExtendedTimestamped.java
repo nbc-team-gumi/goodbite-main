@@ -10,7 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class ExtendedTimestamped extends Timestamped {
+public abstract class ExtendedTimestamped extends Timestamped {
 
     @Column(name = "deleted_date")
     private LocalDateTime deletedAt;

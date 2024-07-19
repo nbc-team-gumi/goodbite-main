@@ -14,7 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class Timestamped {
 
-    @Column(name = "create_time", updatable = false)
+    @Column(name = "create_date", updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 

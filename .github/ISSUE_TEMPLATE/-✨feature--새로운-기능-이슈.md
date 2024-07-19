@@ -1,7 +1,7 @@
 ---
-name: "[\U0001F389FEATURE] 새로운 기능 이슈"
+name: "[✨FEATURE] 새로운 기능 이슈"
 about: 새로운 기능 이슈 발생시 사용
-title: "[\U0001F389FEATURE] 제목을 입력해주세요"
+title: "[✨FEATURE] 제목을 입력해주세요"
 labels: enhancement
 assignees: ''
 

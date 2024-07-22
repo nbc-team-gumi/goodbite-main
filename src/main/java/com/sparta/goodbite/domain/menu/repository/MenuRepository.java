@@ -5,4 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MenuRepository extends JpaRepository<Menu, Long> {
 
+    default Menu findByIdOrThrow(Long menuId) {
+        return findById(menuId).orElseThrow(() -> new RuntimeException("임시 메시지"));
+    }
 }

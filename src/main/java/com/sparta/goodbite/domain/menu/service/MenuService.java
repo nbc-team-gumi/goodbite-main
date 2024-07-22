@@ -30,4 +30,9 @@ public class MenuService {
         Menu menu = menuRepository.findByIdOrThrow(menuId);
         menu.update(updateMenuRequestDto);
     }
+
+    @Transactional
+    public void deleteMenu(Long menuId) {
+        menuRepository.delete(menuRepository.findByIdOrThrow(menuId));
+    }
 }

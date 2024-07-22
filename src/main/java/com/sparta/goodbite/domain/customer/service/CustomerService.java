@@ -2,11 +2,10 @@ package com.sparta.goodbite.domain.customer.service;
 
 import com.sparta.goodbite.domain.customer.dto.CustomerSignUpRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdateNicknameRequestDto;
-import com.sparta.goodbite.domain.customer.dto.UpdatePasswordRequestDto;
+import com.sparta.goodbite.domain.customer.dto.UpdateTelNoRequestDto;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
 import com.sparta.goodbite.exception.customer.CustomerErrorCode;
-import com.sparta.goodbite.exception.customer.CustomerException;
 import com.sparta.goodbite.exception.customer.detail.CustomerNotFoundException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateEmailException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateNicknameException;
@@ -73,8 +72,20 @@ public class CustomerService {
         customer.updateNickname(newNickname);
     }
 
-    /*public void updatePassword(UpdatePasswordRequestDto requestDto) {
+    @Transactional
+    public void updateTelNo(Long customerId, UpdateTelNoRequestDto requestDto) {
+        String newNewTelNo = requestDto.getNewTelNo();
 
-    }*/
+        // 전화번호 중복 검사
+        customerRepository.findByTelNo(newNewTelNo).ifPresent(u -> {
+            throw new DuplicateTelnoException(CustomerErrorCode.DUPLICATE_TELNO);
+        });
 
+        // Customer 조회
+        Customer customer = customerRepository.findById(customerId)
+            .orElseThrow(() -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
+
+        // 전화번호 업데이트
+        customer.updateTelNo(newNewTelNo);
+    }
 }

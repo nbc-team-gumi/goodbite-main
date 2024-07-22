@@ -7,7 +7,7 @@ Content-Type: application/json
   "email": "user55555@gmail.com",
   "nickname": "하22",
   "password": "password123!@",
-  "telNo": "010-55555-0220"
+  "telNo": "010-5555-0220"
 }
 
 ### 회원정보수정-닉네임
@@ -17,6 +17,16 @@ Content-Type: application/json
 {
 
   "newNickname": "하22덜"
+
+}
+
+### 회원정보수정-전화번호
+PUT http://localhost:8080/users/customers/1/telNo
+Content-Type: application/json
+
+{
+
+  "newTelNo": "010-0000-0220"
 
 }
 

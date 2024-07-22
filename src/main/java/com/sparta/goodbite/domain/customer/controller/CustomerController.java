@@ -5,6 +5,7 @@ import com.sparta.goodbite.common.response.ResponseUtil;
 import com.sparta.goodbite.domain.customer.dto.CustomerSignUpRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdateNicknameRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePasswordRequestDto;
+import com.sparta.goodbite.domain.customer.dto.UpdateTelNoRequestDto;
 import com.sparta.goodbite.domain.customer.service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,12 +44,26 @@ public class CustomerController {
      */
 
     @PutMapping("/{customerId}/nickname")
-    public ResponseEntity<MessageResponseDto> updatePassword(@PathVariable Long customerId,@Valid @RequestBody
+    public ResponseEntity<MessageResponseDto> updateNickname(@PathVariable Long customerId,@Valid @RequestBody
     UpdateNicknameRequestDto requestDto/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
     ){
         customerService.updateNickname(customerId,requestDto);
         return ResponseUtil.updateOk();
     }
 
+    /**
+     * 회원정보수정(전화번호) API
+     * @param customerId 업데이트할 고객의 ID
+     * @param requestDto 새로운 닉네임을 담은 DTO
+     * @return 업데이트 성공 메시지를 담은 ResponseEntity
+     */
+
+    @PutMapping("/{customerId}/telNo")
+    public ResponseEntity<MessageResponseDto> updateTelNo(@PathVariable Long customerId,@Valid @RequestBody
+    UpdateTelNoRequestDto requestDto/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
+    ){
+        customerService.updateTelNo(customerId,requestDto);
+        return ResponseUtil.updateOk();
+    }
 
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,4 +25,15 @@ public class Restaurant extends Timestamped {
     private String telno;
     private String category;
 
+    @Builder
+    public Restaurant(Long ownerId, String name, String picture, String address, String area,
+        String telno, String category) {
+        this.ownerId = ownerId;
+        this.name = name;
+        this.picture = picture;
+        this.address = address;
+        this.area = area;
+        this.telno = telno;
+        this.category = category;
+    }
 }

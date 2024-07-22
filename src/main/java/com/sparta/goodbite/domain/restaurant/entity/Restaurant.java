@@ -1,6 +1,7 @@
 package com.sparta.goodbite.domain.restaurant.entity;
 
 import com.sparta.goodbite.common.Timestamped;
+import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -35,5 +36,14 @@ public class Restaurant extends Timestamped {
         this.area = area;
         this.telno = telno;
         this.category = category;
+    }
+
+    public void update(RestaurantRequestDto restaurantRequestDto) {
+        this.name = restaurantRequestDto.getName();
+        this.picture = restaurantRequestDto.getPicture();
+        this.address = restaurantRequestDto.getAddress();
+        this.area = restaurantRequestDto.getArea();
+        this.telno = restaurantRequestDto.getTelno();
+        this.category = restaurantRequestDto.getCategory();
     }
 }

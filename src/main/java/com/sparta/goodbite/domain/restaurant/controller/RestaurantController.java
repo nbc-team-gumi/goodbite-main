@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,6 +38,14 @@ public class RestaurantController {
 
         RestaurantResponseDto restaurantResponseDto = restaurantService.getRestaurant(restaurantId);
         return ResponseUtil.findOk(restaurantResponseDto);
+    }
+
+    @PutMapping("/{restaurantId}")
+    public ResponseEntity<MessageResponseDto> updateRestaurant(@PathVariable Long restaurantId,
+        @RequestBody RestaurantRequestDto restaurantRequestDto) {
+
+        restaurantService.updateRestaurant(restaurantId, restaurantRequestDto);
+        return ResponseUtil.updateOk();
     }
 
 }

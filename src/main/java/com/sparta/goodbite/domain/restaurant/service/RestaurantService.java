@@ -18,15 +18,27 @@ public class RestaurantService {
 
     @Transactional
     public void createRestaurant(RestaurantRequestDto restaurantRequestDto) {
+
         restaurantRepository.save(restaurantRequestDto.toEntity());
     }
 
     @Transactional
     public RestaurantResponseDto getRestaurant(Long restaurantId) {
-        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+
+        Restaurant restaurant = findRestaurant(restaurantId);
+        return new RestaurantResponseDto(restaurant);
+    }
+
+    @Transactional
+    public void updateRestaurant(Long restaurantId, RestaurantRequestDto restaurantRequestDto) {
+
+        Restaurant restaurant = findRestaurant(restaurantId);
+        restaurant.update(restaurantRequestDto);
+    }
+
+    private Restaurant findRestaurant(Long restaurantId) {
+        return restaurantRepository.findById(restaurantId)
             .orElseThrow(() -> new RestaurantException(
                 RestaurantErrorCode.RESTUARNAT_NOT_FOUND));
-
-        return new RestaurantResponseDto(restaurant);
     }
 }

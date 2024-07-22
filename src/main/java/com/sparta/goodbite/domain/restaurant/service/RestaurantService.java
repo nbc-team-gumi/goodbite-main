@@ -1,7 +1,11 @@
 package com.sparta.goodbite.domain.restaurant.service;
 
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
+import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
+import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
+import com.sparta.goodbite.exception.restaurant.detail.RestaurantErrorCode;
+import com.sparta.goodbite.exception.restaurant.detail.RestaurantException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,5 +19,14 @@ public class RestaurantService {
     @Transactional
     public void createRestaurant(RestaurantRequestDto restaurantRequestDto) {
         restaurantRepository.save(restaurantRequestDto.toEntity());
+    }
+
+    @Transactional
+    public RestaurantResponseDto getRestaurant(Long restaurantId) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+            .orElseThrow(() -> new RestaurantException(
+                RestaurantErrorCode.RESTUARNAT_NOT_FOUND));
+
+        return new RestaurantResponseDto(restaurant);
     }
 }

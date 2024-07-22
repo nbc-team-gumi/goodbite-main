@@ -11,6 +11,7 @@ import com.sparta.goodbite.exception.customer.detail.DuplicateEmailException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateNicknameException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateTelnoException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CustomerService {
     private final CustomerRepository customerRepository;
-    //private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public void signUp(CustomerSignUpRequestDto requestDto) {
@@ -40,9 +41,7 @@ public class CustomerService {
         });
 
         // 비밀번호 암호화 -> 인증인가연결시 config에서 PasswordEncoder Bean등록
-        //String password = passwordEncoder.encode(requestDto.getPassword());
-        //임의로 암호화 패스워드 설정
-        String password = requestDto.getPassword();
+        String password = passwordEncoder.encode(requestDto.getPassword());
 
         // User DB에 저장
         Customer customer = Customer.builder()

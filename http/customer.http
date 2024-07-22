@@ -1,3 +1,4 @@
+
 ### 회원가입
 POST http://localhost:8080/users/customers/signup
 Content-Type: application/json
@@ -8,6 +9,18 @@ Content-Type: application/json
   "password": "password123!@",
   "telNo": "010-55555-0220"
 }
+
+### 회원정보수정-닉네임
+PUT http://localhost:8080/users/customers/1/nickname
+Content-Type: application/json
+
+{
+
+  "newNickname": "하22덜"
+
+}
+
+
 
 
 

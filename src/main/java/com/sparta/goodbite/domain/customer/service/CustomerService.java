@@ -1,10 +1,13 @@
 package com.sparta.goodbite.domain.customer.service;
 
 import com.sparta.goodbite.domain.customer.dto.CustomerSignUpRequestDto;
+import com.sparta.goodbite.domain.customer.dto.UpdateNicknameRequestDto;
+import com.sparta.goodbite.domain.customer.dto.UpdatePasswordRequestDto;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
 import com.sparta.goodbite.exception.customer.CustomerErrorCode;
 import com.sparta.goodbite.exception.customer.CustomerException;
+import com.sparta.goodbite.exception.customer.detail.CustomerNotFoundException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateEmailException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateNicknameException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateTelnoException;
@@ -52,4 +55,26 @@ public class CustomerService {
 
         customerRepository.save(customer);
     }
+
+    @Transactional
+    public void updateNickname(Long customerId, UpdateNicknameRequestDto requestDto) {
+        String newNickname = requestDto.getNewNickname();
+
+        // 닉네임 중복 검사
+        customerRepository.findByNickname(newNickname).ifPresent(u -> {
+            throw new DuplicateNicknameException(CustomerErrorCode.DUPLICATE_NICKNAME);
+        });
+
+        // Customer 조회
+        Customer customer = customerRepository.findById(customerId)
+            .orElseThrow(() -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
+
+        // 닉네임 업데이트
+        customer.updateNickname(newNickname);
+    }
+
+    /*public void updatePassword(UpdatePasswordRequestDto requestDto) {
+
+    }*/
+
 }

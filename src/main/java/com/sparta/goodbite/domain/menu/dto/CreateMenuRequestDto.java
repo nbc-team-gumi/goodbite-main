@@ -12,7 +12,7 @@ public class CreateMenuRequestDto {
 //    private Long restaurant_id;
 
     @NotNull(message = "메뉴의 가격을 입력해 주세요.")
-    private int price;
+    private Integer price;
 
     @NotBlank(message = "메뉴의 이름을 입력해 주세요.")
     private String name;

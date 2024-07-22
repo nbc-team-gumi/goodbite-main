@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -48,12 +49,21 @@ public class Waiting extends ExtendedTimestamped {
 
     private String demand;
 
-    public Waiting(Long waitingOrder, WaitingStatus status, Long partySize, WaitingType waitingType,
+    @Builder
+    public Waiting(Restaurant restaurant, Customer customer, Long waitingOrder,
+        WaitingStatus status, Long partySize, WaitingType waitingType,
         String demand) {
+        this.restaurant = restaurant;
+        this.customer = customer;
         this.waitingOrder = waitingOrder;
         this.status = status;
         this.partySize = partySize;
         this.waitingType = waitingType;
+        this.demand = demand;
+    }
+
+    public void update(Long partySize, String demand) {
+        this.partySize = partySize;
         this.demand = demand;
     }
 

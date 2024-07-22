@@ -2,6 +2,7 @@ package com.sparta.goodbite.exception;
 
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
+import com.sparta.goodbite.exception.customer.CustomerException;
 import com.sparta.goodbite.exception.menu.MenuException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(CustomerException.class)
+    public ResponseEntity<MessageResponseDto> handleCustomerException(CustomerException e) {
+        log.error("에러 발생: ", e);
+        return ResponseUtil.of(e.getCustomerErrorCode().getHttpStatus(), e.getMessage());
+    }
 
     @ExceptionHandler(MenuException.class)
     public ResponseEntity<MessageResponseDto> handleMenuException(MenuException e) {

@@ -7,6 +7,7 @@ import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
 import com.sparta.goodbite.domain.restaurant.service.RestaurantService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,6 +40,13 @@ public class RestaurantController {
 
         RestaurantResponseDto restaurantResponseDto = restaurantService.getRestaurant(restaurantId);
         return ResponseUtil.findOk(restaurantResponseDto);
+    }
+
+    @GetMapping
+    public ResponseEntity<DataResponseDto<List<RestaurantResponseDto>>> getRestaurants() {
+
+        List<RestaurantResponseDto> restaurantResponseDtos = restaurantService.getRestaurants();
+        return ResponseUtil.findOk(restaurantResponseDtos);
     }
 
     @PutMapping("/{restaurantId}")

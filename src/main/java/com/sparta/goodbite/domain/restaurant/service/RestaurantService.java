@@ -6,6 +6,8 @@ import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.exception.restaurant.detail.RestaurantErrorCode;
 import com.sparta.goodbite.exception.restaurant.detail.RestaurantException;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,18 @@ public class RestaurantService {
     }
 
     @Transactional
+    public List<RestaurantResponseDto> getRestaurants() {
+
+        List<Restaurant> restaurants = restaurantRepository.findAll();
+
+        List<RestaurantResponseDto> restaurantResponseDtos = restaurants.stream()
+            .map(RestaurantResponseDto::new)
+            .collect(Collectors.toList());
+
+        return restaurantResponseDtos;
+    }
+
+    @Transactional
     public void updateRestaurant(Long restaurantId, RestaurantRequestDto restaurantRequestDto) {
 
         Restaurant restaurant = findRestaurant(restaurantId);
@@ -48,4 +62,6 @@ public class RestaurantService {
             .orElseThrow(() -> new RestaurantException(
                 RestaurantErrorCode.RESTUARNAT_NOT_FOUND));
     }
+
+
 }

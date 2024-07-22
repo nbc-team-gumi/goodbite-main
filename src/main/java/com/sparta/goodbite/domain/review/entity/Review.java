@@ -9,7 +9,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Entity
 public class Review extends Timestamped {
 
@@ -27,4 +35,11 @@ public class Review extends Timestamped {
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "customer_id", nullable = false)
 //    private Customer customer;
+
+    @Builder
+    public Review(float rating, String content, Menu menu) {
+        this.rating = rating;
+        this.content = content;
+        this.menu = menu;
+    }
 }

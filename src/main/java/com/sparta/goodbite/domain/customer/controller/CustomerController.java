@@ -66,4 +66,19 @@ public class CustomerController {
         return ResponseUtil.updateOk();
     }
 
+    /**
+     * 회원정보수정(비밀번호) API
+     * @param customerId 업데이트할 고객의 ID
+     * @param requestDto 새로운 닉네임을 담은 DTO
+     * @return 업데이트 성공 메시지를 담은 ResponseEntity
+     */
+
+    @PutMapping("/{customerId}/password")
+    public ResponseEntity<MessageResponseDto> updatePassword(@PathVariable Long customerId,@Valid @RequestBody
+    UpdatePasswordRequestDto requestDto/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
+    ){
+        customerService.updatePassword(customerId,requestDto);
+        return ResponseUtil.updateOk();
+    }
+
 }

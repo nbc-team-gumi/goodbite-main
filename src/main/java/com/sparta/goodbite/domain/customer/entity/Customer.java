@@ -56,4 +56,8 @@ public class Customer extends ExtendedTimestamped {
     public void updateTelNo(String newNewTelNo) {
         this.telNo = newNewTelNo;
     }
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
 }

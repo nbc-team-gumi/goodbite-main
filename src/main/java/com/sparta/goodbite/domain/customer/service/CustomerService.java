@@ -2,6 +2,7 @@ package com.sparta.goodbite.domain.customer.service;
 
 import com.sparta.goodbite.domain.customer.dto.CustomerSignUpRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdateNicknameRequestDto;
+import com.sparta.goodbite.domain.customer.dto.UpdatePasswordRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdateTelNoRequestDto;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
@@ -86,5 +87,26 @@ public class CustomerService {
 
         // 전화번호 업데이트
         customer.updateTelNo(newNewTelNo);
+    }
+
+    public void updatePassword(Long customerId, UpdatePasswordRequestDto requestDto /*,Customer customer*/) {
+        /*if (!passwordEncoder.matches(requestDto.getPassword(), customer.getPassword())) {
+            throw new PasswordMismatchException("현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        if (passwordEncoder.matches(requestDto.getNewPassword(), customer.getPassword())) {
+            throw new PasswordMismatchException("새로운 비밀번호와 기존 비밀번호가 동일합니다.");
+        }*/
+        String newPassword = passwordEncoder.encode(requestDto.getNewPassword());
+
+        // Customer 조회
+        Customer customer = customerRepository.findById(customerId)
+            .orElseThrow(() -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
+
+        // 비밀번호 업데이트
+        customer.updatePassword(newPassword);
+
+        // 변경된 비밀번호 저장
+        customerRepository.save(customer);
     }
 }

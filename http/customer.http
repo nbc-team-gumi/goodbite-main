@@ -30,6 +30,16 @@ Content-Type: application/json
 
 }
 
+### 회원정보수정-비밀번호
+PUT http://localhost:8080/users/customers/1/password
+Content-Type: application/json
+
+{
+  "password": "password123!@",
+  "newPassword": "password123!@@"
+
+}
+
 
 
 

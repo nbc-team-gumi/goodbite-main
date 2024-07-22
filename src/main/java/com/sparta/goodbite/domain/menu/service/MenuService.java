@@ -1,6 +1,7 @@
 package com.sparta.goodbite.domain.menu.service;
 
 import com.sparta.goodbite.domain.menu.dto.CreateMenuRequestDto;
+import com.sparta.goodbite.domain.menu.dto.MenuResponseDto;
 import com.sparta.goodbite.domain.menu.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,5 +16,10 @@ public class MenuService {
     @Transactional
     public void createMenu(CreateMenuRequestDto createMenuRequestDto) { // User user
         menuRepository.save(createMenuRequestDto.toEntity());
+    }
+
+    @Transactional(readOnly = true)
+    public MenuResponseDto getMenu(Long menuId) {
+        return MenuResponseDto.from(menuRepository.findByIdOrThrow(menuId));
     }
 }

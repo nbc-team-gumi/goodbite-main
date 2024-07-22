@@ -36,6 +36,13 @@ public class RestaurantService {
         restaurant.update(restaurantRequestDto);
     }
 
+    @Transactional
+    public void deleteRestaurant(Long restaurantId) {
+
+        Restaurant restaurant = findRestaurant(restaurantId);
+        restaurantRepository.delete(restaurant);
+    }
+
     private Restaurant findRestaurant(Long restaurantId) {
         return restaurantRepository.findById(restaurantId)
             .orElseThrow(() -> new RestaurantException(

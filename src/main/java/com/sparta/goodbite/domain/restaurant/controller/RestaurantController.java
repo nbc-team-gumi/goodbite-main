@@ -9,6 +9,7 @@ import com.sparta.goodbite.domain.restaurant.service.RestaurantService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,4 +49,10 @@ public class RestaurantController {
         return ResponseUtil.updateOk();
     }
 
+    @DeleteMapping("/{restaurantId}")
+    public ResponseEntity<MessageResponseDto> deleteRestaurant(@PathVariable Long restaurantId) {
+
+        restaurantService.deleteRestaurant(restaurantId);
+        return ResponseUtil.deleteOk();
+    }
 }

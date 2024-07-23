@@ -1,7 +1,9 @@
 package com.sparta.goodbite.domain.customer.controller;
 
+import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
+import com.sparta.goodbite.domain.customer.dto.CustomerResponseDto;
 import com.sparta.goodbite.domain.customer.dto.CustomerSignUpRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdateNicknameRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePasswordRequestDto;
@@ -11,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -79,6 +82,18 @@ public class CustomerController {
     ){
         customerService.updatePassword(customerId,requestDto);
         return ResponseUtil.updateOk();
+    }
+
+    /**
+     * 회원정보조회 API
+     * @param customerId 조회할 고객의 ID
+     * @return 업데이트 성공 메시지를 담은 ResponseEntity
+     */
+
+    @GetMapping("/{customerId}")
+    public ResponseEntity<DataResponseDto<CustomerResponseDto>> getCustomer(@PathVariable Long customerId/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
+    ){
+        return ResponseUtil.findOk(customerService.getCustomer(customerId));
     }
 
 }

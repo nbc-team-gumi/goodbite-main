@@ -1,5 +1,6 @@
 package com.sparta.goodbite.domain.customer.service;
 
+import com.sparta.goodbite.domain.customer.dto.CustomerResponseDto;
 import com.sparta.goodbite.domain.customer.dto.CustomerSignUpRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdateNicknameRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePasswordRequestDto;
@@ -11,6 +12,7 @@ import com.sparta.goodbite.exception.customer.detail.CustomerNotFoundException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateEmailException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateNicknameException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateTelnoException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomerService {
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Transactional(readOnly = true)
+    public CustomerResponseDto getCustomer(Long customerId) {
+        return CustomerResponseDto.from(customerRepository.findById(customerId).orElseThrow(()
+            -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND)));
+    }
 
     @Transactional
     public void signUp(CustomerSignUpRequestDto requestDto) {

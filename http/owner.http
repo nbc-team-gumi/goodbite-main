@@ -1,0 +1,11 @@
+### 회원가입
+POST http://localhost:8080/owners/signup
+Content-Type: application/json
+
+{
+  "email": "user66666@gmail.com",
+  "nickname": "하22f44",
+  "password": "password123!@",
+  "phoneNumber": "010-5556-0220",
+  "businessNumber": "dsf446s1242342"
+}

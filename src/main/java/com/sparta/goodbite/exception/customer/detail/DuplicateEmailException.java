@@ -5,5 +5,7 @@ import com.sparta.goodbite.exception.customer.CustomerException;
 
 public class DuplicateEmailException extends CustomerException {
 
-    public DuplicateEmailException(CustomerErrorCode customerErrorCode){super(customerErrorCode);}
+    public DuplicateEmailException(CustomerErrorCode customerErrorCode) {
+        super(customerErrorCode);
+    }
 }

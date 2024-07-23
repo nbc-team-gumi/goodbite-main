@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 public class Owner extends ExtendedTimestamped implements UserCredentials {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
@@ -38,7 +39,7 @@ public class Owner extends ExtendedTimestamped implements UserCredentials {
     @Column(nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(columnDefinition = "varchar(30)",nullable = false)
+    @Column(columnDefinition = "varchar(30)", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private OwnerStatus ownerStatus;
 
@@ -50,22 +51,23 @@ public class Owner extends ExtendedTimestamped implements UserCredentials {
 
 
     @Builder
-    public Owner(String password, String email, String nickname, String phoneNumber, String businessNumber) {
-        this.password=password;
-        this.email=email;
-        this.nickname=nickname;
-        this.phoneNumber= phoneNumber;
-        this.businessNumber=businessNumber;
+    public Owner(String password, String email, String nickname, String phoneNumber,
+        String businessNumber) {
+        this.password = password;
+        this.email = email;
+        this.nickname = nickname;
+        this.phoneNumber = phoneNumber;
+        this.businessNumber = businessNumber;
         this.ownerStatus = OwnerStatus.UNVERIFIED;
     }
 
     @Override
-    public String getEmail(){
+    public String getEmail() {
         return email;
     }
 
     @Override
-    public String getPassword(){
+    public String getPassword() {
         return password;
     }
 }

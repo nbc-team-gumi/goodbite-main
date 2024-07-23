@@ -7,6 +7,7 @@ import lombok.Getter;
 
 @Getter
 public class CustomerSignUpRequestDto {
+
     @Email(regexp = "^[a-zA-Z0-9+-\\_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$",
         message = "이메일 형식에 맞지 않습니다.")
     @NotBlank(message = "이메일을 입력해주세요.")
@@ -24,6 +25,4 @@ public class CustomerSignUpRequestDto {
     @NotBlank(message = "휴대폰번호를 입력해 주세요.")
     @Pattern(regexp = "^01(?:0|1|[6-9])[.-]?(\\d{3}|\\d{4})[.-]?(\\d{4})$", message = "10 ~ 11 자리의 숫자만 입력 가능합니다.")
     private String phoneNumber;
-
-
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     @ExceptionHandler(CustomerException.class)
     public ResponseEntity<MessageResponseDto> handleCustomerException(CustomerException e) {
         log.error("에러 발생: ", e);

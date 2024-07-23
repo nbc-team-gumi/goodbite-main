@@ -131,7 +131,7 @@ public class CustomerService {
         if (customer.getDeletedAt() != null) {
             throw new CustomerAlreadyDeletedException(CustomerErrorCode.CUSTOMER_ALREADY_DELETED);
         }
-
+        
         // 소프트 삭제를 위해 deletedAt 필드를 현재 시간으로 설정
         customer.deactivate();
         customerRepository.save(customer);

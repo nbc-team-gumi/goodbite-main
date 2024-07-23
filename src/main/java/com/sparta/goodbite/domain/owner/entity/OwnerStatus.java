@@ -8,6 +8,6 @@ import lombok.RequiredArgsConstructor;
 public enum OwnerStatus {
     VERIFIED("VERIFIED"), //인증완료 상태
     UNVERIFIED("UNVERIFIED");
-
+    
     private final String ownerStatus;
 }

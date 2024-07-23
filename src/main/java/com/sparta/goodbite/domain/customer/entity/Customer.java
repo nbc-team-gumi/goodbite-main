@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -59,5 +60,10 @@ public class Customer extends ExtendedTimestamped {
 
     public void updatePassword(String newPassword) {
         this.password = newPassword;
+    }
+
+    // 소프트 삭제를 위한 메서드 추가
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 }

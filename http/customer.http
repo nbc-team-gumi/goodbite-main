@@ -43,5 +43,6 @@ Content-Type: application/json
 ### 회원정보조회
 GET http://localhost:8080/users/customers/1
 
-
+### 회원탈퇴
+DELETE http://localhost:8080/users/customers/2
 

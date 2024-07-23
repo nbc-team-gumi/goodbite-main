@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -87,13 +88,26 @@ public class CustomerController {
     /**
      * 회원정보조회 API
      * @param customerId 조회할 고객의 ID
-     * @return 업데이트 성공 메시지를 담은 ResponseEntity
+     * @return ResponseEntity
      */
 
     @GetMapping("/{customerId}")
     public ResponseEntity<DataResponseDto<CustomerResponseDto>> getCustomer(@PathVariable Long customerId/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
     ){
         return ResponseUtil.findOk(customerService.getCustomer(customerId));
+    }
+
+    /**
+     * 회원탈퇴 API
+     * @param customerId 탈퇴할 고객의 ID
+     * @return 성공 메시지를 담은 ResponseEntity
+     */
+
+    @DeleteMapping("/{customerId}")
+    public ResponseEntity<MessageResponseDto> deleteCustomer(@PathVariable Long customerId/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
+    ){
+        customerService.deleteCustomer(customerId);
+        return ResponseUtil.deleteOk();
     }
 
 }

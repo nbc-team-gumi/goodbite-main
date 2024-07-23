@@ -8,10 +8,12 @@ import com.sparta.goodbite.domain.customer.dto.UpdateTelNoRequestDto;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
 import com.sparta.goodbite.exception.customer.CustomerErrorCode;
+import com.sparta.goodbite.exception.customer.detail.CustomerAlreadyDeletedException;
 import com.sparta.goodbite.exception.customer.detail.CustomerNotFoundException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateEmailException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateNicknameException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateTelnoException;
+import java.time.LocalDateTime;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -97,6 +99,7 @@ public class CustomerService {
         customer.updateTelNo(newNewTelNo);
     }
 
+    @Transactional
     public void updatePassword(Long customerId, UpdatePasswordRequestDto requestDto /*,Customer customer*/) {
         /*if (!passwordEncoder.matches(requestDto.getPassword(), customer.getPassword())) {
             throw new PasswordMismatchException("현재 비밀번호가 일치하지 않습니다.");
@@ -117,4 +120,22 @@ public class CustomerService {
         // 변경된 비밀번호 저장
         customerRepository.save(customer);
     }
+
+    @Transactional
+    public void deleteCustomer(Long customerId){
+        // 고객 엔티티 조회
+        Customer customer = customerRepository.findById(customerId)
+            .orElseThrow(() -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
+
+        // 이미 탈퇴한 사용자인지 확인합니다.
+        if (customer.getDeletedAt() != null) {
+            throw new CustomerAlreadyDeletedException(CustomerErrorCode.CUSTOMER_ALREADY_DELETED);
+        }
+
+        // 소프트 삭제를 위해 deletedAt 필드를 현재 시간으로 설정
+        customer.setDeletedAt(LocalDateTime.now());
+
+        customerRepository.save(customer);
+    }
+
 }

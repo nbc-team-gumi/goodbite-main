@@ -32,7 +32,7 @@ public class CustomerController {
      * 회원가입 API
      *
      * @param requestDto 회원가입 내용
-     * @return ResponseUtil
+     * @return 성공 메시지를 담은 ResponseEntity
      */
 
     @PostMapping("/signup")

@@ -14,7 +14,7 @@ public class CreateReviewRequestDto {
 
     @NotNull(message = "평점을 입력해 주세요.")
     @RatingConstraint
-    private float rating;
+    private Float rating;
 
     @NotNull(message = "리뷰 내용을 입력해 주세요.")
     private String content;

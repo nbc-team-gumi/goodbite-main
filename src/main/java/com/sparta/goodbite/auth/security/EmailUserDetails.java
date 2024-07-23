@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @Getter
 @RequiredArgsConstructor
@@ -23,10 +24,12 @@ public class EmailUserDetails implements UserDetails {
         return user.getEmail();
     }
 
-    // principal - email
+    /**
+     * 사용하지 않는 메서드
+     */
     @Override
     public String getUsername() {
-        return user.getEmail();
+        throw new UsernameNotFoundException("사용되지 않는 메서드입니다.");
     }
 
     // credentials

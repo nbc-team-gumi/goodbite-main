@@ -13,7 +13,6 @@ import com.sparta.goodbite.exception.customer.detail.CustomerNotFoundException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateEmailException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateNicknameException;
 import com.sparta.goodbite.exception.customer.detail.DuplicatePhoneNumberException;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
+
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -99,7 +99,8 @@ public class CustomerService {
     }
 
     @Transactional
-    public void updatePassword(Long customerId, UpdatePasswordRequestDto requestDto /*,Customer customer*/) {
+    public void updatePassword(Long customerId,
+        UpdatePasswordRequestDto requestDto /*,Customer customer*/) {
         /*if (!passwordEncoder.matches(requestDto.getPassword(), customer.getPassword())) {
             throw new PasswordMismatchException("현재 비밀번호가 일치하지 않습니다.");
         }
@@ -121,7 +122,7 @@ public class CustomerService {
     }
 
     @Transactional
-    public void deleteCustomer(Long customerId){
+    public void deleteCustomer(Long customerId) {
         // 고객 엔티티 조회
         Customer customer = customerRepository.findById(customerId)
             .orElseThrow(() -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
@@ -132,8 +133,7 @@ public class CustomerService {
         }
 
         // 소프트 삭제를 위해 deletedAt 필드를 현재 시간으로 설정
-        customer.setDeletedAt(LocalDateTime.now());
-
+        customer.deactivate();
         customerRepository.save(customer);
     }
 

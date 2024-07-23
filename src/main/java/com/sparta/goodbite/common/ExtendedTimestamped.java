@@ -10,5 +10,9 @@ import lombok.Getter;
 public abstract class ExtendedTimestamped extends Timestamped {
 
     @Column(name = "delete_date")
-    protected LocalDateTime deletedAt;
+    private LocalDateTime deletedAt;
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
 }

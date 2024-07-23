@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 public class Customer extends ExtendedTimestamped implements UserCredentials {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
@@ -43,19 +44,19 @@ public class Customer extends ExtendedTimestamped implements UserCredentials {
 
     @Builder
     public Customer(String password, String email, String nickname, String phoneNumber) {
-        this.password=password;
-        this.email=email;
-        this.nickname=nickname;
+        this.password = password;
+        this.email = email;
+        this.nickname = nickname;
         this.phoneNumber = phoneNumber;
     }
 
     @Override
-    public String getEmail(){
+    public String getEmail() {
         return email;
     }
 
     @Override
-    public String getPassword(){
+    public String getPassword() {
         return password;
     }
 
@@ -72,7 +73,7 @@ public class Customer extends ExtendedTimestamped implements UserCredentials {
     }
 
     // 소프트 삭제를 위한 메서드 추가
-    public void setDeletedAt(LocalDateTime deletedAt) {
-        this.deletedAt = deletedAt;
+    public void deactivate() {
+        setDeletedAt(LocalDateTime.now());
     }
 }

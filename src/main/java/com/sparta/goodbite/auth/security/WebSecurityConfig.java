@@ -47,6 +47,12 @@ public class WebSecurityConfig {
         return filter;
     }
 
+    // JWT 인가 필터 Bean 등록
+    @Bean
+    public JwtAuthorizationFilter jwtAuthorizationFilter() {
+        return new JwtAuthorizationFilter(userDetailsService);
+    }
+
     // 시큐리티 필터 체인 설정 Bean 등록
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -73,8 +79,9 @@ public class WebSecurityConfig {
                 .authenticationEntryPoint(authenticationEntryPoint)) // 인증 실패 시 처리
 
             // 커스텀 필터 끼우기
-            // JWT 인증필터 -> UsernamePasswordAuthenticationFilter 순으로 설정
-            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            // JWT 인가필터 -> JWT 인증필터 -> UsernamePasswordAuthenticationFilter 순으로 설정
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
 
         return http.build();
     }

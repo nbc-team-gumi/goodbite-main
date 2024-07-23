@@ -69,7 +69,7 @@ public final class JwtUtil {
     public static boolean validateToken(String token) {
         try {
             // Jwts.parser() is deprecated
-            // Jwts.parserBuilder() 사용
+            // --> Jwts.parserBuilder() 사용 권장
             Jwts.parserBuilder().setSigningKey(JwtConfig.key).build().parseClaimsJws(token);
             log.info("토큰 검증 완료: {}", token);
             return true;
@@ -92,6 +92,14 @@ public final class JwtUtil {
         // getSubject() -> Subject: JWT의 식별자, email으로 세팅되어있음
         return Jwts.parserBuilder().setSigningKey(JwtConfig.key).build().parseClaimsJws(token)
             .getBody().getSubject();
+    }
+
+    // JWT에서 사용자 정보(Claims)에서 authority 가져오기
+    public static String getAuthorityFromToken(String token) {
+        // 토큰에서 사용자 정보 뽑는 방법
+        // getBody() -> Claims : 토큰에 여러 클레임(key-value) 존재
+        return Jwts.parserBuilder().setSigningKey(JwtConfig.key).build().parseClaimsJws(token)
+            .getBody().get(AUTHORIZATION_KEY, String.class);
     }
 
     // HttpServletRequest 에서 Cookie Value : JWT 가져오기

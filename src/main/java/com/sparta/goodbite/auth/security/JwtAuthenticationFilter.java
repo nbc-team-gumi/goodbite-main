@@ -85,8 +85,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String email = ((EmailUserDetails) authResult.getPrincipal()).getEmail();
         String role = ((EmailUserDetails) authResult.getPrincipal()).getRole();
 
-        String token = JwtUtil.createAccessToken(email, role);
-        JwtUtil.addJwtToCookie(token, response);
+        String accessToken = JwtUtil.createAccessToken(email, role);
+        String refreshToken = JwtUtil.createRefreshToken(email, role);
+
+        JwtUtil.addJwtToCookie(accessToken, response);
+        JwtUtil.addJwtToCookie(refreshToken, response);
 
         ResponseUtil.servletApi(response, HttpStatus.OK.value(), "로그인 성공");
     }

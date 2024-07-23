@@ -1,6 +1,7 @@
 package com.sparta.goodbite.domain.owner.entity;
 
 import com.sparta.goodbite.common.ExtendedTimestamped;
+import com.sparta.goodbite.common.UserCredentials;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor
-public class Owner extends ExtendedTimestamped {
+public class Owner extends ExtendedTimestamped implements UserCredentials {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
@@ -47,6 +48,7 @@ public class Owner extends ExtendedTimestamped {
     /*@OneToMany(mappedBy = "owner",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Waiting> waitingList;*/
 
+
     @Builder
     public Owner(String password, String email, String nickname, String phoneNumber, String businessNumber) {
         this.password=password;
@@ -57,5 +59,14 @@ public class Owner extends ExtendedTimestamped {
         this.ownerStatus = OwnerStatus.UNVERIFIED;
     }
 
+    @Override
+    public String getEmail(){
+        return email;
+    }
+
+    @Override
+    public String getPassword(){
+        return password;
+    }
 }
 

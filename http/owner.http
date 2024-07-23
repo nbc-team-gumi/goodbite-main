@@ -9,3 +9,6 @@ Content-Type: application/json
   "phoneNumber": "010-5556-0220",
   "businessNumber": "dsf446s1242342"
 }
+
+### 회원정보조회
+GET http://localhost:8080/owners/5

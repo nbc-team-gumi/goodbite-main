@@ -1,5 +1,6 @@
 package com.sparta.goodbite.domain.owner.service;
 
+import com.sparta.goodbite.domain.owner.dto.OwnerResponseDto;
 import com.sparta.goodbite.domain.owner.dto.OwnerSignUpRequestDto;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
@@ -8,6 +9,7 @@ import com.sparta.goodbite.exception.owner.detail.DuplicateBusinessNumberExcepti
 import com.sparta.goodbite.exception.owner.detail.DuplicateEmailException;
 import com.sparta.goodbite.exception.owner.detail.DuplicateNicknameException;
 import com.sparta.goodbite.exception.owner.detail.DuplicatePhoneNumberException;
+import com.sparta.goodbite.exception.owner.detail.OwnerNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -58,4 +60,12 @@ public class OwnerService {
 
         ownerRepository.save(owner);
     }
+
+    @Transactional(readOnly = true)
+    public OwnerResponseDto getOwner(Long ownerId) {
+        return OwnerResponseDto.from(ownerRepository.findById(ownerId).orElseThrow(()
+            -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND)));
+    }
+
+
 }

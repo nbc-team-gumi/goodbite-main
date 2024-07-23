@@ -7,6 +7,7 @@ import com.sparta.goodbite.domain.review.dto.CreateReviewRequestDto;
 import com.sparta.goodbite.domain.review.dto.ReviewResponseDto;
 import com.sparta.goodbite.domain.review.service.ReviewService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,5 +36,10 @@ public class ReviewController {
     public ResponseEntity<DataResponseDto<ReviewResponseDto>> getReview(
         @PathVariable Long reviewId) {
         return ResponseUtil.findOk(reviewService.getReview(reviewId));
+    }
+
+    @GetMapping
+    public ResponseEntity<DataResponseDto<List<ReviewResponseDto>>> getAllReviews() {
+        return ResponseUtil.findOk(reviewService.getAllReviews());
     }
 }

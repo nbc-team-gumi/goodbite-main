@@ -8,5 +8,5 @@ public interface CustomerRepository extends JpaRepository<Customer,Long> {
     Optional<Customer> findById(Long customerId);
     Optional<Customer> findByNickname(String nickname);
     Optional<Customer> findByEmail(String email);
-    Optional<Customer> findByTelNo(String telNo);
+    Optional<Customer> findByPhoneNumber(String phonenumber);
 }

@@ -26,7 +26,7 @@ Content-Type: application/json
 
 {
 
-  "newTelNo": "010-0000-0220"
+  "newPhonenumber": "010-0000-0220"
 
 }
 

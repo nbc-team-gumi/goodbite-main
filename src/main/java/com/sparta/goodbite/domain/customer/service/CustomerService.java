@@ -14,7 +14,6 @@ import com.sparta.goodbite.exception.customer.detail.DuplicateEmailException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateNicknameException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateTelnoException;
 import java.time.LocalDateTime;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,7 +35,7 @@ public class CustomerService {
     public void signUp(CustomerSignUpRequestDto requestDto) {
         String nickname = requestDto.getNickname();
         String email = requestDto.getEmail();
-        String telNo = requestDto.getTelNo();
+        String phoneNumber = requestDto.getPhoneNumber();
 
         // 닉네임 중복 검사
         customerRepository.findByNickname(nickname).ifPresent(u -> {
@@ -47,7 +46,7 @@ public class CustomerService {
             throw new DuplicateEmailException(CustomerErrorCode.DUPLICATE_EMAIL);
         });
         // 전화번호 중복 검사
-        customerRepository.findByTelNo(telNo).ifPresent(u -> {
+        customerRepository.findByPhoneNumber(phoneNumber).ifPresent(u -> {
             throw new DuplicateTelnoException(CustomerErrorCode.DUPLICATE_TELNO);
         });
 
@@ -59,7 +58,7 @@ public class CustomerService {
             .email(email)
             .nickname(nickname)
             .password(password)
-            .telNo(telNo)
+            .phoneNumber(phoneNumber)
             .build();
 
         customerRepository.save(customer);
@@ -83,11 +82,11 @@ public class CustomerService {
     }
 
     @Transactional
-    public void updateTelNo(Long customerId, UpdateTelNoRequestDto requestDto) {
-        String newNewTelNo = requestDto.getNewTelNo();
+    public void updatePhoneNumber(Long customerId, UpdateTelNoRequestDto requestDto) {
+        String newNewTelNo = requestDto.getNewPhonenumber();
 
         // 전화번호 중복 검사
-        customerRepository.findByTelNo(newNewTelNo).ifPresent(u -> {
+        customerRepository.findByPhoneNumber(newNewTelNo).ifPresent(u -> {
             throw new DuplicateTelnoException(CustomerErrorCode.DUPLICATE_TELNO);
         });
 
@@ -96,7 +95,7 @@ public class CustomerService {
             .orElseThrow(() -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
 
         // 전화번호 업데이트
-        customer.updateTelNo(newNewTelNo);
+        customer.updatePhoneNumber(newNewTelNo);
     }
 
     @Transactional

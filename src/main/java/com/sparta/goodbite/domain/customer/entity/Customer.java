@@ -6,11 +6,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,25 +35,25 @@ public class Customer extends ExtendedTimestamped {
     private String password;
 
     @Column(nullable = false, unique = true)
-    private String telNo;
+    private String phoneNumber;
 
     /*@OneToMany(mappedBy = "customer",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Waiting> waitingList;*/
 
     @Builder
-    public Customer(String password, String email, String nickname, String telNo) {
+    public Customer(String password, String email, String nickname, String phoneNumber) {
         this.password=password;
         this.email=email;
         this.nickname=nickname;
-        this.telNo= telNo;
+        this.phoneNumber = phoneNumber;
     }
 
     public void updateNickname(String newNickname) {
         this.nickname = newNickname;
     }
 
-    public void updateTelNo(String newNewTelNo) {
-        this.telNo = newNewTelNo;
+    public void updatePhoneNumber(String newPhoneNumber) {
+        this.phoneNumber = newPhoneNumber;
     }
 
     public void updatePassword(String newPassword) {

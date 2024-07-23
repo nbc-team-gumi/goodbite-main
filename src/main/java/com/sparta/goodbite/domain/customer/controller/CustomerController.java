@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -46,7 +47,7 @@ public class CustomerController {
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
 
-    @PutMapping("/{customerId}/nickname")
+    @PatchMapping("/{customerId}/nickname")
     public ResponseEntity<MessageResponseDto> updateNickname(@PathVariable Long customerId,@Valid @RequestBody
     UpdateNicknameRequestDto requestDto/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
     ){
@@ -61,7 +62,7 @@ public class CustomerController {
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
 
-    @PutMapping("/{customerId}/phone-number")
+    @PatchMapping("/{customerId}/phone-number")
     public ResponseEntity<MessageResponseDto> updatePhoneNumber(@PathVariable Long customerId,@Valid @RequestBody
     UpdatePhoneNumberRequestDto requestDto/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
     ){
@@ -76,7 +77,7 @@ public class CustomerController {
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
 
-    @PutMapping("/{customerId}/password")
+    @PatchMapping("/{customerId}/password")
     public ResponseEntity<MessageResponseDto> updatePassword(@PathVariable Long customerId,@Valid @RequestBody
     UpdatePasswordRequestDto requestDto/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
     ){

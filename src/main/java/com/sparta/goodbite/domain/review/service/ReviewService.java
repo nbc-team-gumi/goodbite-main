@@ -40,4 +40,10 @@ public class ReviewService {
         Review review = reviewRepository.findByIdOrThrow(reviewId);
         review.update(updateReviewRequestDto);
     }
+
+    @Transactional
+    public void deleteReview(Long reviewId) {
+        Review review = reviewRepository.findByIdOrThrow(reviewId);
+        reviewRepository.delete(review);
+    }
 }

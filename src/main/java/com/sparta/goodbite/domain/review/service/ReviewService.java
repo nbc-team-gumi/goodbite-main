@@ -5,6 +5,7 @@ import com.sparta.goodbite.domain.menu.repository.MenuRepository;
 import com.sparta.goodbite.domain.review.dto.CreateReviewRequestDto;
 import com.sparta.goodbite.domain.review.dto.ReviewResponseDto;
 import com.sparta.goodbite.domain.review.repository.ReviewRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,5 +26,10 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public ReviewResponseDto getReview(Long reviewId) {
         return ReviewResponseDto.from(reviewRepository.findByIdOrThrow(reviewId));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewResponseDto> getAllReviews() {
+        return reviewRepository.findAll().stream().map(ReviewResponseDto::from).toList();
     }
 }

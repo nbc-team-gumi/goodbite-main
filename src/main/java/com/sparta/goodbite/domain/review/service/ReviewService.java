@@ -4,6 +4,8 @@ import com.sparta.goodbite.domain.menu.entity.Menu;
 import com.sparta.goodbite.domain.menu.repository.MenuRepository;
 import com.sparta.goodbite.domain.review.dto.CreateReviewRequestDto;
 import com.sparta.goodbite.domain.review.dto.ReviewResponseDto;
+import com.sparta.goodbite.domain.review.dto.UpdateReviewRequestDto;
+import com.sparta.goodbite.domain.review.entity.Review;
 import com.sparta.goodbite.domain.review.repository.ReviewRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +33,11 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public List<ReviewResponseDto> getAllReviews() {
         return reviewRepository.findAll().stream().map(ReviewResponseDto::from).toList();
+    }
+
+    @Transactional
+    public void updateReview(Long reviewId, UpdateReviewRequestDto updateReviewRequestDto) {
+        Review review = reviewRepository.findByIdOrThrow(reviewId);
+        review.update(updateReviewRequestDto);
     }
 }

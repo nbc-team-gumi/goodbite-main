@@ -21,6 +21,8 @@ public class WebSecurityConfig {
     // Bean 객체 authenticationConfiguration 으로부터 인증매니저를 get 가능 : getAuthenticationManager()
     private final AuthenticationConfiguration authenticationConfiguration;
     private final EmailUserDetailsService userDetailsService;
+    private final GlobalAccessDeniedHandler accessDeniedHandler;
+    private final GlobalAuthenticationEntryPoint authenticationEntryPoint;
 
     // Manager Bean 등록
     @Bean
@@ -64,6 +66,11 @@ public class WebSecurityConfig {
 
             // 기본 폼 로그인을 비활성화, 중복 인증 방지
             .formLogin((formLogin) -> formLogin.disable())
+
+            // 예외 처리 핸들러
+            .exceptionHandling((exceptionHandling) -> exceptionHandling
+                .accessDeniedHandler(accessDeniedHandler) // 접근 거부(인가 실패) 시 처리
+                .authenticationEntryPoint(authenticationEntryPoint)) // 인증 실패 시 처리
 
             // 커스텀 필터 끼우기
             // JWT 인증필터 -> UsernamePasswordAuthenticationFilter 순으로 설정

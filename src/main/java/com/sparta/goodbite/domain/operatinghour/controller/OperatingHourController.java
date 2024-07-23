@@ -6,6 +6,7 @@ import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourRequestDto;
 import com.sparta.goodbite.domain.operatinghour.service.OperatingHourService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/operationHours")
+@RequestMapping("/operatingHours")
 @RequiredArgsConstructor
 public class OperatingHourController {
 
@@ -28,12 +29,20 @@ public class OperatingHourController {
         return ResponseUtil.createOk();
     }
 
-    @PutMapping("/{operationHourId}")
+    @PutMapping("/{operatingHourId}")
     public ResponseEntity<MessageResponseDto> updateOperatingHour(
-        @PathVariable Long operationHourId,
+        @PathVariable Long operatingHourId,
         @RequestBody OperatingHourRequestDto operatingHourRequestDto) {
 
-        operatingHourService.updateOperatingHour(operationHourId, operatingHourRequestDto);
+        operatingHourService.updateOperatingHour(operatingHourId, operatingHourRequestDto);
         return ResponseUtil.updateOk();
+    }
+
+    @DeleteMapping("/{operatingHourId}")
+    public ResponseEntity<MessageResponseDto> deleteOperatingHour(
+        @PathVariable Long operatingHourId) {
+
+        operatingHourService.deleteOperatingHour(operatingHourId);
+        return ResponseUtil.deleteOk();
     }
 }

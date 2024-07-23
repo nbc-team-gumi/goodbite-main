@@ -25,11 +25,17 @@ public class OperatingHourService {
     }
 
     @Transactional
-    public void updateOperatingHour(Long operationHourId,
+    public void updateOperatingHour(Long operatingHourId,
         OperatingHourRequestDto operatingHourRequestDto) {
 
-        OperatingHour operatingHour = operatingHourRepository.findByIdOrThrow(operationHourId);
+        OperatingHour operatingHour = operatingHourRepository.findByIdOrThrow(operatingHourId);
         operatingHour.update(operatingHourRequestDto);
+    }
 
+    @Transactional
+    public void deleteOperatingHour(Long operatingHourId) {
+
+        OperatingHour operatingHour = operatingHourRepository.findByIdOrThrow(operatingHourId);
+        operatingHourRepository.delete(operatingHour);
     }
 }

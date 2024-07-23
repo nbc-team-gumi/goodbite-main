@@ -1,8 +1,8 @@
 package com.sparta.goodbite.domain.waiting.entity;
 
 import com.sparta.goodbite.common.ExtendedTimestamped;
+import com.sparta.goodbite.domain.Customer.entity.Customer;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
-import com.sparta.goodbite.domain.user.entity.Customer;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -65,6 +65,10 @@ public class Waiting extends ExtendedTimestamped {
     public void update(Long partySize, String demand) {
         this.partySize = partySize;
         this.demand = demand;
+    }
+
+    public void reduceWaitingOrder() {
+        this.waitingOrder = --this.waitingOrder;
     }
 
 

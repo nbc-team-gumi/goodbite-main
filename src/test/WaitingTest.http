@@ -1,0 +1,43 @@
+### Waiting 손님이 등록
+POST http://localhost:8080/waitings
+Content-Type: application/json
+
+{
+  "restaurantId": 2,
+  "partySize": 2,
+  "waitingType": "OFFLINE",
+  "demand": "주세요"
+}
+
+### Waiting 단일 정보 조회
+GET http://localhost:8080/waitings/28
+
+
+
+### Waiting 가게에서 정보 수정
+PATCH http://localhost:8080/waitings/27
+Content-Type: application/json
+
+{
+  "partySize": 4,
+  "demand": "제일 가운데 자리로 수정해주세요"
+}
+
+### Waiting 삭제
+DELETE http://localhost:8080/waitings/28
+
+
+### Waiting 사장이 수락하고 가게 전체 Waiting 순서 하나씩 줄어들게 하는거
+PUT http://localhost:8080/restaurants/waitings/1
+
+
+### Waiting 사장이 하나만 수락하고 그 뒤 가게 Waiting 순서 하나씩 줄어들게 하는거
+PUT http://localhost:8080/waitings/32
+
+
+### 가게 웨이팅 리스트 페이지네이션 해서 보기
+GET http://localhost:8080/waitings/2/waitingList?page=0&size=5
+Content-Type: application/json
+
+{
+}

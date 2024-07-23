@@ -83,10 +83,10 @@ public class CustomerService {
 
     @Transactional
     public void updatePhoneNumber(Long customerId, UpdatePhoneNumberRequestDto requestDto) {
-        String newNewTelNo = requestDto.getNewPhonenumber();
+        String newPhoneNumber = requestDto.getNewPhoneNumber();
 
         // 전화번호 중복 검사
-        customerRepository.findByPhoneNumber(newNewTelNo).ifPresent(u -> {
+        customerRepository.findByPhoneNumber(newPhoneNumber).ifPresent(u -> {
             throw new DuplicatePhoneNumberException(CustomerErrorCode.DUPLICATE_PHONE_NUMBER);
         });
 
@@ -95,7 +95,7 @@ public class CustomerService {
             .orElseThrow(() -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
 
         // 전화번호 업데이트
-        customer.updatePhoneNumber(newNewTelNo);
+        customer.updatePhoneNumber(newPhoneNumber);
     }
 
     @Transactional

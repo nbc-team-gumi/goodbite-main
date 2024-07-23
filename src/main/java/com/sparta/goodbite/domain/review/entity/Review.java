@@ -2,6 +2,7 @@ package com.sparta.goodbite.domain.review.entity;
 
 import com.sparta.goodbite.common.Timestamped;
 import com.sparta.goodbite.domain.menu.entity.Menu;
+import com.sparta.goodbite.domain.review.dto.UpdateReviewRequestDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -41,5 +42,14 @@ public class Review extends Timestamped {
         this.rating = rating;
         this.content = content;
         this.menu = menu;
+    }
+
+    public void update(UpdateReviewRequestDto updateReviewRequestDto) {
+        this.rating =
+            updateReviewRequestDto.getRating() != null ? updateReviewRequestDto.getRating()
+                : this.rating;
+        this.content =
+            updateReviewRequestDto.getContent() != null ? updateReviewRequestDto.getContent()
+                : this.content;
     }
 }

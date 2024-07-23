@@ -12,6 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 
 @Configuration
 @RequiredArgsConstructor
@@ -53,6 +55,15 @@ public class WebSecurityConfig {
         return new JwtAuthorizationFilter(userDetailsService);
     }
 
+    // 로그아웃 핸들러 Bean 등록
+    @Bean
+    public LogoutSuccessHandler logoutSuccessHandler() {
+        SimpleUrlLogoutSuccessHandler handler = new SimpleUrlLogoutSuccessHandler();
+        // 로그아웃 성공시 로그인 페이지로 리디렉션
+        handler.setDefaultTargetUrl("/users/login?logout");
+        return handler;
+    }
+
     // 시큐리티 필터 체인 설정 Bean 등록
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -72,6 +83,12 @@ public class WebSecurityConfig {
 
             // 기본 폼 로그인을 비활성화, 중복 인증 방지
             .formLogin((formLogin) -> formLogin.disable())
+
+            // 로그아웃 설정
+            .logout(logout -> logout
+                .logoutUrl("/users/logout")
+                .logoutSuccessHandler(logoutSuccessHandler())
+                .deleteCookies("Authorization"))
 
             // 예외 처리 핸들러
             .exceptionHandling((exceptionHandling) -> exceptionHandling

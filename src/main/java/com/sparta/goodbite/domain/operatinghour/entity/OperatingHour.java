@@ -1,6 +1,7 @@
 package com.sparta.goodbite.domain.operatinghour.entity;
 
 import com.sparta.goodbite.common.Timestamped;
+import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourRequestDto;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,5 +36,11 @@ public class OperatingHour extends Timestamped {
         this.dayOfWeek = dayOfWeek;
         this.openTime = openTime;
         this.closeTime = closeTime;
+    }
+
+    public void update(OperatingHourRequestDto operatingHourRequestDto) {
+        this.dayOfWeek = operatingHourRequestDto.getDayOfWeek();
+        this.openTime = operatingHourRequestDto.getOpenTime();
+        this.closeTime = operatingHourRequestDto.getCloseTime();
     }
 }

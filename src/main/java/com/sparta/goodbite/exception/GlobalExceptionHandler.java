@@ -3,6 +3,7 @@ package com.sparta.goodbite.exception;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
 import com.sparta.goodbite.exception.menu.MenuException;
+import com.sparta.goodbite.exception.operatinghour.OperatingHourException;
 import com.sparta.goodbite.exception.restaurant.RestaurantException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -23,5 +24,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<MessageResponseDto> handleRestaurantException(RestaurantException e) {
         log.error("에러 발생: ", e);
         return ResponseUtil.of(e.getRestaurantErrorCode().getHttpStatus(), e.getMessage());
+    }
+
+    @ExceptionHandler(OperatingHourException.class)
+    public ResponseEntity<MessageResponseDto> handleOperatingHourException(
+        OperatingHourException e) {
+        log.error("에러 발생: ", e);
+        return ResponseUtil.of(e.getOperatingHourErrorCode().getHttpStatus(), e.getMessage());
     }
 }

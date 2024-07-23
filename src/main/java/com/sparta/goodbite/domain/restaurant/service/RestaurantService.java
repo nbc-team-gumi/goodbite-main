@@ -33,11 +33,9 @@ public class RestaurantService {
 
         List<Restaurant> restaurants = restaurantRepository.findAll();
 
-        List<RestaurantResponseDto> restaurantResponseDtos = restaurants.stream()
+        return restaurants.stream()
             .map(RestaurantResponseDto::from)
             .toList();
-
-        return restaurantResponseDtos;
     }
 
     @Transactional

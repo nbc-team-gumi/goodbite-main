@@ -7,7 +7,7 @@ import com.sparta.goodbite.domain.customer.dto.CustomerResponseDto;
 import com.sparta.goodbite.domain.customer.dto.CustomerSignUpRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdateNicknameRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePasswordRequestDto;
-import com.sparta.goodbite.domain.customer.dto.UpdateTelNoRequestDto;
+import com.sparta.goodbite.domain.customer.dto.UpdatePhoneNumberRequestDto;
 import com.sparta.goodbite.domain.customer.service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +63,7 @@ public class CustomerController {
 
     @PutMapping("/{customerId}/phone-number")
     public ResponseEntity<MessageResponseDto> updatePhoneNumber(@PathVariable Long customerId,@Valid @RequestBody
-    UpdateTelNoRequestDto requestDto/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
+    UpdatePhoneNumberRequestDto requestDto/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
     ){
         customerService.updatePhoneNumber(customerId,requestDto);
         return ResponseUtil.updateOk();

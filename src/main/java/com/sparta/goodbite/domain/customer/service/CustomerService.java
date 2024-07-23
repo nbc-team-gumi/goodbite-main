@@ -4,7 +4,7 @@ import com.sparta.goodbite.domain.customer.dto.CustomerResponseDto;
 import com.sparta.goodbite.domain.customer.dto.CustomerSignUpRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdateNicknameRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePasswordRequestDto;
-import com.sparta.goodbite.domain.customer.dto.UpdateTelNoRequestDto;
+import com.sparta.goodbite.domain.customer.dto.UpdatePhoneNumberRequestDto;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
 import com.sparta.goodbite.exception.customer.CustomerErrorCode;
@@ -12,7 +12,7 @@ import com.sparta.goodbite.exception.customer.detail.CustomerAlreadyDeletedExcep
 import com.sparta.goodbite.exception.customer.detail.CustomerNotFoundException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateEmailException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateNicknameException;
-import com.sparta.goodbite.exception.customer.detail.DuplicateTelnoException;
+import com.sparta.goodbite.exception.customer.detail.DuplicatePhoneNumberException;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,7 +47,7 @@ public class CustomerService {
         });
         // 전화번호 중복 검사
         customerRepository.findByPhoneNumber(phoneNumber).ifPresent(u -> {
-            throw new DuplicateTelnoException(CustomerErrorCode.DUPLICATE_TELNO);
+            throw new DuplicatePhoneNumberException(CustomerErrorCode.DUPLICATE_PHONE_NUMBER);
         });
 
         // 비밀번호 암호화 -> 인증인가연결시 config에서 PasswordEncoder Bean등록
@@ -82,12 +82,12 @@ public class CustomerService {
     }
 
     @Transactional
-    public void updatePhoneNumber(Long customerId, UpdateTelNoRequestDto requestDto) {
+    public void updatePhoneNumber(Long customerId, UpdatePhoneNumberRequestDto requestDto) {
         String newNewTelNo = requestDto.getNewPhonenumber();
 
         // 전화번호 중복 검사
         customerRepository.findByPhoneNumber(newNewTelNo).ifPresent(u -> {
-            throw new DuplicateTelnoException(CustomerErrorCode.DUPLICATE_TELNO);
+            throw new DuplicatePhoneNumberException(CustomerErrorCode.DUPLICATE_PHONE_NUMBER);
         });
 
         // Customer 조회

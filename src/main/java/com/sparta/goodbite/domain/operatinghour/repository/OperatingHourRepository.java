@@ -3,6 +3,7 @@ package com.sparta.goodbite.domain.operatinghour.repository;
 import com.sparta.goodbite.domain.operatinghour.entity.OperatingHour;
 import com.sparta.goodbite.exception.operatinghour.OperatingHourErrorCode;
 import com.sparta.goodbite.exception.operatinghour.detail.OperatingHourNotFoundException;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OperatingHourRepository extends JpaRepository<OperatingHour, Long> {
@@ -11,4 +12,6 @@ public interface OperatingHourRepository extends JpaRepository<OperatingHour, Lo
         return findById(operatingHourId).orElseThrow(() -> new OperatingHourNotFoundException(
             OperatingHourErrorCode.OPERATINGHOUR_NOT_FOUND));
     }
+
+    List<OperatingHour> findAllByRestaurantId(Long restaurantId);
 }

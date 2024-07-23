@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,7 +38,7 @@ public class ReviewController {
     @GetMapping("/{reviewId}")
     public ResponseEntity<DataResponseDto<ReviewResponseDto>> getReview(
         @PathVariable Long reviewId) {
-        
+
         return ResponseUtil.findOk(reviewService.getReview(reviewId));
     }
 
@@ -52,5 +53,11 @@ public class ReviewController {
 
         reviewService.updateReview(reviewId, updateReviewRequestDto);
         return ResponseUtil.updateOk();
+    }
+
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<MessageResponseDto> deleteReview(@PathVariable Long reviewId) {
+        reviewService.deleteReview(reviewId);
+        return ResponseUtil.deleteOk();
     }
 }

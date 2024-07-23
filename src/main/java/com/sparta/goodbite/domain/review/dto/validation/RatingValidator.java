@@ -11,6 +11,9 @@ public class RatingValidator implements ConstraintValidator<RatingConstraint, Fl
 
     @Override
     public boolean isValid(Float rating, ConstraintValidatorContext context) {
-        return rating != null && 0.0 <= rating && rating <= 5.0 && rating * 10 % 5 == 0;
+        if (rating == null) {
+            return true;
+        }
+        return 0.0 <= rating && rating <= 5.0 && rating * 10 % 5 == 0;
     }
 }

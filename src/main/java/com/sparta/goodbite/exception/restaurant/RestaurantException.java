@@ -1,4 +1,4 @@
-package com.sparta.goodbite.exception.restaurant.detail;
+package com.sparta.goodbite.exception.restaurant;
 
 import lombok.Getter;
 

@@ -4,8 +4,8 @@ import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
-import com.sparta.goodbite.exception.restaurant.detail.RestaurantErrorCode;
-import com.sparta.goodbite.exception.restaurant.detail.RestaurantException;
+import com.sparta.goodbite.exception.restaurant.RestaurantErrorCode;
+import com.sparta.goodbite.exception.restaurant.detail.RestaurantNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -59,8 +59,8 @@ public class RestaurantService {
 
     private Restaurant findRestaurant(Long restaurantId) {
         return restaurantRepository.findById(restaurantId)
-            .orElseThrow(() -> new RestaurantException(
-                RestaurantErrorCode.RESTUARNAT_NOT_FOUND));
+            .orElseThrow(() -> new RestaurantNotFoundException(
+                RestaurantErrorCode.RESTAURANT_NOT_FOUND));
     }
 
 

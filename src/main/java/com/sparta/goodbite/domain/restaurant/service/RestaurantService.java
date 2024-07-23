@@ -4,10 +4,7 @@ import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
-import com.sparta.goodbite.exception.restaurant.RestaurantErrorCode;
-import com.sparta.goodbite.exception.restaurant.detail.RestaurantNotFoundException;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,21 +21,21 @@ public class RestaurantService {
         restaurantRepository.save(restaurantRequestDto.toEntity());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public RestaurantResponseDto getRestaurant(Long restaurantId) {
 
-        Restaurant restaurant = findRestaurant(restaurantId);
-        return new RestaurantResponseDto(restaurant);
+        Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
+        return RestaurantResponseDto.from(restaurant);
     }
 
-    @Transactional
-    public List<RestaurantResponseDto> getRestaurants() {
+    @Transactional(readOnly = true)
+    public List<RestaurantResponseDto> getAllRestaurants() {
 
         List<Restaurant> restaurants = restaurantRepository.findAll();
 
         List<RestaurantResponseDto> restaurantResponseDtos = restaurants.stream()
-            .map(RestaurantResponseDto::new)
-            .collect(Collectors.toList());
+            .map(RestaurantResponseDto::from)
+            .toList();
 
         return restaurantResponseDtos;
     }
@@ -46,22 +43,14 @@ public class RestaurantService {
     @Transactional
     public void updateRestaurant(Long restaurantId, RestaurantRequestDto restaurantRequestDto) {
 
-        Restaurant restaurant = findRestaurant(restaurantId);
+        Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
         restaurant.update(restaurantRequestDto);
     }
 
     @Transactional
     public void deleteRestaurant(Long restaurantId) {
 
-        Restaurant restaurant = findRestaurant(restaurantId);
+        Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
         restaurantRepository.delete(restaurant);
     }
-
-    private Restaurant findRestaurant(Long restaurantId) {
-        return restaurantRepository.findById(restaurantId)
-            .orElseThrow(() -> new RestaurantNotFoundException(
-                RestaurantErrorCode.RESTAURANT_NOT_FOUND));
-    }
-
-
 }

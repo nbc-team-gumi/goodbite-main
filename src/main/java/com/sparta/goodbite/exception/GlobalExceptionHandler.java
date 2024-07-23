@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(RestaurantException.class)
-    public ResponseEntity<MessageResponseDto> handleMenuException(RestaurantException e) {
+    public ResponseEntity<MessageResponseDto> handleRestaurantException(RestaurantException e) {
         log.error("에러 발생: ", e);
         return ResponseUtil.of(e.getRestaurantErrorCode().getHttpStatus(), e.getMessage());
     }

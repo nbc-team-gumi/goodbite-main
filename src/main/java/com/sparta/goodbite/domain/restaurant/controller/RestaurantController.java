@@ -38,15 +38,13 @@ public class RestaurantController {
     public ResponseEntity<DataResponseDto<RestaurantResponseDto>> getRestaurant(
         @PathVariable Long restaurantId) {
 
-        RestaurantResponseDto restaurantResponseDto = restaurantService.getRestaurant(restaurantId);
-        return ResponseUtil.findOk(restaurantResponseDto);
+        return ResponseUtil.findOk(restaurantService.getRestaurant(restaurantId));
     }
 
     @GetMapping
-    public ResponseEntity<DataResponseDto<List<RestaurantResponseDto>>> getRestaurants() {
+    public ResponseEntity<DataResponseDto<List<RestaurantResponseDto>>> getAllRestaurants() {
 
-        List<RestaurantResponseDto> restaurantResponseDtos = restaurantService.getRestaurants();
-        return ResponseUtil.findOk(restaurantResponseDtos);
+        return ResponseUtil.findOk(restaurantService.getAllRestaurants());
     }
 
     @PutMapping("/{restaurantId}")

@@ -20,30 +20,30 @@ public class Restaurant extends Timestamped {
     private Long id;
     private Long ownerId;
     private String name;
-    private String picture;
+    private String imageUrl;
     private String address;
     private String area;
-    private String telno;
+    private String phoneNumber;
     private String category;
 
     @Builder
-    public Restaurant(Long ownerId, String name, String picture, String address, String area,
-        String telno, String category) {
+    public Restaurant(Long ownerId, String name, String imageUrl, String address, String area,
+        String phoneNumber, String category) {
         this.ownerId = ownerId;
         this.name = name;
-        this.picture = picture;
+        this.imageUrl = imageUrl;
         this.address = address;
         this.area = area;
-        this.telno = telno;
+        this.phoneNumber = phoneNumber;
         this.category = category;
     }
 
     public void update(RestaurantRequestDto restaurantRequestDto) {
         this.name = restaurantRequestDto.getName();
-        this.picture = restaurantRequestDto.getPicture();
+        this.imageUrl = restaurantRequestDto.getImageUrl();
         this.address = restaurantRequestDto.getAddress();
         this.area = restaurantRequestDto.getArea();
-        this.telno = restaurantRequestDto.getTelno();
+        this.phoneNumber = restaurantRequestDto.getPhoneNumber();
         this.category = restaurantRequestDto.getCategory();
     }
 }

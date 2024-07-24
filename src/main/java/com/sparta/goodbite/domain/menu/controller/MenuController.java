@@ -28,10 +28,9 @@ public class MenuController {
 
     @PostMapping
     public ResponseEntity<MessageResponseDto> createMenu(
-        @RequestBody @Valid CreateMenuRequestDto createMenuRequestDto) { // @AuthenticationPricipal UserDetailsImpl userDetails
+        @Valid @RequestBody CreateMenuRequestDto createMenuRequestDto) {
 
-        menuService.createMenu(
-            createMenuRequestDto); // menuService.createMenu(createMenuRequestDto, user);
+        menuService.createMenu(createMenuRequestDto);
         return ResponseUtil.createOk();
     }
 
@@ -48,7 +47,7 @@ public class MenuController {
         return ResponseUtil.updateOk();
     }
 
-    @DeleteMapping("{menuId}")
+    @DeleteMapping("/{menuId}")
     public ResponseEntity<MessageResponseDto> deleteMenu(@PathVariable Long menuId) {
         menuService.deleteMenu(menuId);
         return ResponseUtil.deleteOk();

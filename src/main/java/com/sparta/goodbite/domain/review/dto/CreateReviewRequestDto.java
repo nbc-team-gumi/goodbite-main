@@ -14,12 +14,16 @@ public class CreateReviewRequestDto {
 
     @NotNull(message = "평점을 입력해 주세요.")
     @RatingConstraint
-    private Float rating;
+    private float rating;
 
     @NotNull(message = "리뷰 내용을 입력해 주세요.")
     private String content;
 
     public Review toEntity(Menu menu) {
-        return Review.builder().rating(rating).content(content).menu(menu).build();
+        return Review.builder()
+            .rating(rating)
+            .content(content)
+            .menu(menu)
+            .build();
     }
 }

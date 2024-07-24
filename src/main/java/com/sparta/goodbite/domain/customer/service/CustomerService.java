@@ -38,15 +38,15 @@ public class CustomerService {
         String phoneNumber = requestDto.getPhoneNumber();
 
         // 닉네임 중복 검사
-        customerRepository.findByNickname(nickname).ifPresent(u -> {
+        customerRepository.findByNickname(nickname).ifPresent(unused -> {
             throw new DuplicateNicknameException(CustomerErrorCode.DUPLICATE_NICKNAME);
         });
         // 이메일 중복 검사
-        customerRepository.findByEmail(email).ifPresent(u -> {
+        customerRepository.findByEmail(email).ifPresent(unused -> {
             throw new DuplicateEmailException(CustomerErrorCode.DUPLICATE_EMAIL);
         });
         // 전화번호 중복 검사
-        customerRepository.findByPhoneNumber(phoneNumber).ifPresent(u -> {
+        customerRepository.findByPhoneNumber(phoneNumber).ifPresent(unused -> {
             throw new DuplicatePhoneNumberException(CustomerErrorCode.DUPLICATE_PHONE_NUMBER);
         });
 
@@ -69,7 +69,7 @@ public class CustomerService {
         String newNickname = requestDto.getNewNickname();
 
         // 닉네임 중복 검사
-        customerRepository.findByNickname(newNickname).ifPresent(u -> {
+        customerRepository.findByNickname(newNickname).ifPresent(unused -> {
             throw new DuplicateNicknameException(CustomerErrorCode.DUPLICATE_NICKNAME);
         });
 
@@ -86,7 +86,7 @@ public class CustomerService {
         String newPhoneNumber = requestDto.getNewPhoneNumber();
 
         // 전화번호 중복 검사
-        customerRepository.findByPhoneNumber(newPhoneNumber).ifPresent(u -> {
+        customerRepository.findByPhoneNumber(newPhoneNumber).ifPresent(unused -> {
             throw new DuplicatePhoneNumberException(CustomerErrorCode.DUPLICATE_PHONE_NUMBER);
         });
 
@@ -117,8 +117,6 @@ public class CustomerService {
         // 비밀번호 업데이트
         customer.updatePassword(newPassword);
 
-        // 변경된 비밀번호 저장
-        customerRepository.save(customer);
     }
 
     @Transactional
@@ -131,10 +129,9 @@ public class CustomerService {
         if (customer.getDeletedAt() != null) {
             throw new CustomerAlreadyDeletedException(CustomerErrorCode.CUSTOMER_ALREADY_DELETED);
         }
-        
+
         // 소프트 삭제를 위해 deletedAt 필드를 현재 시간으로 설정
         customer.deactivate();
-        customerRepository.save(customer);
     }
 
 }

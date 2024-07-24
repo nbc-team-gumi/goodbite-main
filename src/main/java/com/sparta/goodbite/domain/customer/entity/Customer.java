@@ -22,11 +22,11 @@ public class Customer extends ExtendedTimestamped implements UserCredentials {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, unique = true)
+    @Column
     private Long id;
 
     @Column(nullable = false, unique = true)
-    @Email(message = "이메일 형식이 올바르지 않습니다.")
+    @Email
     private String email;
 
     @Column(nullable = false, unique = true)

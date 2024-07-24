@@ -81,7 +81,7 @@ public class OwnerService {
             .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
 
         // 사업자번호 중복 검사
-        ownerRepository.findByBusinessNumber(newBusinessNumber).ifPresent(u -> {
+        ownerRepository.findByBusinessNumber(newBusinessNumber).ifPresent(unused -> {
             throw new DuplicateBusinessNumberException(OwnerErrorCode.DUPLICATE_BUSINESS_NUMBER);
         });
 
@@ -108,8 +108,6 @@ public class OwnerService {
         // 비밀번호 업데이트
         owner.updatePassword(newPassword);
 
-        // 변경된 비밀번호 저장
-        ownerRepository.save(owner);
     }
 
     @Transactional
@@ -121,7 +119,7 @@ public class OwnerService {
             .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
 
         // 전화번호 중복 검사
-        ownerRepository.findByPhoneNumber(newPhoneNumber).ifPresent(u -> {
+        ownerRepository.findByPhoneNumber(newPhoneNumber).ifPresent(unused -> {
             throw new DuplicatePhoneNumberException(OwnerErrorCode.DUPLICATE_PHONE_NUMBER);
         });
 
@@ -138,7 +136,7 @@ public class OwnerService {
             .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
 
         // 닉네임 중복 검사
-        ownerRepository.findByNickname(newNickname).ifPresent(u -> {
+        ownerRepository.findByNickname(newNickname).ifPresent(unused -> {
             throw new DuplicateNicknameException(OwnerErrorCode.DUPLICATE_NICKNAME);
         });
 
@@ -158,7 +156,6 @@ public class OwnerService {
 
         // 소프트 삭제를 위해 deletedAt 필드를 현재 시간으로 설정
         owner.deactivate();
-        ownerRepository.save(owner);
 
     }
 }

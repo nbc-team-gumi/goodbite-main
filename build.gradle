@@ -51,6 +51,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // SSE 통신을 위한 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-web-services'
+
 }
 
 tasks.named('test') {

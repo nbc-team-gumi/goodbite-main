@@ -2,6 +2,10 @@ package com.sparta.goodbite.domain.owner.service;
 
 import com.sparta.goodbite.domain.owner.dto.OwnerResponseDto;
 import com.sparta.goodbite.domain.owner.dto.OwnerSignUpRequestDto;
+import com.sparta.goodbite.domain.owner.dto.UpdateBusinessNumberRequestDto;
+import com.sparta.goodbite.domain.owner.dto.UpdateOwnerNicknameRequestDto;
+import com.sparta.goodbite.domain.owner.dto.UpdateOwnerPasswordRequestDto;
+import com.sparta.goodbite.domain.owner.dto.UpdateOwnerPhoneNumberRequestDto;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.exception.owner.OwnerErrorCode;
@@ -67,5 +71,76 @@ public class OwnerService {
             -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND)));
     }
 
+    @Transactional
+    public void updateBusinessNumber(Long ownerId, UpdateBusinessNumberRequestDto requestDto) {
+        String newBusinessNumber = requestDto.getNewBusinessNumber();
 
+        // Owner 조회
+        Owner owner = ownerRepository.findById(ownerId)
+            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
+
+        // 사업자번호 중복 검사
+        ownerRepository.findByBusinessNumber(newBusinessNumber).ifPresent(u -> {
+            throw new DuplicateBusinessNumberException(OwnerErrorCode.DUPLICATE_BUSINESS_NUMBER);
+        });
+
+        // 사업자번호 업데이트
+        owner.updateBusinessNumber(newBusinessNumber);
+    }
+
+    @Transactional
+    public void updatePassword(Long ownerId,
+        UpdateOwnerPasswordRequestDto requestDto /*,Owner owner*/) {
+        /*if (!passwordEncoder.matches(requestDto.getPassword(), owner.getPassword())) {
+            throw new PasswordMismatchException("현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        if (passwordEncoder.matches(requestDto.getNewPassword(), owner.getPassword())) {
+            throw new PasswordMismatchException("새로운 비밀번호와 기존 비밀번호가 동일합니다.");
+        }*/
+        String newPassword = passwordEncoder.encode(requestDto.getNewPassword());
+
+        // Owner 조회
+        Owner owner = ownerRepository.findById(ownerId)
+            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
+
+        // 비밀번호 업데이트
+        owner.updatePassword(newPassword);
+
+        // 변경된 비밀번호 저장
+        ownerRepository.save(owner);
+    }
+
+    @Transactional
+    public void updatePhoneNumber(Long ownerId, UpdateOwnerPhoneNumberRequestDto requestDto) {
+        String newPhoneNumber = requestDto.getNewPhoneNumber();
+
+        // Owner 조회
+        Owner owner = ownerRepository.findById(ownerId)
+            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
+
+        // 전화번호 중복 검사
+        ownerRepository.findByPhoneNumber(newPhoneNumber).ifPresent(u -> {
+            throw new DuplicatePhoneNumberException(OwnerErrorCode.DUPLICATE_PHONE_NUMBER);
+        });
+
+        // 전화번호 업데이트
+        owner.updatePhoneNumber(newPhoneNumber);
+    }
+
+    @Transactional
+    public void updateNickname(Long ownerId, UpdateOwnerNicknameRequestDto requestDto) {
+        String newNickname = requestDto.getNewNickname();
+
+        // Owner 조회
+        Owner owner = ownerRepository.findById(ownerId)
+            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
+
+        // 닉네임 중복 검사
+        ownerRepository.findByNickname(newNickname).ifPresent(u -> {
+            throw new DuplicateNicknameException(OwnerErrorCode.DUPLICATE_NICKNAME);
+        });
+
+        owner.updateNickname(newNickname);
+    }
 }

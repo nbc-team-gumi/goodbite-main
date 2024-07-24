@@ -12,3 +12,36 @@ Content-Type: application/json
 
 ### 회원정보조회
 GET http://localhost:8080/owners/5
+
+### 회원정보수정-닉네임
+PATCH http://localhost:8080/owners/1/nickname
+Content-Type: application/json
+
+{
+  "newNickname": "하22덜3"
+}
+
+### 회원정보수정-전화번호
+PATCH http://localhost:8080/owners/1/phone-number
+Content-Type: application/json
+
+{
+  "newPhoneNumber": "010-0000-0220"
+}
+
+### 회원정보수정-비밀번호
+PATCH http://localhost:8080/owners/1/password
+Content-Type: application/json
+
+{
+  "password": "password123!@2@",
+  "newPassword": "password123!@@"
+}
+
+### 회원정보수정-사업자번호
+PATCH http://localhost:8080/owners/1/business-number
+Content-Type: application/json
+
+{
+  "newBusinessNumber": "sdfgsdfgsdgg1234"
+}

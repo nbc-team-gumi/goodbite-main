@@ -70,5 +70,21 @@ public class Owner extends ExtendedTimestamped implements UserCredentials {
     public String getPassword() {
         return password;
     }
+
+    public void updateNickname(String newNickname) {
+        this.nickname = newNickname;
+    }
+
+    public void updatePhoneNumber(String newPhoneNumber) {
+        this.phoneNumber = newPhoneNumber;
+    }
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
+
+    public void updateBusinessNumber(String newBusinessNumber) {
+        this.businessNumber = newBusinessNumber;
+    }
 }
 

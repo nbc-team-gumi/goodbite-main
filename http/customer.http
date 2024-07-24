@@ -1,6 +1,8 @@
+@baseUrl = http://localhost:8080/customers
+@customerId=1
 
 ### 회원가입
-POST http://localhost:8080/customers/signup
+POST {{baseUrl}}/signup
 Content-Type: application/json
 
 {
@@ -11,7 +13,7 @@ Content-Type: application/json
 }
 
 ### 회원정보수정-닉네임
-PATCH http://localhost:8080/customers/1/nickname
+PATCH {{baseUrl}}/{{customerId}}/nickname
 Content-Type: application/json
 
 {
@@ -19,7 +21,7 @@ Content-Type: application/json
 }
 
 ### 회원정보수정-전화번호
-PATCH http://localhost:8080/customers/1/phone-number
+PATCH {{baseUrl}}/{{customerId}}/phone-number
 Content-Type: application/json
 
 {
@@ -27,7 +29,7 @@ Content-Type: application/json
 }
 
 ### 회원정보수정-비밀번호
-PATCH http://localhost:8080/customers/1/password
+PATCH {{baseUrl}}/{{customerId}}/password
 Content-Type: application/json
 
 {
@@ -36,8 +38,8 @@ Content-Type: application/json
 }
 
 ### 회원정보조회
-GET http://localhost:8080/customers/1
+GET {{baseUrl}}/{{customerId}}
 
 ### 회원탈퇴
-DELETE http://localhost:8080/customers/3
+DELETE {{baseUrl}}/{{customerId}}
 

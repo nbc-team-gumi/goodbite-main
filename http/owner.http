@@ -1,5 +1,7 @@
+@baseUrl="http://localhost:8080/owners"
+@ownerId=1
 ### 회원가입
-POST http://localhost:8080/owners/signup
+POST {{baseUrl}}/signup
 Content-Type: application/json
 
 {
@@ -11,10 +13,10 @@ Content-Type: application/json
 }
 
 ### 회원정보조회
-GET http://localhost:8080/owners/5
+GET {{baseUrl}}/{{ownerId}}
 
 ### 회원정보수정-닉네임
-PATCH http://localhost:8080/owners/1/nickname
+PATCH {{baseUrl}}/{{ownerId}}/nickname
 Content-Type: application/json
 
 {
@@ -22,7 +24,7 @@ Content-Type: application/json
 }
 
 ### 회원정보수정-전화번호
-PATCH http://localhost:8080/owners/1/phone-number
+PATCH {{baseUrl}}/{{ownerId}}/phone-number
 Content-Type: application/json
 
 {
@@ -30,7 +32,7 @@ Content-Type: application/json
 }
 
 ### 회원정보수정-비밀번호
-PATCH http://localhost:8080/owners/1/password
+PATCH {{baseUrl}}/{{ownerId}}/password
 Content-Type: application/json
 
 {
@@ -39,7 +41,7 @@ Content-Type: application/json
 }
 
 ### 회원정보수정-사업자번호
-PATCH http://localhost:8080/owners/1/business-number
+PATCH {{baseUrl}}/{{ownerId}}/business-number
 Content-Type: application/json
 
 {
@@ -47,4 +49,4 @@ Content-Type: application/json
 }
 
 ### 회원탈퇴
-DELETE http://localhost:8080/owners/1
+DELETE {{baseUrl}}/{{ownerId}}

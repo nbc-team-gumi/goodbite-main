@@ -1,7 +1,6 @@
 package com.sparta.goodbite.domain.operatinghour.service;
 
 import com.sparta.goodbite.domain.operatinghour.dto.CreateOperatingHourRequestDto;
-import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
 import com.sparta.goodbite.domain.operatinghour.dto.UpdateOperatingHourRequestDto;
 import com.sparta.goodbite.domain.operatinghour.entity.OperatingHour;
 import com.sparta.goodbite.domain.operatinghour.repository.OperatingHourRepository;
@@ -9,7 +8,6 @@ import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.exception.operatinghour.OperatingHourErrorCode;
 import com.sparta.goodbite.exception.operatinghour.detail.OperatingHourDuplicatedException;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,17 +48,5 @@ public class OperatingHourService {
 
         OperatingHour operatingHour = operatingHourRepository.findByIdOrThrow(operatingHourId);
         operatingHourRepository.delete(operatingHour);
-    }
-
-    @Transactional(readOnly = true)
-    public List<OperatingHourResponseDto> getAllOperatingHoursByRestaurant(Long restaurantId) {
-
-        restaurantRepository.findByIdOrThrow(restaurantId);
-        List<OperatingHour> operatingHours = operatingHourRepository.findAllByRestaurantId(
-            restaurantId);
-
-        return operatingHours.stream()
-            .map(OperatingHourResponseDto::from)
-            .toList();
     }
 }

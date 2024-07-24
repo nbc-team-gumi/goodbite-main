@@ -23,36 +23,23 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-// WebSecurityConfig 에 의해 Bean 등록됨
 // JWT 인증 필터
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    /*
-     * UsernamePasswordAuthenticationFilter :
-     * 기본적으로 '/login' POST 요청을 처리하며 별도의 Spring MVC Controller 를 지정하지 않아도 응답 처리 해줌
-     */
 
     public JwtAuthenticationFilter() {
-        // /users/login 엔드포인트로 들어오는 POST 요청은 이 필터 JwtAuthenticationFilter 에 의해 처리됨
-        // 바꿔 말하면 다른 API 요청은 이 필터를 무시함
+        // 이 필터가 다음 엔드포인트 POST 요청을 처리하도록 설정
         setFilterProcessesUrl("/users/login");
     }
 
-    /**
-     * 로그인 시도
-     * <p>
-     * 사용자로부터 Email, Password 를 받아 저장합니다.
-     *
-     * @param request  서블릿 요청 객체
-     * @param response 서블릿 응답 객체
-     * @return 사용자 인증 객체
-     */
     @Override
     public Authentication attemptAuthentication(
         HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
-        log.info("로그인 시도");
+        log.debug("로그인 시도");
+
         try {
+            // 이 필터가 서블릿 요청을 가로채 로그인 처리를 수행
             LoginRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(),
                 LoginRequestDto.class);
 
@@ -61,7 +48,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             Collection<GrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority(role));
 
-            // 사용자 정보 반환
+            // 사용자 인증 정보 매니저에게 위임
             return getAuthenticationManager().authenticate(
                 new UsernamePasswordAuthenticationToken(
                     requestDto.getEmail(),
@@ -80,13 +67,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         HttpServletResponse response, FilterChain chain, Authentication authResult)
         throws IOException, ServletException {
 
-        log.info("로그인 성공 및 JWT 생성");
+        log.debug("로그인 성공 및 액세스 토큰, 리프레시 토큰 생성");
 
         String email = ((EmailUserDetails) authResult.getPrincipal()).getEmail();
         String role = ((EmailUserDetails) authResult.getPrincipal()).getRole();
 
         String accessToken = JwtUtil.createAccessToken(email, role);
-        String refreshToken = JwtUtil.createRefreshToken(email, role);
+        String refreshToken = JwtUtil.createRefreshToken(email);
 
         JwtUtil.addJwtToCookie(accessToken, response);
         JwtUtil.addJwtToCookie(refreshToken, response);
@@ -99,7 +86,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         HttpServletResponse response, AuthenticationException failed)
         throws IOException, ServletException {
 
-        log.info("로그인 실패");
+        log.debug("로그인 실패");
 
         int status = switch (failed) {
             case BadCredentialsException badCredentialsException -> HttpStatus.UNAUTHORIZED.value();
@@ -108,6 +95,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             case null, default -> HttpStatus.INTERNAL_SERVER_ERROR.value();
         };
 
-        ResponseUtil.servletApi(response, HttpStatus.BAD_REQUEST.value(), "로그인 실패");
+        ResponseUtil.servletApi(response, status, "로그인 실패");
     }
 }

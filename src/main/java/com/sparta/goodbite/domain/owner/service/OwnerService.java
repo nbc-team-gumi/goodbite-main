@@ -13,6 +13,7 @@ import com.sparta.goodbite.exception.owner.detail.DuplicateBusinessNumberExcepti
 import com.sparta.goodbite.exception.owner.detail.DuplicateEmailException;
 import com.sparta.goodbite.exception.owner.detail.DuplicateNicknameException;
 import com.sparta.goodbite.exception.owner.detail.DuplicatePhoneNumberException;
+import com.sparta.goodbite.exception.owner.detail.OwnerAlreadyDeletedException;
 import com.sparta.goodbite.exception.owner.detail.OwnerNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -142,5 +143,22 @@ public class OwnerService {
         });
 
         owner.updateNickname(newNickname);
+    }
+
+    @Transactional
+    public void deleteOwner(Long ownerId) {
+        // Owner 조회
+        Owner owner = ownerRepository.findById(ownerId)
+            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
+
+        // 이미 탈퇴한 사용자인지 확인합니다.
+        if (owner.getDeletedAt() != null) {
+            throw new OwnerAlreadyDeletedException(OwnerErrorCode.OWNER_ALREADY_DELETED);
+        }
+
+        // 소프트 삭제를 위해 deletedAt 필드를 현재 시간으로 설정
+        owner.deactivate();
+        ownerRepository.save(owner);
+
     }
 }

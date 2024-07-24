@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -85,6 +86,11 @@ public class Owner extends ExtendedTimestamped implements UserCredentials {
 
     public void updateBusinessNumber(String newBusinessNumber) {
         this.businessNumber = newBusinessNumber;
+    }
+
+    // 소프트 삭제를 위한 메서드 추가
+    public void deactivate() {
+        setDeletedAt(LocalDateTime.now());
     }
 }
 

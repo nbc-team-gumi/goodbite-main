@@ -45,3 +45,6 @@ Content-Type: application/json
 {
   "newBusinessNumber": "sdfgsdfgsdgg1234"
 }
+
+### 회원탈퇴
+DELETE http://localhost:8080/owners/1

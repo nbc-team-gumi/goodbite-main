@@ -35,7 +35,6 @@ public class OwnerController {
      * @param requestDto 회원가입 내용
      * @return 성공 메시지를 담은 ResponseEntity
      */
-
     @PostMapping("/signup")
     public ResponseEntity<MessageResponseDto> signUp(
         @Valid @RequestBody OwnerSignUpRequestDto requestDto) {
@@ -49,7 +48,6 @@ public class OwnerController {
      * @param ownerId 조회할 고객의 ID
      * @return ResponseEntity
      */
-
     @GetMapping("/{ownerId}")
     public ResponseEntity<DataResponseDto<OwnerResponseDto>> getOwner(
         @PathVariable Long ownerId/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
@@ -64,7 +62,6 @@ public class OwnerController {
      * @param requestDto 새로운 닉네임을 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
-
     @PatchMapping("/{ownerId}/nickname")
     public ResponseEntity<MessageResponseDto> updateNickname(
         @PathVariable Long ownerId,

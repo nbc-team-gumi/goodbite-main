@@ -34,7 +34,6 @@ public class CustomerController {
      * @param requestDto 회원가입 내용
      * @return 성공 메시지를 담은 ResponseEntity
      */
-
     @PostMapping("/signup")
     public ResponseEntity<MessageResponseDto> signUp(
         @Valid @RequestBody CustomerSignUpRequestDto requestDto) {
@@ -49,7 +48,6 @@ public class CustomerController {
      * @param requestDto 새로운 닉네임을 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
-
     @PatchMapping("/{customerId}/nickname")
     public ResponseEntity<MessageResponseDto> updateNickname(@PathVariable Long customerId,
         @Valid @RequestBody
@@ -66,7 +64,6 @@ public class CustomerController {
      * @param requestDto 새로운 닉네임을 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
-
     @PatchMapping("/{customerId}/phone-number")
     public ResponseEntity<MessageResponseDto> updatePhoneNumber(@PathVariable Long customerId,
         @Valid @RequestBody
@@ -83,7 +80,6 @@ public class CustomerController {
      * @param requestDto 새로운 닉네임을 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
-
     @PatchMapping("/{customerId}/password")
     public ResponseEntity<MessageResponseDto> updatePassword(@PathVariable Long customerId,
         @Valid @RequestBody
@@ -99,7 +95,6 @@ public class CustomerController {
      * @param customerId 조회할 고객의 ID
      * @return ResponseEntity
      */
-
     @GetMapping("/{customerId}")
     public ResponseEntity<DataResponseDto<CustomerResponseDto>> getCustomer(
         @PathVariable Long customerId/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
@@ -113,7 +108,6 @@ public class CustomerController {
      * @param customerId 탈퇴할 고객의 ID
      * @return 성공 메시지를 담은 ResponseEntity
      */
-
     @DeleteMapping("/{customerId}")
     public ResponseEntity<MessageResponseDto> deleteCustomer(
         @PathVariable Long customerId/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/

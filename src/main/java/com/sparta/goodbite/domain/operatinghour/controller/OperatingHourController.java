@@ -6,6 +6,7 @@ import com.sparta.goodbite.common.response.ResponseUtil;
 import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourRequestDto;
 import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
 import com.sparta.goodbite.domain.operatinghour.service.OperatingHourService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class OperatingHourController {
     private final OperatingHourService operatingHourService;
 
     @PostMapping
-    public ResponseEntity<MessageResponseDto> createOperatingHour(@RequestBody
+    public ResponseEntity<MessageResponseDto> createOperatingHour(@Valid @RequestBody
     OperatingHourRequestDto operatingHourRequestDto) {
 
         operatingHourService.createOperatingHour(operatingHourRequestDto);
@@ -36,7 +37,7 @@ public class OperatingHourController {
     @PutMapping("/{operatingHourId}")
     public ResponseEntity<MessageResponseDto> updateOperatingHour(
         @PathVariable Long operatingHourId,
-        @RequestBody OperatingHourRequestDto operatingHourRequestDto) {
+        @Valid @RequestBody OperatingHourRequestDto operatingHourRequestDto) {
 
         operatingHourService.updateOperatingHour(operatingHourId, operatingHourRequestDto);
         return ResponseUtil.updateOk();

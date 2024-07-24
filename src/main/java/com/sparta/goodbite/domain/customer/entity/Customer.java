@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor
-
 public class Customer extends ExtendedTimestamped implements UserCredentials {
 
     @Id

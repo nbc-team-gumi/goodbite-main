@@ -12,6 +12,7 @@ public enum CustomerErrorCode {
     DUPLICATE_PHONE_NUMBER(HttpStatus.LOCKED, "이미 전화번호가 존재합니다."),
     CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."),
     CUSTOMER_ALREADY_DELETED(HttpStatus.FORBIDDEN, "이미 탈퇴한 회원입니다.");
+    
     private final HttpStatus httpStatus;
     private final String message;
 }

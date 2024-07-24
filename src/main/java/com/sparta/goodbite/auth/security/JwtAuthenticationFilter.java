@@ -9,25 +9,28 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 // JWT 인증 필터
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    public JwtAuthenticationFilter() {
+    private final EmailUserDetailsService userDetailsService;
+
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager,
+        EmailUserDetailsService userDetailsService) {
+        super.setAuthenticationManager(authenticationManager);
+        this.userDetailsService = userDetailsService;
+
         // 이 필터가 다음 엔드포인트 POST 요청을 처리하도록 설정
         setFilterProcessesUrl("/users/login");
     }
@@ -36,28 +39,28 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(
         HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
-        log.debug("로그인 시도");
+        log.info("로그인 시도");
 
         try {
             // 이 필터가 서블릿 요청을 가로채 로그인 처리를 수행
             LoginRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(),
                 LoginRequestDto.class);
+            log.info("로그인 요청 데이터: email={}, role={}", requestDto.getEmail(), requestDto.getRole());
 
-            // 사용자 Role을 GrantedAuthority로 변환
-            String role = requestDto.getRole();
-            Collection<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority(role));
-
-            // 사용자 인증 정보 매니저에게 위임
-            return getAuthenticationManager().authenticate(
-                new UsernamePasswordAuthenticationToken(
-                    requestDto.getEmail(),
-                    requestDto.getPassword(),
-                    authorities
-                )
+            EmailUserDetails userDetails = userDetailsService.loadUserByEmail(
+                requestDto.getEmail(),
+                requestDto.getRole()
             );
+            log.info("로드된 사용자 정보: email={}, authorities={}", userDetails.getEmail(),
+                userDetails.getAuthorities());
+
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                userDetails.getEmail(), requestDto.getPassword(), userDetails.getAuthorities());
+
+            return this.getAuthenticationManager().authenticate(authenticationToken);
+
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error("로그인 시도 중 오류 발생: {}", e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
     }
@@ -86,7 +89,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         HttpServletResponse response, AuthenticationException failed)
         throws IOException, ServletException {
 
-        log.debug("로그인 실패");
+        log.info("로그인 실패: {}", failed.getMessage());
 
         int status = switch (failed) {
             case BadCredentialsException badCredentialsException -> HttpStatus.UNAUTHORIZED.value();

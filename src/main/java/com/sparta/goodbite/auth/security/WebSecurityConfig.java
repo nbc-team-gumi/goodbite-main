@@ -1,5 +1,7 @@
 package com.sparta.goodbite.auth.security;
 
+import com.sparta.goodbite.auth.UserRoleEnum;
+import com.sparta.goodbite.auth.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,9 +30,8 @@ public class WebSecurityConfig {
 
     // Manager Bean 등록
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
-        throws Exception {
-        return configuration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager() throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     // PasswordEncoder 필요
@@ -42,11 +43,7 @@ public class WebSecurityConfig {
     // JWT 인증 필터 Bean 등록
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
-
-        // manager 객체 세팅
-        filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
-        return filter;
+        return new JwtAuthenticationFilter(authenticationManager(), userDetailsService);
     }
 
     // JWT 인가 필터 Bean 등록
@@ -68,17 +65,28 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        // 세션을 사용하지 않도록 정책 STATELESS 로 변경
-        http.sessionManagement((sessionManagement) -> sessionManagement
+        http
+            // CSRF 설정: CSRF 보호 비활성 (보안 취약)
+            .csrf((csrf) -> csrf.disable())
+
+            // CSRF 설정: 로그인 엔드포인트에 대해 CSRF 보호 비활성화
+            //.csrf(csrf -> csrf
+            //.ignoringRequestMatchers("/users/login"));
+
+            // 세션을 사용하지 않도록 정책 STATELESS 로 변경
+            .sessionManagement((sessionManagement) -> sessionManagement
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
             // 인가 설정
             .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
                 .requestMatchers("/",
-                    "/users/customers/signup",
-                    "/users/owners/signup",
+                    "/customers/signup",
+                    "/owners/signup",
                     "/users/login")
                 .permitAll()
+                .requestMatchers("/admin/**").hasRole(UserRoleEnum.ADMIN.name())
+                .requestMatchers("/owner/**").hasRole(UserRoleEnum.OWNER.name())
+                .requestMatchers("/customer/**").hasRole(UserRoleEnum.CUSTOMER.name())
                 .anyRequest().authenticated())
 
             // 기본 폼 로그인을 비활성화, 중복 인증 방지
@@ -88,8 +96,11 @@ public class WebSecurityConfig {
             .logout(logout -> logout
                 .logoutUrl("/users/logout")
                 .logoutSuccessHandler(logoutSuccessHandler())
-                .deleteCookies("Authorization"))
+                .deleteCookies(JwtUtil.AUTHORIZATION_HEADER))
 
+            // 사용자 세부 정보 서비스를 명시적으로 지정
+            .userDetailsService(userDetailsService)
+            
             // 예외 처리 핸들러
             .exceptionHandling((exceptionHandling) -> exceptionHandling
                 .accessDeniedHandler(accessDeniedHandler) // 접근 거부(인가 실패) 시 처리

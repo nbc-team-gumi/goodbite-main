@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -139,32 +138,38 @@ public final class JwtUtil {
 
     // HttpServletRequest 에서 Cookie Value : Access Token 가져오기
     public static String getAccessTokenFromRequest(HttpServletRequest req) {
-        return Arrays.stream(req.getCookies())
-            .filter(cookie -> AUTHORIZATION_HEADER.equals(cookie.getName()))
-            .findFirst()
-            .map(cookie -> {
-                try {
-                    return URLDecoder.decode(cookie.getValue(), "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    return null;
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
+                    try {
+                        return URLDecoder.decode(cookie.getValue(),
+                            "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
+                    } catch (UnsupportedEncodingException e) {
+                        return null;
+                    }
                 }
-            })
-            .orElse(null);
+            }
+        }
+        return null;
     }
 
     // HttpServletRequest 에서 Cookie Value : Refresh Token 가져오기
     public static String getRefreshTokenFromRequest(HttpServletRequest req) {
-        return Arrays.stream(req.getCookies())
-            .filter(cookie -> REFRESH_HEADER.equals(cookie.getName()))
-            .findFirst()
-            .map(cookie -> {
-                try {
-                    return URLDecoder.decode(cookie.getValue(), "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    return null;
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(REFRESH_HEADER)) {
+                    try {
+                        return URLDecoder.decode(cookie.getValue(),
+                            "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
+                    } catch (UnsupportedEncodingException e) {
+                        return null;
+                    }
                 }
-            })
-            .orElse(null);
+            }
+        }
+        return null;
     }
 
     // JWT 추출 (Bearer 제거)

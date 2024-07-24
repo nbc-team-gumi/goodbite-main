@@ -1,17 +1,16 @@
 package com.sparta.goodbite.auth.security;
 
-import com.sparta.goodbite.auth.UserRoleEnum;
 import com.sparta.goodbite.auth.dummy.UserCredentials;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Objects;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+@Slf4j(topic = "EmailUserDetails")
 @Getter
 @RequiredArgsConstructor
 public class EmailUserDetails implements UserDetails {
@@ -21,36 +20,29 @@ public class EmailUserDetails implements UserDetails {
 
     // principal - email
     public String getEmail() {
+        log.debug(user.getEmail());
         return user.getEmail();
     }
 
-    /**
-     * 사용하지 않는 메서드
-     */
     @Override
     public String getUsername() {
-        throw new UsernameNotFoundException("사용되지 않는 메서드입니다.");
+        return getEmail();
     }
 
     // credentials
     @Override
     public String getPassword() {
+        log.debug(user.getPassword());
         return user.getPassword();
     }
 
     // authorities - role
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String authority = "";
-        if (Objects.equals(role, UserRoleEnum.CUSTOMER.name())) {
-            authority = UserRoleEnum.CUSTOMER.getAuthority();
-        } else if (Objects.equals(role, UserRoleEnum.OWNER.name())) {
-            authority = UserRoleEnum.OWNER.getAuthority();
-        } else if (Objects.equals(role, UserRoleEnum.ADMIN.name())) {
-            authority = UserRoleEnum.ADMIN.getAuthority();
-        }
 
-        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(authority);
+        log.debug(role);
+
+        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(role);
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(simpleGrantedAuthority);
 

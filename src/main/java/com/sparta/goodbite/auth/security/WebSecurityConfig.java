@@ -2,6 +2,8 @@ package com.sparta.goodbite.auth.security;
 
 import com.sparta.goodbite.auth.UserRoleEnum;
 import com.sparta.goodbite.auth.util.JwtUtil;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,8 +16,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 
 @Configuration
 @RequiredArgsConstructor
@@ -40,10 +42,17 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    // Validator 유효성 검증
+    @Bean
+    public Validator validator() {
+        return Validation.buildDefaultValidatorFactory().getValidator();
+    }
+
     // JWT 인증 필터 Bean 등록
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        return new JwtAuthenticationFilter(authenticationManager(), userDetailsService);
+        return new JwtAuthenticationFilter(authenticationManager(), userDetailsService,
+            validator());
     }
 
     // JWT 인가 필터 Bean 등록
@@ -55,11 +64,32 @@ public class WebSecurityConfig {
     // 로그아웃 핸들러 Bean 등록
     @Bean
     public LogoutSuccessHandler logoutSuccessHandler() {
-        SimpleUrlLogoutSuccessHandler handler = new SimpleUrlLogoutSuccessHandler();
-        // 로그아웃 성공시 로그인 페이지로 리디렉션
-        handler.setDefaultTargetUrl("/users/login?logout");
-        return handler;
+
+//        // 로그아웃 페이지로 리디렉션 (프론트 개발시 고려)
+//        SimpleUrlLogoutSuccessHandler handler = new SimpleUrlLogoutSuccessHandler();
+//        handler.setDefaultTargetUrl("/users/login?logout");
+//        return handler;
+
+        return new EmailLogoutSuccessHandler();
     }
+
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//
+//        // 출처 허용
+//        configuration.addAllowedOrigin("http://localhost:8080");
+//        // 모든 http 메서드 허용
+//        configuration.addAllowedMethod("*");
+//        // 모든 헤더 허용
+//        configuration.addAllowedHeader("*");
+//        // 자격 증명 허용
+//        configuration.setAllowCredentials(true);
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+//    }
 
     // 시큐리티 필터 체인 설정 Bean 등록
     @Bean
@@ -73,43 +103,43 @@ public class WebSecurityConfig {
             //.csrf(csrf -> csrf
             //.ignoringRequestMatchers("/users/login"));
 
+            // CORS 설정
+//            .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
+
             // 세션을 사용하지 않도록 정책 STATELESS 로 변경
-            .sessionManagement((sessionManagement) -> sessionManagement
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(
+                SessionCreationPolicy.STATELESS))
 
             // 인가 설정
-            .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-                .requestMatchers("/",
-                    "/customers/signup",
-                    "/owners/signup",
-                    "/users/login")
-                .permitAll()
-                .requestMatchers("/admin/**").hasRole(UserRoleEnum.ADMIN.name())
-                .requestMatchers("/owner/**").hasRole(UserRoleEnum.OWNER.name())
-                .requestMatchers("/customer/**").hasRole(UserRoleEnum.CUSTOMER.name())
-                .anyRequest().authenticated())
+            .authorizeHttpRequests(
+                (authorizeHttpRequests) -> authorizeHttpRequests
+                    .requestMatchers("/", "/owners/signup", "/users/login", "/customers/signup")
+                    .permitAll()
+                    .requestMatchers("/admins/**").hasRole(UserRoleEnum.ADMIN.name())
+                    .requestMatchers("/owners/**").hasRole(UserRoleEnum.OWNER.name())
+                    .requestMatchers("/customers/").hasRole(UserRoleEnum.CUSTOMER.name())
+                    .anyRequest().authenticated())
 
             // 기본 폼 로그인을 비활성화, 중복 인증 방지
             .formLogin((formLogin) -> formLogin.disable())
 
             // 로그아웃 설정
-            .logout(logout -> logout
-                .logoutUrl("/users/logout")
+            .logout(logout -> logout.logoutUrl("/users/logout")
                 .logoutSuccessHandler(logoutSuccessHandler())
-                .deleteCookies(JwtUtil.AUTHORIZATION_HEADER))
+                .deleteCookies(JwtUtil.AUTHORIZATION_HEADER, JwtUtil.REFRESH_HEADER))
 
             // 사용자 세부 정보 서비스를 명시적으로 지정
             .userDetailsService(userDetailsService)
-            
+
             // 예외 처리 핸들러
-            .exceptionHandling((exceptionHandling) -> exceptionHandling
-                .accessDeniedHandler(accessDeniedHandler) // 접근 거부(인가 실패) 시 처리
+            .exceptionHandling((exceptionHandling) -> exceptionHandling.accessDeniedHandler(
+                    accessDeniedHandler) // 접근 거부(인가 실패) 시 처리
                 .authenticationEntryPoint(authenticationEntryPoint)) // 인증 실패 시 처리
 
             // 커스텀 필터 끼우기
-            // JWT 인가필터 -> JWT 인증필터 -> UsernamePasswordAuthenticationFilter 순으로 설정
-            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
+            // JWT 인가필터 -> LogoutFilter -> JWT 인증필터 -> UsernamePasswordAuthenticationFilter 순으로 설정
+            .addFilterBefore(jwtAuthorizationFilter(), LogoutFilter.class)
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

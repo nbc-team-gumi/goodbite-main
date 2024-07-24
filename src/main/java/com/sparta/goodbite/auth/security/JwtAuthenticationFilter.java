@@ -8,7 +8,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.io.IOException;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +21,7 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 // JWT 인증 필터
@@ -25,11 +29,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final EmailUserDetailsService userDetailsService;
+    private final Validator validator;
 
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager,
-        EmailUserDetailsService userDetailsService) {
+        EmailUserDetailsService userDetailsService, Validator validator) {
         super.setAuthenticationManager(authenticationManager);
         this.userDetailsService = userDetailsService;
+        this.validator = validator;
 
         // 이 필터가 다음 엔드포인트 POST 요청을 처리하도록 설정
         setFilterProcessesUrl("/users/login");
@@ -45,17 +51,20 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             // 이 필터가 서블릿 요청을 가로채 로그인 처리를 수행
             LoginRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(),
                 LoginRequestDto.class);
-            log.info("로그인 요청 데이터: email={}, role={}", requestDto.getEmail(), requestDto.getRole());
 
-            EmailUserDetails userDetails = userDetailsService.loadUserByEmail(
-                requestDto.getEmail(),
-                requestDto.getRole()
-            );
-            log.info("로드된 사용자 정보: email={}, authorities={}", userDetails.getEmail(),
-                userDetails.getAuthorities());
+            // Dto 유효성 검증
+            String validationErrors = validateDto(requestDto);
+            if (!validationErrors.isEmpty()) {
+                log.error("유효성 검증 실패: {}", validationErrors);
+                ResponseUtil.servletApi(response, HttpStatus.BAD_REQUEST.value(),
+                    "유효성 검증 실패: " + validationErrors);
+                return null;
+            }
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(requestDto.getEmail());
 
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                userDetails.getEmail(), requestDto.getPassword(), userDetails.getAuthorities());
+                userDetails.getUsername(), requestDto.getPassword(), userDetails.getAuthorities());
 
             return this.getAuthenticationManager().authenticate(authenticationToken);
 
@@ -63,6 +72,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             log.error("로그인 시도 중 오류 발생: {}", e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    // 로그인 요청 유효성 검증(Validation)
+    private String validateDto(LoginRequestDto requestDto) {
+        Set<ConstraintViolation<LoginRequestDto>> violations = validator.validate(requestDto);
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (ConstraintViolation<LoginRequestDto> violation : violations) {
+                sb.append(violation.getMessage()).append(" ");
+            }
+            return sb.toString().trim();
+        }
+        return "";
     }
 
     @Override

@@ -37,7 +37,7 @@ public final class JwtUtil {
         String createdToken = BEARER_PREFIX +
             Jwts.builder()
                 .setSubject(email) // 사용자 식별자값(ID)
-                .claim(AUTHORIZATION_KEY, authority) // 권한 (CUSTOMER / OWNER / ADMIN)
+                .claim(AUTHORIZATION_KEY, authority) // 권한 (ROLE_CUSTOMER / ROLE_OWNER / ROLE_ADMIN)
                 .setExpiration(new Date(date.getTime() + 1000 * 60 * 60)) // 1시간
                 .setIssuedAt(date) // 발급일
                 .signWith(JwtConfig.key, SIGNATURE_ALGORITHM) // 암호화 알고리즘
@@ -63,21 +63,23 @@ public final class JwtUtil {
     // JWT Cookie 에 저장
     public static void addJwtToCookie(String token, HttpServletResponse res) {
         try {
-            // 인코딩 사용 이유:
-            // Cookie Value 에는 공백 포함 불가
-            // URLEncoder.encode(): 공백 -> '+'으로 인코딩
-            // 퍼센트('%') 인코딩으로 변환
-            token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
-            log.debug("URL encoding: {}", token);
+            Cookie cookie;
 
             // 토큰 종류 확인
-            // 쿠키 생성
-            Cookie cookie;
             if (isAccessToken(token)) {
+                // 인코딩 사용 이유:
+                // Cookie Value 에는 공백 포함 불가
+                // URLEncoder.encode(): 공백 -> '+'으로 인코딩
+                // 퍼센트('%') 인코딩으로 변환
+                token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
+
+                // 쿠키 생성
                 cookie = new Cookie(AUTHORIZATION_HEADER, token); // Name-Value
             } else {
                 cookie = new Cookie(REFRESH_HEADER, token); // Name-Value
+                cookie.setMaxAge(60 * 60 * 24 * 7); // 7일
             }
+            log.debug("URL encoding: {}", token);
             cookie.setPath("/");
             cookie.setHttpOnly(true); // 클라이언트 JavaScript 에서 쿠키 접근 불가
             //cookie.setSecure(true); // HTTPS 사용 시 Secure 설정

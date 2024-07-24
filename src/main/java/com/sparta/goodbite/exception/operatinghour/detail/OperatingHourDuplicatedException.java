@@ -3,9 +3,10 @@ package com.sparta.goodbite.exception.operatinghour.detail;
 import com.sparta.goodbite.exception.operatinghour.OperatingHourErrorCode;
 import com.sparta.goodbite.exception.operatinghour.OperatingHourException;
 
-public class OperatingHourNotFoundException extends OperatingHourException {
+public class OperatingHourDuplicatedException extends OperatingHourException {
 
-    public OperatingHourNotFoundException(OperatingHourErrorCode operatingHourErrorCode) {
+    public OperatingHourDuplicatedException(OperatingHourErrorCode operatingHourErrorCode) {
         super(operatingHourErrorCode);
     }
+
 }

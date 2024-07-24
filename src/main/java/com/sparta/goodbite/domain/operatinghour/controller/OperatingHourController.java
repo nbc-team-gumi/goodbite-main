@@ -3,8 +3,9 @@ package com.sparta.goodbite.domain.operatinghour.controller;
 import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
-import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourRequestDto;
+import com.sparta.goodbite.domain.operatinghour.dto.CreateOperatingHourRequestDto;
 import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
+import com.sparta.goodbite.domain.operatinghour.dto.UpdateOperatingHourRequestDto;
 import com.sparta.goodbite.domain.operatinghour.service.OperatingHourService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/operatingHours")
+@RequestMapping("/operating-hours")
 @RequiredArgsConstructor
 public class OperatingHourController {
 
@@ -28,18 +29,18 @@ public class OperatingHourController {
 
     @PostMapping
     public ResponseEntity<MessageResponseDto> createOperatingHour(@Valid @RequestBody
-    OperatingHourRequestDto operatingHourRequestDto) {
+    CreateOperatingHourRequestDto createOperatingHourRequestDto) {
 
-        operatingHourService.createOperatingHour(operatingHourRequestDto);
+        operatingHourService.createOperatingHour(createOperatingHourRequestDto);
         return ResponseUtil.createOk();
     }
 
     @PutMapping("/{operatingHourId}")
     public ResponseEntity<MessageResponseDto> updateOperatingHour(
         @PathVariable Long operatingHourId,
-        @Valid @RequestBody OperatingHourRequestDto operatingHourRequestDto) {
+        @Valid @RequestBody UpdateOperatingHourRequestDto updateOperatingHourRequestDto) {
 
-        operatingHourService.updateOperatingHour(operatingHourId, operatingHourRequestDto);
+        operatingHourService.updateOperatingHour(operatingHourId, updateOperatingHourRequestDto);
         return ResponseUtil.updateOk();
     }
 

@@ -1,22 +1,26 @@
 package com.sparta.goodbite.domain.operatinghour.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sparta.goodbite.domain.operatinghour.entity.OperatingHour;
+import com.sparta.goodbite.domain.operatinghour.enums.DayOfWeekEnum;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import java.time.LocalTime;
 import lombok.Getter;
 
 @Getter
-public class OperatingHourRequestDto {
+public class CreateOperatingHourRequestDto {
 
-    @NotNull
+    @NotNull(message = "가게를 입력해주세요.")
     private Long restaurantId;
-    @NotNull
-    private String dayOfWeek;
-    @Pattern(regexp = "^(?:[01]\\d|2[0-4]):[0-5]\\d$", message = "24:00 형식으로 입력해주세요.")
-    private String openTime;
-    @Pattern(regexp = "^(?:[01]\\d|2[0-4]):[0-5]\\d$", message = "24:00 형식으로 입력해주세요.")
-    private String closeTime;
+
+    private DayOfWeekEnum dayOfWeek;
+
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime openTime;
+
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime closeTime;
 
     public OperatingHour toEntity(Restaurant restaurant) {
         return OperatingHour.builder()

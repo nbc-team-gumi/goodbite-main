@@ -41,6 +41,10 @@ public class EmailUserDetailsService implements UserDetailsService {
 //        return new EmailUserDetails(user, UserRoleEnum.valueOf(role).getAuthority());
 //    }
 
+    /*
+     * 구현의 복잡함으로 인해 우선적으로 아래 방법을 사용합니다.
+     * 추후에 해결 방법을 찾아 봅시다.
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 

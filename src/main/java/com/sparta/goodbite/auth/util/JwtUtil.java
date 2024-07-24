@@ -31,32 +31,30 @@ public final class JwtUtil {
     }
 
     // 액세스 토큰 생성
-    // Prefix: Bearer ~
+    // Prefix: Bearer
     public static String createAccessToken(String email, String authority) {
         Date date = new Date();
 
         String createdToken = BEARER_PREFIX +
             Jwts.builder()
                 .setSubject(email) // 사용자 식별자값(ID)
-                .claim(AUTHORIZATION_KEY, authority) // 권한 (USER / ADMIN)
+                .claim(AUTHORIZATION_KEY, authority) // 권한 (CUSTOMER / OWNER / ADMIN)
                 .setExpiration(new Date(date.getTime() + 1000 * 60 * 60)) // 1시간
                 .setIssuedAt(date) // 발급일
                 .signWith(JwtConfig.key, SIGNATURE_ALGORITHM) // 암호화 알고리즘
                 .compact();
 
-        log.info("사용자 토큰 생성: {}", createdToken);
+        log.debug("사용자 토큰 생성: {}", createdToken);
         return createdToken;
     }
 
     // 리프레시 토큰 생성
-    // 권한을 넣지 않는다? (수정하기)
     // Prefix: 없음
-    public static String createRefreshToken(String email, String authority) {
+    public static String createRefreshToken(String email) {
         Date date = new Date();
 
         return Jwts.builder()
             .setSubject(email)
-            .claim(AUTHORIZATION_KEY, authority)
             .setExpiration(new Date(date.getTime() + 1000 * 60 * 60 * 24 * 7)) // 7일
             .setIssuedAt(date)
             .signWith(JwtConfig.key, SIGNATURE_ALGORITHM)
@@ -71,19 +69,19 @@ public final class JwtUtil {
             // URLEncoder.encode(): 공백 -> '+'으로 인코딩
             // 퍼센트('%') 인코딩으로 변환
             token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
-            log.info("URL encoding: {}", token);
+            log.debug("URL encoding: {}", token);
 
             // 토큰 종류 확인
             // 쿠키 생성
             Cookie cookie;
             if (isAccessToken(token)) {
                 cookie = new Cookie(AUTHORIZATION_HEADER, token); // Name-Value
-                cookie.setPath("/");
             } else {
                 cookie = new Cookie(REFRESH_HEADER, token); // Name-Value
-                cookie.setPath("/");
-                cookie.setHttpOnly(true);
             }
+            cookie.setPath("/");
+            cookie.setHttpOnly(true); // 클라이언트 JavaScript 에서 쿠키 접근 불가
+            //cookie.setSecure(true); // HTTPS 사용 시 Secure 설정
 
             // Response 객체에 Cookie 추가
             res.addCookie(cookie);
@@ -93,24 +91,33 @@ public final class JwtUtil {
         }
     }
 
-    // JWT 검증 (토큰 기한 만료, 위변조)
-    public static boolean validateToken(String token) {
+    // JWT 위변조 검증
+    public static boolean isTokenValid(String token) {
         try {
             // Jwts.parser() is deprecated
             // --> Jwts.parserBuilder() 사용 권장
             Jwts.parserBuilder().setSigningKey(JwtConfig.key).build().parseClaimsJws(token);
-            log.info("토큰 검증 완료: {}", token);
+            log.debug("토큰 검증 완료: {}", token);
             return true;
         } catch (SecurityException | MalformedJwtException e) {
-            log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
-        } catch (ExpiredJwtException e) {
-            log.error("Expired JWT token, 만료된 JWT token 입니다.");
+            log.error("Invalid JWT signature, 유효하지 않은 JWT 서명 입니다.");
         } catch (UnsupportedJwtException e) {
             log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
         } catch (IllegalArgumentException e) {
             log.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
         }
         return false;
+    }
+
+    // JWT가 기한 만료 검증
+    public static boolean isTokenExpired(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(JwtConfig.key).build().parseClaimsJws(token);
+            return false;
+        } catch (ExpiredJwtException e) {
+            log.info("Expired JWT token, 만료된 JWT token 입니다.");
+            return true;
+        }
     }
 
     // JWT에서 사용자 정보(Claims)에서 email 가져오기
@@ -130,7 +137,7 @@ public final class JwtUtil {
             .getBody().get(AUTHORIZATION_KEY, String.class);
     }
 
-    // HttpServletRequest 에서 Cookie Value : JWT 가져오기
+    // HttpServletRequest 에서 Cookie Value : Access Token 가져오기
     public static String getAccessTokenFromRequest(HttpServletRequest req) {
         return Arrays.stream(req.getCookies())
             .filter(cookie -> AUTHORIZATION_HEADER.equals(cookie.getName()))
@@ -145,7 +152,7 @@ public final class JwtUtil {
             .orElse(null);
     }
 
-    // HttpServletRequest 에서 Cookie Value : JWT 가져오기
+    // HttpServletRequest 에서 Cookie Value : Refresh Token 가져오기
     public static String getRefreshTokenFromRequest(HttpServletRequest req) {
         return Arrays.stream(req.getCookies())
             .filter(cookie -> REFRESH_HEADER.equals(cookie.getName()))
@@ -174,5 +181,21 @@ public final class JwtUtil {
     // 액세스 토큰 확인 (Bearer)
     public static Boolean isAccessToken(String token) {
         return StringUtils.hasText(token) && token.startsWith(BEARER_PREFIX);
+    }
+
+    // 액세스 토큰 쿠키 삭제
+    public static void deleteAccessTokenFromCookie(HttpServletResponse res) {
+        Cookie cookie = new Cookie(AUTHORIZATION_HEADER, null);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // 쿠키 삭제를 위한 MaxAge 설정
+        res.addCookie(cookie);
+    }
+
+    // 리프레시 토큰 쿠키 삭제
+    public static void deleteRefreshTokenFromCookie(HttpServletResponse res) {
+        Cookie cookie = new Cookie(REFRESH_HEADER, null);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // 쿠키 삭제를 위한 MaxAge 설정
+        res.addCookie(cookie);
     }
 }

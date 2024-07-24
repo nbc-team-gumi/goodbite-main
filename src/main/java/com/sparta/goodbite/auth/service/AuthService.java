@@ -14,12 +14,12 @@ public class AuthService {
         HttpServletResponse response) {
         String refreshToken = JwtUtil.getRefreshTokenFromRequest(request);
 
-        if (refreshToken == null || !JwtUtil.validateToken(JwtUtil.substringToken(refreshToken))) {
+        if (refreshToken == null || !JwtUtil.isTokenValid(refreshToken)) {
             throw new InvalidRefreshTokenException(AuthErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        String email = JwtUtil.getEmailFromToken(JwtUtil.substringToken(refreshToken));
-        String authority = JwtUtil.getAuthorityFromToken(JwtUtil.substringToken(refreshToken));
+        String email = JwtUtil.getEmailFromToken(refreshToken);
+        String authority = JwtUtil.getAuthorityFromToken(refreshToken);
 
         String newAccessToken = JwtUtil.createAccessToken(email, authority);
         JwtUtil.addJwtToCookie(newAccessToken, response);

@@ -15,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 // JWT 인가 필터 사용자 정의
@@ -30,29 +29,52 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         HttpServletRequest req, HttpServletResponse res, FilterChain filterChain)
         throws ServletException, IOException {
 
-        String tokenValue = JwtUtil.getAccessTokenFromRequest(req);
+        String accessToken = JwtUtil.getAccessTokenFromRequest(req);
 
-        if (StringUtils.hasText(tokenValue)) {
-            // JWT 토큰 substring
-            tokenValue = JwtUtil.substringToken(tokenValue);
+        if (accessToken != null) {
+            // prefix 제거
+            accessToken = JwtUtil.substringToken(accessToken);
 
-            if (!JwtUtil.validateToken(tokenValue)) {
-                log.error("유효하지 않은 액세스 토큰: {}", tokenValue);
-                ResponseUtil.servletApi(res, HttpStatus.UNAUTHORIZED.value(), "");
+            // 유효하지 않은 액세스 토큰
+            if (!JwtUtil.isTokenValid(accessToken)) {
+                ResponseUtil.servletApi(res, HttpStatus.UNAUTHORIZED.value(), "토큰이 유효하지 않습니다.");
                 return;
             }
 
-            try {
-                setAuthentication(
-                    JwtUtil.getEmailFromToken(tokenValue),
-                    JwtUtil.getAuthorityFromToken(tokenValue)
-                );
-            } catch (Exception e) {
-                log.error(e.getMessage());
-                ResponseUtil.servletApi(res, HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    e.getMessage());
-                return;
+            // 액세스 토큰은 맞지만, 만료된 토큰
+            if (JwtUtil.isTokenExpired(accessToken)) {
+
+                // 리프레시 토큰 검증
+                String refreshToken = JwtUtil.getRefreshTokenFromRequest(req);
+                if (refreshToken != null && !JwtUtil.isTokenValid(refreshToken)) {
+
+                    String email = JwtUtil.getEmailFromToken(accessToken);
+                    String role = JwtUtil.getAuthorityFromToken(accessToken);
+
+                    // JWT 재발급
+                    String newAccessToken = JwtUtil.createAccessToken(email, role);
+                    JwtUtil.addJwtToCookie(newAccessToken, res);
+
+                    accessToken = JwtUtil.substringToken(newAccessToken);
+                } else {
+
+                    // 리프레시 토큰이 만료되거나 존재하지 않습니다.
+                    // 액세스 토큰 재발급 불가
+                    // 재로그인 요청
+
+                    // 액세스 토큰, 리프레시 토큰 쿠키 삭제
+                    JwtUtil.deleteAccessTokenFromCookie(res);
+                    JwtUtil.deleteRefreshTokenFromCookie(res);
+                    ResponseUtil.servletApi(res, HttpStatus.UNAUTHORIZED.value(),
+                        "토큰이 만료되었습니다. 다시 로그인해주세요.");
+                    return;
+                }
             }
+
+            setAuthentication(
+                JwtUtil.getEmailFromToken(accessToken),
+                JwtUtil.getAuthorityFromToken(accessToken)
+            );
         }
 
         filterChain.doFilter(req, res);

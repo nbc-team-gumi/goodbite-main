@@ -26,7 +26,7 @@ public class Menu extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer price;
+    private int price;
     private String name;
     private String description;
 //    private String imageUrl;

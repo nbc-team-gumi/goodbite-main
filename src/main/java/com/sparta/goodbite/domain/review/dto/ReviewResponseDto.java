@@ -1,14 +1,13 @@
 package com.sparta.goodbite.domain.review.dto;
 
-import com.sparta.goodbite.domain.menu.entity.Menu;
 import com.sparta.goodbite.domain.review.entity.Review;
 
-public record ReviewResponseDto(float rating, String content, Menu menu) {
+public record ReviewResponseDto(Long menuId, float rating, String content) {
 
     public static ReviewResponseDto from(Review review) {
         return new ReviewResponseDto(
+            review.getMenu().getId(),
             review.getRating(),
-            review.getContent(),
-            review.getMenu());
+            review.getContent());
     }
 }

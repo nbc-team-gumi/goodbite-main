@@ -19,12 +19,12 @@ public class GlobalExceptionHandler {
         log.error("에러 발생: ", e);
         return ResponseUtil.of(e.getMenuErrorCode().getHttpStatus(), e.getMessage());
     }
-
-
+    
     @ExceptionHandler(ReviewException.class)
     public ResponseEntity<MessageResponseDto> handleReviewException(ReviewException e) {
         log.error("에러 발생: ", e);
         return ResponseUtil.of(e.getReviewErrorCode().getHttpStatus(), e.getMessage());
+    }
 
     @ExceptionHandler(RestaurantException.class)
     public ResponseEntity<MessageResponseDto> handleRestaurantException(RestaurantException e) {

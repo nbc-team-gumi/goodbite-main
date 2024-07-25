@@ -49,11 +49,12 @@ public final class JwtUtil {
 
     // 리프레시 토큰 생성
     // Prefix: 없음
-    public static String createRefreshToken(String email) {
+    public static String createRefreshToken(String email, String authority) {
         Date date = new Date();
 
         return Jwts.builder()
             .setSubject(email)
+            .claim(AUTHORIZATION_KEY, authority) // 권한 (ROLE_CUSTOMER / ROLE_OWNER / ROLE_ADMIN)
             .setExpiration(new Date(date.getTime() + 1000 * 60 * 60 * 24 * 7)) // 7일
             .setIssuedAt(date)
             .signWith(JwtConfig.key, SIGNATURE_ALGORITHM)

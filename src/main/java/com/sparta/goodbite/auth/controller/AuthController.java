@@ -22,11 +22,4 @@ public class AuthController {
         authService.updateAccessToken(request, response);
         return ResponseUtil.createOk();
     }
-
-    @PostMapping("/users/refresh-token")
-    public ResponseEntity<MessageResponseDto> updateRefreshToken(HttpServletRequest request,
-        HttpServletResponse response) {
-        authService.updateRefreshToken(request, response);
-        return ResponseUtil.createOk();
-    }
 }

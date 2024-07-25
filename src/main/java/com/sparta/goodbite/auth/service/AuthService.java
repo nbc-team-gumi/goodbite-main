@@ -14,26 +14,22 @@ public class AuthService {
         HttpServletResponse response) {
         String refreshToken = JwtUtil.getRefreshTokenFromRequest(request);
 
+        // 리프레시 토큰이 만료되거나 존재하지 않습니다.
+        // 액세스 토큰 재발급 불가
+        // 재로그인 요청
+
         if (refreshToken == null || !JwtUtil.isTokenValid(refreshToken)) {
+            if (refreshToken != null) {
+                JwtUtil.deleteRefreshTokenFromCookie(response);
+            }
             throw new InvalidRefreshTokenException(AuthErrorCode.INVALID_REFRESH_TOKEN);
         }
 
+        // 액세스 토큰 재발급
         String email = JwtUtil.getEmailFromToken(refreshToken);
         String authority = JwtUtil.getAuthorityFromToken(refreshToken);
 
         String newAccessToken = JwtUtil.createAccessToken(email, authority);
         JwtUtil.addJwtToCookie(newAccessToken, response);
-    }
-
-    public void updateRefreshToken(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = JwtUtil.getRefreshTokenFromRequest(request);
-
-        if (refreshToken == null || !JwtUtil.isTokenValid(refreshToken)) {
-            throw new InvalidRefreshTokenException(AuthErrorCode.INVALID_REFRESH_TOKEN);
-        }
-
-        String newRefreshToken = JwtUtil.createRefreshToken(
-            JwtUtil.getEmailFromToken(refreshToken));
-        JwtUtil.addJwtToCookie(newRefreshToken, response);
     }
 }

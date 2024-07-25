@@ -1,5 +1,6 @@
-package com.sparta.goodbite.domain.review.dto.validation;
+package com.sparta.goodbite.domain.review.dto.validation.constraint;
 
+import com.sparta.goodbite.domain.review.dto.validation.validator.RatingValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.ElementType;

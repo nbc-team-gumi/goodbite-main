@@ -99,20 +99,24 @@ public class CustomerService {
     }
 
     @Transactional
-    public void updatePassword(Long customerId,
-        UpdatePasswordRequestDto requestDto /*,Customer customer*/) {
-        /*if (!passwordEncoder.matches(requestDto.getPassword(), customer.getPassword())) {
-            throw new PasswordMismatchException("현재 비밀번호가 일치하지 않습니다.");
+    public void updatePassword(Long customerId, UpdatePasswordRequestDto requestDto
+        /*,Customer customer*/) {
+        /*//현재 비밀번호 일치 여부 확인
+        if (!passwordEncoder.matches(requestDto.getPassword(), customer.getPassword())) {
+            throw new PasswordMismatchException(UserErrorCode.INVALID_CURRENT_PASSWORD);
         }
 
+        //새 비밀번호와 기존 비밀번호 동일여부 확인
         if (passwordEncoder.matches(requestDto.getNewPassword(), customer.getPassword())) {
-            throw new PasswordMismatchException("새로운 비밀번호와 기존 비밀번호가 동일합니다.");
+            throw new SamePasswordException(UserErrorCode.PASSWORD_SAME_AS_OLD);
         }*/
-        String newPassword = passwordEncoder.encode(requestDto.getNewPassword());
 
         // Customer 조회
         Customer customer = customerRepository.findById(customerId)
             .orElseThrow(() -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
+
+        //새 비밀번호 암호화
+        String newPassword = passwordEncoder.encode(requestDto.getNewPassword());
 
         // 비밀번호 업데이트
         customer.updatePassword(newPassword);

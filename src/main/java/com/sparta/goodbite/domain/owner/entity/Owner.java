@@ -90,7 +90,7 @@ public class Owner extends ExtendedTimestamped implements UserCredentials {
 
     // 소프트 삭제를 위한 메서드 추가
     public void deactivate() {
-        setDeletedAt(LocalDateTime.now());
+        this.deletedAt = LocalDateTime.now();
     }
 }
 

@@ -1,5 +1,5 @@
-@baseUrl="http://localhost:8080/owners"
-@ownerId=1
+@baseUrl=http://localhost:8080/owners
+@ownerId=2
 ### 회원가입
 POST {{baseUrl}}/signup
 Content-Type: application/json

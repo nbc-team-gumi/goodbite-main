@@ -1,0 +1,39 @@
+
+### 식당 생성
+POST http://localhost:8080/restaurants
+Content-Type: application/json
+
+{
+  "ownerId": 1,
+  "name": "가게이름",
+  "imageUrl": "https://image.ajunews.com/content/image/2019/12/25/20191225170826943516.jpg",
+  "address": "가게 상세주소",
+  "area": "지역",
+  "phoneNumber": "02-1234-1234",
+  "category": "분류"
+}
+
+### 식당 수정
+PUT http://localhost:8080/restaurants/1
+Content-Type: application/json
+
+{
+  "name": "가게이름 수정",
+  "imageUrl": "url 수정",
+  "address": "가게 상세주소 수정",
+  "area": "지역",
+  "phoneNumber": "02-1234-1234",
+  "category": "분류"
+}
+
+### 식당 단일 조회
+GET http://localhost:8080/restaurants/1
+
+### 전체 식당 조회
+GET http://localhost:8080/restaurants
+
+### 식당별 영업시간 조회
+GET http://localhost:8080/restaurants/1/operating-hours
+
+### 식당 삭제
+DELETE http://localhost:8080/restaurants/1

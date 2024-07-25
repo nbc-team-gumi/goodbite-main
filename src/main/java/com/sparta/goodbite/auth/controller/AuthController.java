@@ -17,9 +17,16 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/users/refresh")
-    public ResponseEntity<MessageResponseDto> refreshAccessToken(HttpServletRequest request,
+    public ResponseEntity<MessageResponseDto> updateAccessToken(HttpServletRequest request,
         HttpServletResponse response) {
-        authService.CreateRefreshToken(request, response);
+        authService.updateAccessToken(request, response);
+        return ResponseUtil.createOk();
+    }
+
+    @PostMapping("/users/refresh-token")
+    public ResponseEntity<MessageResponseDto> updateRefreshToken(HttpServletRequest request,
+        HttpServletResponse response) {
+        authService.updateRefreshToken(request, response);
         return ResponseUtil.createOk();
     }
 }

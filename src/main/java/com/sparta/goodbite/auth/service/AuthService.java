@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
 
-    public void CreateRefreshToken(HttpServletRequest request,
+    public void updateAccessToken(HttpServletRequest request,
         HttpServletResponse response) {
         String refreshToken = JwtUtil.getRefreshTokenFromRequest(request);
 
@@ -23,5 +23,17 @@ public class AuthService {
 
         String newAccessToken = JwtUtil.createAccessToken(email, authority);
         JwtUtil.addJwtToCookie(newAccessToken, response);
+    }
+
+    public void updateRefreshToken(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = JwtUtil.getRefreshTokenFromRequest(request);
+
+        if (refreshToken == null || !JwtUtil.isTokenValid(refreshToken)) {
+            throw new InvalidRefreshTokenException(AuthErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        String newRefreshToken = JwtUtil.createRefreshToken(
+            JwtUtil.getEmailFromToken(refreshToken));
+        JwtUtil.addJwtToCookie(newRefreshToken, response);
     }
 }

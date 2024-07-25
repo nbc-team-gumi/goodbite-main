@@ -77,7 +77,6 @@ public final class JwtUtil {
                 cookie = new Cookie(AUTHORIZATION_HEADER, token); // Name-Value
             } else {
                 cookie = new Cookie(REFRESH_HEADER, token); // Name-Value
-                cookie.setMaxAge(60 * 60 * 24 * 7); // 7일
             }
             log.debug("URL encoding: {}", token);
             cookie.setPath("/");

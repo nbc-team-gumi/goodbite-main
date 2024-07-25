@@ -1,6 +1,6 @@
 package com.sparta.goodbite.domain.operatinghour.enums;
 
-public enum DayOfWeekEnum {
+public enum DayOfWeek {
 
     MON("월"),
     TUE("화"),
@@ -12,7 +12,7 @@ public enum DayOfWeekEnum {
 
     private final String dayOfWeek;
 
-    DayOfWeekEnum(String value) {
+    DayOfWeek(String value) {
         this.dayOfWeek = value;
     }
 }

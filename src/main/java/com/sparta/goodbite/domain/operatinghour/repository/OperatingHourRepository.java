@@ -1,7 +1,7 @@
 package com.sparta.goodbite.domain.operatinghour.repository;
 
 import com.sparta.goodbite.domain.operatinghour.entity.OperatingHour;
-import com.sparta.goodbite.domain.operatinghour.enums.DayOfWeekEnum;
+import com.sparta.goodbite.domain.operatinghour.enums.DayOfWeek;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.exception.operatinghour.OperatingHourErrorCode;
 import com.sparta.goodbite.exception.operatinghour.detail.OperatingHourNotFoundException;
@@ -17,5 +17,5 @@ public interface OperatingHourRepository extends JpaRepository<OperatingHour, Lo
 
     List<OperatingHour> findAllByRestaurantId(Long restaurantId);
 
-    boolean existsByDayOfWeekAndRestaurant(DayOfWeekEnum dayOfWeek, Restaurant restaurant);
+    boolean existsByDayOfWeekAndRestaurant(DayOfWeek dayOfWeek, Restaurant restaurant);
 }

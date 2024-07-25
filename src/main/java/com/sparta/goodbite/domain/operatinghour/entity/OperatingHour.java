@@ -2,7 +2,7 @@ package com.sparta.goodbite.domain.operatinghour.entity;
 
 import com.sparta.goodbite.common.Timestamped;
 import com.sparta.goodbite.domain.operatinghour.dto.UpdateOperatingHourRequestDto;
-import com.sparta.goodbite.domain.operatinghour.enums.DayOfWeekEnum;
+import com.sparta.goodbite.domain.operatinghour.enums.DayOfWeek;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -32,13 +32,13 @@ public class OperatingHour extends Timestamped {
     private Restaurant restaurant;
 
     @Enumerated(EnumType.STRING)
-    private DayOfWeekEnum dayOfWeek;
+    private DayOfWeek dayOfWeek;
 
     private LocalTime openTime;
     private LocalTime closeTime;
 
     @Builder
-    public OperatingHour(Restaurant restaurant, DayOfWeekEnum dayOfWeek, LocalTime openTime,
+    public OperatingHour(Restaurant restaurant, DayOfWeek dayOfWeek, LocalTime openTime,
         LocalTime closeTime) {
         this.restaurant = restaurant;
         this.dayOfWeek = dayOfWeek;

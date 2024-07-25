@@ -1,10 +1,10 @@
 package com.sparta.goodbite.domain.operatinghour.dto;
 
 import com.sparta.goodbite.domain.operatinghour.entity.OperatingHour;
-import com.sparta.goodbite.domain.operatinghour.enums.DayOfWeekEnum;
+import com.sparta.goodbite.domain.operatinghour.enums.DayOfWeek;
 import java.time.LocalTime;
 
-public record OperatingHourResponseDto(DayOfWeekEnum dayOfWeek, LocalTime openTime,
+public record OperatingHourResponseDto(DayOfWeek dayOfWeek, LocalTime openTime,
                                        LocalTime closeTime) {
 
     public static OperatingHourResponseDto from(OperatingHour operatingHour) {

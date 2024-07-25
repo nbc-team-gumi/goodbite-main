@@ -38,7 +38,7 @@ public final class JwtUtil {
             Jwts.builder()
                 .setSubject(email) // 사용자 식별자값(ID)
                 .claim(AUTHORIZATION_KEY, authority) // 권한 (ROLE_CUSTOMER / ROLE_OWNER / ROLE_ADMIN)
-                .setExpiration(new Date(date.getTime() + 1000 * 15)) // 60 * 60)) // 1시간
+                .setExpiration(new Date(date.getTime() + 1000 * 60 * 60)) // 1시간
                 .setIssuedAt(date) // 발급일
                 .signWith(JwtConfig.key, SIGNATURE_ALGORITHM) // 암호화 알고리즘
                 .compact();

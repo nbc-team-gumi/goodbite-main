@@ -113,7 +113,8 @@ public class WebSecurityConfig {
             // 인가 설정
             .authorizeHttpRequests(
                 (authorizeHttpRequests) -> authorizeHttpRequests
-                    .requestMatchers("/", "/owners/signup", "/users/login", "/customers/signup",
+                    .requestMatchers("/", "/owners/signup", "/customers/signup", "/users/login",
+                        "/users/refresh",
                         "/error")
                     .permitAll()
                     .requestMatchers("/admins/**").hasRole(UserRoleEnum.ADMIN.name())

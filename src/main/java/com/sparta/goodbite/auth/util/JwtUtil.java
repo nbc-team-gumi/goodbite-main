@@ -38,7 +38,7 @@ public final class JwtUtil {
             Jwts.builder()
                 .setSubject(email) // 사용자 식별자값(ID)
                 .claim(AUTHORIZATION_KEY, authority) // 권한 (ROLE_CUSTOMER / ROLE_OWNER / ROLE_ADMIN)
-                .setExpiration(new Date(date.getTime() + 1000 * 60 * 60)) // 1시간
+                .setExpiration(new Date(date.getTime() + 1000 * 15)) // 60 * 60)) // 1시간
                 .setIssuedAt(date) // 발급일
                 .signWith(JwtConfig.key, SIGNATURE_ALGORITHM) // 암호화 알고리즘
                 .compact();
@@ -92,11 +92,18 @@ public final class JwtUtil {
         }
     }
 
-    // JWT 위변조 검증
+    // JWT 위변조, 만료 검증
     public static boolean isTokenValid(String token) {
         try {
-            // Jwts.parser() is deprecated
-            // --> Jwts.parserBuilder() 사용 권장
+            return isTokenValidOrExpired(token);
+        } catch (ExpiredJwtException e) {
+            return false;
+        }
+    }
+
+    // JWT 위변조 검증, 만료시 ExpiredJwtException throw
+    public static boolean isTokenValidOrExpired(String token) {
+        try {
             Jwts.parserBuilder().setSigningKey(JwtConfig.key).build().parseClaimsJws(token);
             log.debug("토큰 검증 완료: {}", token);
             return true;
@@ -106,19 +113,11 @@ public final class JwtUtil {
             log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
         } catch (IllegalArgumentException e) {
             log.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
-        }
-        return false;
-    }
-
-    // JWT가 기한 만료 검증
-    public static boolean isTokenExpired(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(JwtConfig.key).build().parseClaimsJws(token);
-            return false;
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT token, 만료된 JWT token 입니다.");
-            return true;
+            throw e;
         }
+        return false;
     }
 
     // JWT에서 사용자 정보(Claims)에서 email 가져오기

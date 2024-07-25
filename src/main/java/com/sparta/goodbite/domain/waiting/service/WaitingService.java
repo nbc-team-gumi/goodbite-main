@@ -14,7 +14,9 @@ import com.sparta.goodbite.exception.waiting.WaitingErrorCode;
 import com.sparta.goodbite.exception.waiting.WaitingException;
 import com.sparta.goodbite.exception.waiting.detail.WaitingNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +35,8 @@ public class WaitingService {
     private final RestaurantRepository restaurantRepository;
     private final CustomerRepository customerRepository;
 
+    private final Map<Long, SseEmitter> emitters = new HashMap<>();
+    private final Map<Long, Integer> waitingList = new HashMap<>();
 
     public WaitingResponseDto createWaiting(
 //        UserDetailsImpl userDetails,
@@ -40,14 +45,18 @@ public class WaitingService {
         Restaurant restaurant = restaurantRepository.findById(
             postWaitingRequestDto.getRestaurantId()).orElseThrow();
 
-        System.out.println(restaurant.getId());
-
-        Customer customer = customerRepository.findById(3L)
+        Customer customer = customerRepository.findById(2L)
             .orElseThrow(); // 추후 UserDetails 받고 수정 필요
 
-        Long LastOrderNumber = findLastOrderNumber(restaurant);
+        Waiting waitingDuplicated = waitingRepository.findByRestaurantIdAndCustomerId(
+            restaurant.getId(),
+            customer.getId());
 
-        System.out.println(LastOrderNumber);
+        if (waitingDuplicated != null) {
+            throw new WaitingException(WaitingErrorCode.WAITING_DUPLICATED);
+        }
+
+        Long LastOrderNumber = findLastOrderNumber(restaurant.getId());
 
         Waiting waiting = new Waiting(
             restaurant,
@@ -57,11 +66,10 @@ public class WaitingService {
             postWaitingRequestDto.getPartySize(),
             postWaitingRequestDto.getWaitingType(),
             postWaitingRequestDto.getDemand());
-        System.out.println(waiting.getWaitingType());
 
         waitingRepository.save(waiting);
 
-        return WaitingResponseDto.from(waiting, restaurant.getName());
+        return WaitingResponseDto.of(waiting, restaurant.getName());
     }
 
     // 단일 조회용 메서드
@@ -70,7 +78,7 @@ public class WaitingService {
         Waiting waiting = waitingRepository.findById(waitingId)
             .orElseThrow(() -> new WaitingNotFoundException(
                 WaitingErrorCode.WAITING_NOT_FOUND));
-        return WaitingResponseDto.from(waiting, waiting.getRestaurant().getName());
+        return WaitingResponseDto.of(waiting, waiting.getRestaurant().getName());
     }
 
     //    //가게 주인용 api
@@ -80,7 +88,7 @@ public class WaitingService {
     public void reduceAllWaitingOrders(
 //        UserDetailsImpl userDetails,
         Long restaurantId) {
-        List<Waiting> waitingList = waitingRepository.findByRestaurantId(restaurantId);
+        List<Waiting> waitingList = waitingRepository.findALLByRestaurantId(restaurantId);
         if (waitingList.isEmpty()) {
             throw new WaitingException(WaitingErrorCode.WAITING_NOT_FOUND);
         }
@@ -89,13 +97,15 @@ public class WaitingService {
 
         for (Waiting waiting : waitingList) {
             waiting.reduceWaitingOrder();
-            waitingArrayList.add(waiting);
             if (waiting.getWaitingOrder() == 0) {
                 // 그리고 여기서 알람이나 그런거 해야 함
                 System.out.println("0번은 입장하세요~");
                 //알람!
-                deleteWaiting(waiting.getId());
+                waitingRepository.delete(waiting);
+            } else {
+                waitingArrayList.add(waiting);
             }
+
         }
         // 쿼리가 계속 나감...
         // 한꺼번에 범위로 줄일 수 있음
@@ -104,7 +114,9 @@ public class WaitingService {
 
     // 웨이팅 하나만 삭제하고 뒤 웨이팅 숫자 하나씩 감소
     @Transactional
-    public void reduceOneWaitingOrders(Long waitingId) {
+    public void reduceOneWaitingOrders(
+        //        UserDetailsImpl userDetails,
+        Long waitingId) {
         reduceWaitingOrders(waitingId, "reduce");
     }
 
@@ -122,39 +134,33 @@ public class WaitingService {
         waiting.update(updateWaitingRequestDto.getPartySize(), updateWaitingRequestDto.getDemand());
 
         waitingRepository.save(waiting);
-        return WaitingResponseDto.from(waiting, restaurantName);
+        return WaitingResponseDto.of(waiting, restaurantName);
     }
 
     // 삭제 시, 메서드를 호출한 유저의 id와 취소하고자 하는 가게 id를 받아야 하는거 아닌가?
     // 프론트에서 어떤값을 주느냐에 따라 달라질 것 같다.
-    public WaitingResponseDto deleteWaiting(Long waitingId) {
+    public void deleteWaiting(
 //        UserDetailsImpl userDetails,
-        Waiting waiting = waitingRepository.findById(waitingId)
-            .orElseThrow(() -> new WaitingNotFoundException(
-                WaitingErrorCode.WAITING_NOT_FOUND));
-
-        String restaurantName = waiting.getRestaurant().getName();
-
+        Long waitingId) {
         reduceWaitingOrders(waitingId, "delete");
-
-        return WaitingResponseDto.from(waiting, restaurantName);
     }
 
     public Long findLastOrderNumber(
-        Restaurant restaurant) {
-        if (!waitingRepository.findByRestaurantId(restaurant.getId()).isEmpty()) {
+        Long restaurantId) {
+        if (!waitingRepository.findALLByRestaurantId(restaurantId).isEmpty()) {
             // 해당하는 레스토랑에 예약이 하나라도 존재한다면
             return waitingRepository.findMaxWaitingOrderByRestaurantId(
-                restaurant.getId());
-        } else {
-            // 해당하는 레스토랑에 예약이 하나도 없다
-            return 0L;
+                restaurantId);
         }
+        // 해당하는 레스토랑에 예약이 하나도 없다
+        return 0L;
+
     }
 
     public Page<WaitingResponseDto> getWaitingsByRestaurantId(Long restaurantId,
         Pageable pageable) {
         Page<Waiting> waitingPage = waitingRepository.findByRestaurantId(restaurantId, pageable);
+
         List<WaitingResponseDto> waitingResponseDtos = waitingPage.stream()
             .map(this::convertToDto)
             .collect(Collectors.toList());
@@ -162,13 +168,13 @@ public class WaitingService {
     }
 
     private WaitingResponseDto convertToDto(Waiting waiting) {
-        return WaitingResponseDto.from(waiting, waiting.getRestaurant().getName());
+        return WaitingResponseDto.of(waiting, waiting.getRestaurant().getName());
     }
 
     private void reduceWaitingOrders(Long waitingId, String type) {
         Waiting waitingOne = waitingRepository.findById(waitingId)
             .orElseThrow(() -> new WaitingException(WaitingErrorCode.WAITING_NOT_FOUND));
-        List<Waiting> waitingList = waitingRepository.findByRestaurantId(
+        List<Waiting> waitingList = waitingRepository.findALLByRestaurantId(
             waitingOne.getRestaurant().getId());
 
         boolean flag = false;
@@ -197,4 +203,5 @@ public class WaitingService {
         // 쿼리 최적화
         waitingRepository.saveAll(waitingArrayList);
     }
+
 }

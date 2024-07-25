@@ -16,7 +16,6 @@ public class Restaurant extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     
     private String name;
 }

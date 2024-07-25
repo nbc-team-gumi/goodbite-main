@@ -27,11 +27,11 @@ public class Waiting extends ExtendedTimestamped {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id")
+    @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
     @Column(nullable = false)
@@ -68,7 +68,7 @@ public class Waiting extends ExtendedTimestamped {
     }
 
     public void reduceWaitingOrder() {
-        this.waitingOrder = --this.waitingOrder;
+        --this.waitingOrder;
     }
 
 

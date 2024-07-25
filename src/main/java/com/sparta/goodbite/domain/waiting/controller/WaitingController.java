@@ -7,6 +7,7 @@ import com.sparta.goodbite.domain.waiting.dto.PostWaitingRequestDto;
 import com.sparta.goodbite.domain.waiting.dto.UpdateWaitingRequestDto;
 import com.sparta.goodbite.domain.waiting.dto.WaitingResponseDto;
 import com.sparta.goodbite.domain.waiting.service.WaitingService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,24 +31,32 @@ public class WaitingController {
     @PostMapping("/waitings")
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> createWaiting(
 //        @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @RequestBody PostWaitingRequestDto postWaitingRequestDto
+        @Valid @RequestBody PostWaitingRequestDto postWaitingRequestDto
     ) {
         return ResponseUtil.createOk(waitingService.createWaiting(postWaitingRequestDto));
     }
 
     // 웨이팅 전체 조회용 api
-    @GetMapping("/waitings/{restaurantId}/waitingList")
+    @GetMapping("/restaurants/{restaurantId}/waitingList")
     public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getWaitingList(
 //        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long restaurantId,
-        @PageableDefault(size = 5)
-        Pageable pageable
+        @PageableDefault(size = 5) Pageable pageable
     ) {
-
+        System.out.println("12341334123123123132");
         return ResponseUtil.createOk(
             waitingService.getWaitingsByRestaurantId(restaurantId, pageable));
     }
 
+    @GetMapping("/restaurants/{restaurantId}/waitings")
+    public ResponseEntity<DataResponseDto<Long>> getWaitingLastNumber(
+        //        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @PathVariable Long restaurantId
+    ) {
+        return ResponseUtil.findOk(
+            waitingService.findLastOrderNumber(restaurantId)
+        );
+    }
 
     // 웨이팅 단일 조회용 api
     @GetMapping("/waitings/{waitingId}")
@@ -58,9 +67,8 @@ public class WaitingController {
         return ResponseUtil.findOk(waitingService.getWaiting(waitingId));
     }
 
-
     // 가게 주인용 가게 전체 하나씩 웨이팅 줄이기 메서드 호출
-    @PutMapping("/restaurants/waitings/{restaurantId}")
+    @PutMapping("/restaurants/{restaurantId}/waitings")
     public ResponseEntity<MessageResponseDto> reduceAllWaitingOrders(
 //        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long restaurantId
@@ -79,19 +87,16 @@ public class WaitingController {
         return ResponseUtil.updateOk();
     }
 
-
     // 가게용 웨이팅 정보 업데이트
     @PatchMapping("/waitings/{waitingId}")
-    public ResponseEntity<DataResponseDto<WaitingResponseDto>> updateWaiting(
+    public ResponseEntity<MessageResponseDto> updateWaiting(
 //        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long waitingId,
-        @RequestBody UpdateWaitingRequestDto updateWaitingRequestDto
+        @Valid @RequestBody UpdateWaitingRequestDto updateWaitingRequestDto
     ) {
-
-        return ResponseUtil.updateOk(
-            waitingService.updateWaiting(waitingId, updateWaitingRequestDto));
+        waitingService.updateWaiting(waitingId, updateWaitingRequestDto);
+        return ResponseUtil.updateOk();
     }
-
 
     // 가게/손님용 취소
     @DeleteMapping("/waitings/{waitingId}")
@@ -102,6 +107,5 @@ public class WaitingController {
         waitingService.deleteWaiting(waitingId);
         return ResponseUtil.deleteOk();
     }
-
 
 }

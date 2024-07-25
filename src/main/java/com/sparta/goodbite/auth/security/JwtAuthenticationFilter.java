@@ -62,6 +62,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             }
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(requestDto.getEmail());
+            if (userDetails == null) {
+                log.error("사용자를 찾을 수 없습니다.");
+                ResponseUtil.servletApi(response, HttpStatus.BAD_REQUEST.value(),
+                    "사용자를 찾을 수 없습니다.");
+                return null;
+            }
 
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 userDetails.getUsername(), requestDto.getPassword(), userDetails.getAuthorities());

@@ -1,7 +1,7 @@
 package com.sparta.goodbite.domain.review.dto;
 
 import com.sparta.goodbite.domain.menu.entity.Menu;
-import com.sparta.goodbite.domain.review.dto.validation.RatingConstraint;
+import com.sparta.goodbite.domain.review.dto.validation.constraint.RatingConstraint;
 import com.sparta.goodbite.domain.review.entity.Review;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

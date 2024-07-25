@@ -1,5 +1,6 @@
-package com.sparta.goodbite.domain.operatinghour.dto.validation;
+package com.sparta.goodbite.domain.operatinghour.dto.validation.contraint;
 
+import com.sparta.goodbite.domain.operatinghour.dto.validation.validator.OpenTimeBeforeCloseTimeValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.ElementType;

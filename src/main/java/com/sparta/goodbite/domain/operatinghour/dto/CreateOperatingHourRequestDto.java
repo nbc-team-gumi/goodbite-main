@@ -3,7 +3,7 @@ package com.sparta.goodbite.domain.operatinghour.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sparta.goodbite.domain.operatinghour.dto.validation.OpenTimeBeforeCloseTimeConstraint;
 import com.sparta.goodbite.domain.operatinghour.entity.OperatingHour;
-import com.sparta.goodbite.domain.operatinghour.enums.DayOfWeekEnum;
+import com.sparta.goodbite.domain.operatinghour.enums.DayOfWeek;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalTime;
@@ -16,7 +16,7 @@ public class CreateOperatingHourRequestDto {
     @NotNull(message = "가게를 입력해주세요.")
     private Long restaurantId;
 
-    private DayOfWeekEnum dayOfWeek;
+    private DayOfWeek dayOfWeek;
 
     @JsonFormat(pattern = "HH:mm")
     private LocalTime openTime;

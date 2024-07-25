@@ -20,6 +20,7 @@ public class AuthService {
 
         if (refreshToken == null || !JwtUtil.isTokenValid(refreshToken)) {
             if (refreshToken != null) {
+                JwtUtil.deleteAccessTokenFromCookie(response);
                 JwtUtil.deleteRefreshTokenFromCookie(response);
             }
             throw new InvalidRefreshTokenException(AuthErrorCode.INVALID_REFRESH_TOKEN);

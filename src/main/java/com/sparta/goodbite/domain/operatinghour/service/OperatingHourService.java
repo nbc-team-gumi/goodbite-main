@@ -7,6 +7,7 @@ import com.sparta.goodbite.domain.operatinghour.repository.OperatingHourReposito
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.exception.operatinghour.OperatingHourErrorCode;
+import com.sparta.goodbite.exception.operatinghour.detail.OpenTimeLaterThanCloseTimeException;
 import com.sparta.goodbite.exception.operatinghour.detail.OperatingHourDuplicatedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,12 @@ public class OperatingHourService {
             throw new OperatingHourDuplicatedException(
                 OperatingHourErrorCode.OPERATINGHOUR_DUPLICATED);
         }
+
+        if (createOperatingHourRequestDto.getOpenTime()
+            .isAfter(createOperatingHourRequestDto.getCloseTime())) {
+            throw new OpenTimeLaterThanCloseTimeException(
+                OperatingHourErrorCode.OPERATINGHOUR_OPEN_AFTER_CLOSE);
+        }
         operatingHourRepository.save(createOperatingHourRequestDto.toEntity(restaurant));
     }
 
@@ -40,6 +47,12 @@ public class OperatingHourService {
         UpdateOperatingHourRequestDto updateOperatingHourRequestDto) {
 
         OperatingHour operatingHour = operatingHourRepository.findByIdOrThrow(operatingHourId);
+
+        if (updateOperatingHourRequestDto.getOpenTime()
+            .isAfter(updateOperatingHourRequestDto.getCloseTime())) {
+            throw new OpenTimeLaterThanCloseTimeException(
+                OperatingHourErrorCode.OPERATINGHOUR_OPEN_AFTER_CLOSE);
+        }
         operatingHour.update(updateOperatingHourRequestDto);
     }
 

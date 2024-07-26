@@ -5,10 +5,10 @@ POST {{baseUrl}}/signup
 Content-Type: application/json
 
 {
-  "email": "user66666@gmail.com",
-  "nickname": "하22f44",
-  "password": "password123!@",
-  "phoneNumber": "010-5556-0220",
+  "email": "testowner1@email.com",
+  "nickname": "가게1",
+  "password": "Passw0rd!",
+  "phoneNumber": "010-0001-0000",
   "businessNumber": "dsf446s1242342"
 }
 
@@ -20,7 +20,7 @@ PATCH {{baseUrl}}/{{ownerId}}/nickname
 Content-Type: application/json
 
 {
-  "newNickname": "하22덜3"
+  "newNickname": "가게2"
 }
 
 ### 회원정보수정-전화번호
@@ -28,7 +28,7 @@ PATCH {{baseUrl}}/{{ownerId}}/phone-number
 Content-Type: application/json
 
 {
-  "newPhoneNumber": "010-0000-0220"
+  "newPhoneNumber": "010-1111-0000"
 }
 
 ### 회원정보수정-비밀번호
@@ -36,8 +36,8 @@ PATCH {{baseUrl}}/{{ownerId}}/password
 Content-Type: application/json
 
 {
-  "currentPassword": "password123!@2@",
-  "newPassword": "password123!@@"
+  "currentPassword": "Passw0rd!",
+  "newPassword": "Passw0rd!@"
 }
 
 ### 회원정보수정-사업자번호

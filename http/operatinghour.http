@@ -1,0 +1,24 @@
+#@baseUrl = http://localhost:8080/operating-hours
+
+### 영업시간 생성
+POST http://localhost:8080/operating-hours
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "dayOfWeek": "MON",
+  "openTime": "09:00",
+  "closeTime": "22:00"
+}
+
+### 영업시간 수정
+PUT http://localhost:8080/operating-hours/1
+Content-Type: application/json
+
+{
+  "openTime": "09:00",
+  "closeTime": "21:00"
+}
+
+### 영업시간 삭제
+DELETE http://localhost:8080/operating-hours/1

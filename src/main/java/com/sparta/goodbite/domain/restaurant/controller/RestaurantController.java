@@ -3,6 +3,7 @@ package com.sparta.goodbite.domain.restaurant.controller;
 import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
+import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
 import com.sparta.goodbite.domain.restaurant.service.RestaurantService;
@@ -60,5 +61,13 @@ public class RestaurantController {
 
         restaurantService.deleteRestaurant(restaurantId);
         return ResponseUtil.deleteOk();
+    }
+
+    @GetMapping("/{restaurantId}/operating-hours")
+    public ResponseEntity<DataResponseDto<List<OperatingHourResponseDto>>> getAllOperatingHoursByRestaurant(
+        @PathVariable Long restaurantId) {
+
+        return ResponseUtil.findOk(
+            restaurantService.getAllOperatingHoursByRestaurant(restaurantId));
     }
 }

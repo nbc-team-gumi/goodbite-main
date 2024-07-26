@@ -1,5 +1,8 @@
 package com.sparta.goodbite.domain.restaurant.service;
 
+import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
+import com.sparta.goodbite.domain.operatinghour.entity.OperatingHour;
+import com.sparta.goodbite.domain.operatinghour.repository.OperatingHourRepository;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
@@ -14,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
+    private final OperatingHourRepository operatingHourRepository;
 
     @Transactional
     public void createRestaurant(RestaurantRequestDto restaurantRequestDto) {
@@ -50,5 +54,17 @@ public class RestaurantService {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
         restaurantRepository.delete(restaurant);
+    }
+
+    @Transactional(readOnly = true)
+    public List<OperatingHourResponseDto> getAllOperatingHoursByRestaurant(Long restaurantId) {
+
+        restaurantRepository.findByIdOrThrow(restaurantId);
+        List<OperatingHour> operatingHours = operatingHourRepository.findAllByRestaurantId(
+            restaurantId);
+
+        return operatingHours.stream()
+            .map(OperatingHourResponseDto::from)
+            .toList();
     }
 }

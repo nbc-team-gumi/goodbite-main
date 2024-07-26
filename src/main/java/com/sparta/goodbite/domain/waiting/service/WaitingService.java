@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -34,6 +35,7 @@ public class WaitingService {
     private final WaitingRepository waitingRepository;
     private final RestaurantRepository restaurantRepository;
     private final CustomerRepository customerRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     private final Map<Long, SseEmitter> emitters = new HashMap<>();
     private final Map<Long, Integer> waitingList = new HashMap<>();
@@ -189,6 +191,8 @@ public class WaitingService {
                     System.out.println("식당 웨이팅 받기 성공 알림");
                 }
                 System.out.println("0번은 입장하세요!");
+                sendNotificationToCustomer(waiting.getCustomer().getId(),
+                    "Your waiting number is now 0");
                 waitingRepository.delete(waiting);
                 flag = true;
             } else if (flag) {
@@ -202,6 +206,10 @@ public class WaitingService {
         }
         // 쿼리 최적화
         waitingRepository.saveAll(waitingArrayList);
+    }
+
+    private void sendNotificationToCustomer(Long customerId, String message) {
+        messagingTemplate.convertAndSend("/topic/notifications/" + customerId, message);
     }
 
 }

@@ -52,8 +52,13 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // SSE 통신을 위한 의존성 추가
-    implementation 'org.springframework.boot:spring-boot-starter-web-services'
+    // 웹소켓 통신을 위한 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    runtimeOnly 'mysql:mysql-connector-java'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // validation을 위한 의존성 추가
     implementation 'org.springframework.boot:spring-boot-starter-validation'

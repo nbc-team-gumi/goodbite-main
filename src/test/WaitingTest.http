@@ -1,24 +1,32 @@
+@restaurantId = 1
+@baseUrl = http://localhost:8080
+
 ### Waiting 손님이 등록
-POST http://localhost:8080/waitings
+POST {{baseUrl}}/waitings
 Content-Type: application/json
 
 {
-  "restaurantId": 3,
+  "restaurantId": 2,
   "partySize": 123,
   "waitingType": "OFFLINE",
-  "demand": ""
+  "demand": "널널한 자리로 주세요~"
 }
 
+> {%
+  client.global.set("waitingId", response.body.data.waitingId);
+%}
+
+
 ### Waiting 단일 정보 조회
-GET http://localhost:8080/waitings/63
+GET {{baseUrl}}/waitings/{{waitingId}}
 
 
 ### Restaurant의 마지막 Waiting번호 가져오기
-GET http://localhost:8080/restaurants/2/waitings
+GET {{baseUrl}}/restaurants/{{restaurantId}}/waitings
 
 
 ### Waiting 가게에서 정보 수정
-PATCH http://localhost:8080/waitings/59
+PATCH {{baseUrl}}/waitings/{{waitingId}}
 Content-Type: application/json
 
 {
@@ -27,20 +35,16 @@ Content-Type: application/json
 }
 
 ### Waiting 취소/삭제
-DELETE http://localhost:8080/waitings/28
+DELETE {{baseUrl}}/waitings/{{waitingId}}
 
 
 ### Waiting 사장이 수락하고 가게 전체 Waiting 순서 하나씩 줄어들게 하는거
-PUT http://localhost:8080/restaurants/2/waitings
+PUT {{baseUrl}}/{{restaurantId}}/waitings
 
 
 ### Waiting 사장이 하나만 수락하고 그 뒤 가게 Waiting 순서 하나씩 줄어들게 하는거
-PUT http://localhost:8080/waitings/61
+PUT {{baseUrl}}/waitings/{{waitingId}}
 
 ### 가게 웨이팅 리스트 페이지네이션 해서 보기
-GET http://localhost:8080/restaurants/1/waitingList?page=0&size=5
-Content-Type: application/json
-
-{
-}
+GET {{baseUrl}}/restaurants/{{restaurantId}}/waitingList?page=0&size=5
 

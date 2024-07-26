@@ -1,0 +1,45 @@
+@baseUrl = http://localhost:8080/customers
+@customerId=1
+
+### 회원가입
+POST {{baseUrl}}/signup
+Content-Type: application/json
+
+{
+  "email": "user55555@gmail.com",
+  "nickname": "하22",
+  "password": "password123!@",
+  "telNo": "010-5555-0220"
+}
+
+### 회원정보수정-닉네임
+PATCH {{baseUrl}}/{{customerId}}/nickname
+Content-Type: application/json
+
+{
+  "newNickname": "하22덜"
+}
+
+### 회원정보수정-전화번호
+PATCH {{baseUrl}}/{{customerId}}/phone-number
+Content-Type: application/json
+
+{
+  "newPhoneNumber": "010-0000-0220"
+}
+
+### 회원정보수정-비밀번호
+PATCH {{baseUrl}}/{{customerId}}/password
+Content-Type: application/json
+
+{
+  "currentPassword": "password123!@",
+  "newPassword": "password123!@@"
+}
+
+### 회원정보조회
+GET {{baseUrl}}/{{customerId}}
+
+### 회원탈퇴
+DELETE {{baseUrl}}/{{customerId}}
+

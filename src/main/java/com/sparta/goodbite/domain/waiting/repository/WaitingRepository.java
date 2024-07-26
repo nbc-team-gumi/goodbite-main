@@ -12,7 +12,6 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
 
     Waiting findByRestaurantIdAndCustomerId(Long restaurantId, Long customerId);
 
-
     ArrayList<Waiting> findALLByRestaurantId(Long restaurantId);
 
     @Query("SELECT MAX(w.waitingOrder) FROM Waiting w WHERE w.restaurant.id = :restaurant_id")

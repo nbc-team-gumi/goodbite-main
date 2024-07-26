@@ -1,12 +1,10 @@
 package com.sparta.goodbite.auth.security;
 
 import com.sparta.goodbite.auth.UserRole;
-import com.sparta.goodbite.domain.user.admin.entity.Admin;
-import com.sparta.goodbite.domain.user.admin.repository.AdminRepository;
-import com.sparta.goodbite.domain.user.customer.entity.Customer;
-import com.sparta.goodbite.domain.user.customer.repository.CustomerRepository;
-import com.sparta.goodbite.domain.user.owner.entity.Owner;
-import com.sparta.goodbite.domain.user.owner.repository.OwnerRepository;
+import com.sparta.goodbite.domain.customer.entity.Customer;
+import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
+import com.sparta.goodbite.domain.owner.entity.Owner;
+import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +20,7 @@ public class EmailUserDetailsService implements UserDetailsService {
 
     private final CustomerRepository customerRepository;
     private final OwnerRepository ownerRepository;
-    private final AdminRepository adminRepository;
+//    private final AdminRepository adminRepository;
 
 //    public EmailUserDetails loadUserByEmail(String email, String role)
 //        throws UsernameNotFoundException {
@@ -58,10 +56,10 @@ public class EmailUserDetailsService implements UserDetailsService {
             return new EmailUserDetails(owner.get(), UserRole.OWNER.getAuthority());
         }
 
-        Optional<Admin> admin = adminRepository.findByEmail(username);
-        if (admin.isPresent()) {
-            return new EmailUserDetails(admin.get(), UserRole.ADMIN.getAuthority());
-        }
+//        Optional<Admin> admin = adminRepository.findByEmail(username);
+//        if (admin.isPresent()) {
+//            return new EmailUserDetails(admin.get(), UserRole.ADMIN.getAuthority());
+//        }
 
         return null;
     }

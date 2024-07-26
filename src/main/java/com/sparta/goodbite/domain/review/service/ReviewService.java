@@ -1,5 +1,7 @@
 package com.sparta.goodbite.domain.review.service;
 
+import com.sparta.goodbite.common.UserCredentials;
+import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.menu.entity.Menu;
 import com.sparta.goodbite.domain.menu.repository.MenuRepository;
 import com.sparta.goodbite.domain.review.dto.CreateReviewRequestDto;
@@ -20,9 +22,10 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
 
     @Transactional
-    public void createReview(CreateReviewRequestDto createReviewRequestDto) {
+    public void createReview(CreateReviewRequestDto createReviewRequestDto, UserCredentials user) {
         Menu menu = menuRepository.findByIdOrThrow(createReviewRequestDto.getMenuId());
-        reviewRepository.save(createReviewRequestDto.toEntity(menu));
+        Customer customer = null;
+        reviewRepository.save(createReviewRequestDto.toEntity(menu, customer));
     }
 
     @Transactional(readOnly = true)
@@ -36,13 +39,15 @@ public class ReviewService {
     }
 
     @Transactional
-    public void updateReview(Long reviewId, UpdateReviewRequestDto updateReviewRequestDto) {
+    public void updateReview(Long reviewId, UpdateReviewRequestDto updateReviewRequestDto,
+        UserCredentials user) {
+
         Review review = reviewRepository.findByIdOrThrow(reviewId);
         review.update(updateReviewRequestDto);
     }
 
     @Transactional
-    public void deleteReview(Long reviewId) {
+    public void deleteReview(Long reviewId, UserCredentials user) {
         Review review = reviewRepository.findByIdOrThrow(reviewId);
         reviewRepository.delete(review);
     }

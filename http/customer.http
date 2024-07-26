@@ -9,7 +9,7 @@ Content-Type: application/json
   "email": "user55555@gmail.com",
   "nickname": "하22",
   "password": "password123!@",
-  "telNo": "010-5555-0220"
+  "phoneNumber": "010-5555-0220"
 }
 
 ### 회원정보수정-닉네임

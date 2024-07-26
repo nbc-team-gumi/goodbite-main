@@ -28,7 +28,7 @@ public class OwnerService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void signUp(OwnerSignUpRequestDto requestDto) {
+    public void signup(OwnerSignUpRequestDto requestDto) {
         String nickname = requestDto.getNickname();
         String email = requestDto.getEmail();
         String phoneNumber = requestDto.getPhoneNumber();
@@ -72,6 +72,7 @@ public class OwnerService {
             -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND)));
     }
 
+
     @Transactional
     public void updateBusinessNumber(Long ownerId, UpdateBusinessNumberRequestDto requestDto) {
         String newBusinessNumber = requestDto.getNewBusinessNumber();
@@ -87,6 +88,8 @@ public class OwnerService {
 
         // 사업자번호 업데이트
         owner.updateBusinessNumber(newBusinessNumber);
+
+        //사업자번호 인증상태 미인증으로 변환
     }
 
     @Transactional

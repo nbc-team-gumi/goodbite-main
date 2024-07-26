@@ -38,7 +38,7 @@ public class OwnerController {
     @PostMapping("/signup")
     public ResponseEntity<MessageResponseDto> signUp(
         @Valid @RequestBody OwnerSignUpRequestDto requestDto) {
-        ownerService.signUp(requestDto);
+        ownerService.signup(requestDto);
         return ResponseUtil.createOk();
     }
 

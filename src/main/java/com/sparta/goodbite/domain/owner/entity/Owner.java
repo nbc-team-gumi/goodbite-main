@@ -10,7 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,11 +23,9 @@ public class Owner extends ExtendedTimestamped implements UserCredentials {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, unique = true)
     private Long id;
 
     @Column(nullable = false, unique = true)
-    @Email(message = "이메일 형식이 올바르지 않습니다.")
     private String email;
 
     @Column(nullable = false, unique = true)
@@ -83,6 +80,10 @@ public class Owner extends ExtendedTimestamped implements UserCredentials {
     public void updatePassword(String newPassword) {
         this.password = newPassword;
     }
+
+    /*public  void updateStatus(OwnerStatus newOwnerStatus){
+        this.newOwnerStatus = ownerStatus;}
+    }*/
 
     public void updateBusinessNumber(String newBusinessNumber) {
         this.businessNumber = newBusinessNumber;

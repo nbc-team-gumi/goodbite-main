@@ -20,12 +20,12 @@ public class CustomerSignUpRequestDto {
     private String nickname;
 
     @NotBlank(message = "비밀번호를 입력해 주세요.")
-    @Size(min = 8, max = 15, message = "최소 8자 이상, 15자 이하")
+    @Size(min = 8, max = 15, message = "비밀번호는 최소 8자 이상, 15자이하이어야 합니다.")
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]$",
-        message = "최소 8자 이상, 15자 이하의 알파벳 대소문자, 숫자, 특수문자로 구성되어야 합니다.")
+        message = "비밀번호는 알파벳 대소문자, 숫자, 특수문자로 구성되어야 합니다.")
     private String password;
 
     @NotBlank(message = "휴대폰번호를 입력해 주세요.")
-    @Pattern(regexp = "^01(?:0|1|[6-9])[.-]?(\\d{3}|\\d{4})[.-]?(\\d{4})$", message = "10 ~ 11 자리의 숫자만 입력 가능합니다.")
+    @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message = "휴대폰 번호 양식에 맞지 않습니다. ex) 010-0000-0000\n")
     private String phoneNumber;
 }

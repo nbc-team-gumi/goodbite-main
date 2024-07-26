@@ -33,7 +33,7 @@ PATCH {{baseUrl}}/{{customerId}}/password
 Content-Type: application/json
 
 {
-  "password": "password123!@",
+  "currentPassword": "password123!@",
   "newPassword": "password123!@@"
 }
 

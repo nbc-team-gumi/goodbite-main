@@ -103,12 +103,12 @@ public class CustomerService {
         /*,Customer customer*/) {
         /*//현재 비밀번호 일치 여부 확인
         if (!passwordEncoder.matches(requestDto.getPassword(), customer.getPassword())) {
-            throw new PasswordMismatchException(UserErrorCode.INVALID_CURRENT_PASSWORD);
+            throw new PasswordMismatchException(UserErrorCode.PASSWORD_MISMATCH);
         }
 
         //새 비밀번호와 기존 비밀번호 동일여부 확인
         if (passwordEncoder.matches(requestDto.getNewPassword(), customer.getPassword())) {
-            throw new SamePasswordException(UserErrorCode.PASSWORD_SAME_AS_OLD);
+            throw new SamePasswordException(UserErrorCode.SAME_PASSWORD);
         }*/
 
         // Customer 조회

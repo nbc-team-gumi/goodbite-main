@@ -6,9 +6,16 @@ import com.sparta.goodbite.exception.auth.AuthException;
 import com.sparta.goodbite.exception.menu.MenuException;
 import com.sparta.goodbite.exception.restaurant.RestaurantException;
 import com.sparta.goodbite.exception.review.ReviewException;
+import com.sparta.goodbite.exception.waiting.WaitingException;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
@@ -25,6 +32,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<MessageResponseDto> handleAuthException(AuthException e) {
         log.error("에러 발생: ", e);
         return ResponseUtil.of(e.getAuthErrorCode().getHttpStatus(), e.getMessage());
+    }
 
     @ExceptionHandler(ReviewException.class)
     public ResponseEntity<MessageResponseDto> handleReviewException(ReviewException e) {
@@ -36,5 +44,23 @@ public class GlobalExceptionHandler {
     public ResponseEntity<MessageResponseDto> handleRestaurantException(RestaurantException e) {
         log.error("에러 발생: ", e);
         return ResponseUtil.of(e.getRestaurantErrorCode().getHttpStatus(), e.getMessage());
+    }
+
+    @ExceptionHandler(WaitingException.class)
+    public ResponseEntity<MessageResponseDto> handleWaitingException(WaitingException e) {
+        log.error("에러 발생: ", e);
+        return ResponseUtil.of(e.getWaitingErrorCode().getHttpStatus(), e.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }

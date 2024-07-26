@@ -9,7 +9,6 @@ import com.sparta.goodbite.exception.review.ReviewException;
 import com.sparta.goodbite.exception.waiting.WaitingException;
 import java.util.HashMap;
 import java.util.Map;
-import jakarta.security.auth.message.AuthException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,35 +32,35 @@ public class GlobalExceptionHandler {
     public ResponseEntity<MessageResponseDto> handleAuthException(AuthException e) {
         log.error("에러 발생: ", e);
         return ResponseUtil.of(e.getAuthErrorCode().getHttpStatus(), e.getMessage());
+    }
 
-        @ExceptionHandler(ReviewException.class)
-        public ResponseEntity<MessageResponseDto> handleReviewException (ReviewException e){
-            log.error("에러 발생: ", e);
-            return ResponseUtil.of(e.getReviewErrorCode().getHttpStatus(), e.getMessage());
-        }
+    @ExceptionHandler(ReviewException.class)
+    public ResponseEntity<MessageResponseDto> handleReviewException(ReviewException e) {
+        log.error("에러 발생: ", e);
+        return ResponseUtil.of(e.getReviewErrorCode().getHttpStatus(), e.getMessage());
+    }
 
-        @ExceptionHandler(RestaurantException.class)
-        public ResponseEntity<MessageResponseDto> handleRestaurantException (RestaurantException e){
-            log.error("에러 발생: ", e);
-            return ResponseUtil.of(e.getRestaurantErrorCode().getHttpStatus(), e.getMessage());
-        }
+    @ExceptionHandler(RestaurantException.class)
+    public ResponseEntity<MessageResponseDto> handleRestaurantException(RestaurantException e) {
+        log.error("에러 발생: ", e);
+        return ResponseUtil.of(e.getRestaurantErrorCode().getHttpStatus(), e.getMessage());
+    }
 
-        @ExceptionHandler(WaitingException.class)
-        public ResponseEntity<MessageResponseDto> handleWaitingException (WaitingException e){
-            log.error("에러 발생: ", e);
-            return ResponseUtil.of(e.getWaitingErrorCode().getHttpStatus(), e.getMessage());
-        }
+    @ExceptionHandler(WaitingException.class)
+    public ResponseEntity<MessageResponseDto> handleWaitingException(WaitingException e) {
+        log.error("에러 발생: ", e);
+        return ResponseUtil.of(e.getWaitingErrorCode().getHttpStatus(), e.getMessage());
+    }
 
-        @ExceptionHandler(MethodArgumentNotValidException.class)
-        @ResponseStatus(HttpStatus.BAD_REQUEST)
-        public Map<String, String> handleValidationExceptions (MethodArgumentNotValidException ex){
-            Map<String, String> errors = new HashMap<>();
-            ex.getBindingResult().getAllErrors().forEach((error) -> {
-                String fieldName = ((FieldError) error).getField();
-                String errorMessage = error.getDefaultMessage();
-                errors.put(fieldName, errorMessage);
-            });
-            return errors;
-        }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }

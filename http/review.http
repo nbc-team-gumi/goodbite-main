@@ -1,0 +1,64 @@
+@baseUrl = http://localhost:8080/reviews
+
+@reviewId = 1
+@menuId = 2
+@rating = 4.5
+@content = "Great food!"
+
+@invalidRating = 4.7
+
+@updatedRating = 5.0
+@updatedContent = "Excellent food!"
+
+### 리뷰 생성
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "menuId": {{menuId}},
+  "rating": {{rating}},
+  "content": {{content}}
+}
+
+### 리뷰 생성 실패
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "menuId": {{menuId}},
+  "rating": {{invalidRating}},
+  "content": {{content}}
+}
+
+
+### 리뷰 단건 조회
+GET {{baseUrl}}/{{reviewId}}
+
+
+### 리뷰 전체 조회
+GET {{baseUrl}}
+
+
+### 리뷰 수정
+PUT {{baseUrl}}/{{reviewId}}
+Content-Type: application/json
+
+{
+  "rating": {{updatedRating}},
+  "content": {{updatedContent}}
+}
+
+
+### 리뷰 수정 실패
+PUT {{baseUrl}}/{{reviewId}}
+Content-Type: application/json
+
+{
+  "rating": {{invalidRating}},
+  "content": {{updatedContent}}
+}
+
+
+### 리뷰 삭제
+DELETE {{baseUrl}}/{{reviewId}}
+Content-Type: application/json

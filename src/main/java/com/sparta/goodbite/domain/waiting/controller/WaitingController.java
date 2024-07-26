@@ -43,7 +43,6 @@ public class WaitingController {
         @PathVariable Long restaurantId,
         @PageableDefault(size = 5) Pageable pageable
     ) {
-        System.out.println("12341334123123123132");
         return ResponseUtil.createOk(
             waitingService.getWaitingsByRestaurantId(restaurantId, pageable));
     }

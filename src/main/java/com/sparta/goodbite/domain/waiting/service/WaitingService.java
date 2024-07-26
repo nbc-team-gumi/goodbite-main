@@ -179,6 +179,7 @@ public class WaitingService {
         List<Waiting> waitingList = waitingRepository.findALLByRestaurantId(
             waitingOne.getRestaurant().getId());
 
+        String message = "";
         boolean flag = false;
         List<Waiting> waitingArrayList = new ArrayList<>();
 
@@ -186,13 +187,12 @@ public class WaitingService {
             if (Objects.equals(waiting.getId(), waitingId)) {
                 //여기서 알람 메서드
                 if (type.equals("delete")) {
-                    System.out.println("삭제 성공 알림");
+                    message = "웨이팅이 취소되었습니다.";
                 } else if (type.equals("reduce")) {
-                    System.out.println("식당 웨이팅 받기 성공 알림");
+                    message = "가게로 들어와 주세요.";
                 }
-                System.out.println("0번은 입장하세요!");
                 sendNotificationToCustomer(waiting.getCustomer().getId(),
-                    "Your waiting number is now 0");
+                    message);
                 waitingRepository.delete(waiting);
                 flag = true;
             } else if (flag) {

@@ -1,7 +1,7 @@
 package com.sparta.goodbite.domain.waiting.entity;
 
 import com.sparta.goodbite.common.ExtendedTimestamped;
-import com.sparta.goodbite.domain.Customer.entity.Customer;
+import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

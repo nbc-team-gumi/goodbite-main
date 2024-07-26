@@ -1,7 +1,8 @@
 package com.sparta.goodbite.domain.waiting.service;
 
-import com.sparta.goodbite.domain.Customer.entity.Customer;
-import com.sparta.goodbite.domain.Customer.repository.CustomerRepository;
+import com.sparta.goodbite.auth.security.EmailUserDetails;
+import com.sparta.goodbite.domain.customer.entity.Customer;
+import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.domain.waiting.dto.PostWaitingRequestDto;
@@ -41,14 +42,13 @@ public class WaitingService {
     private final Map<Long, Integer> waitingList = new HashMap<>();
 
     public WaitingResponseDto createWaiting(
-//        UserDetailsImpl userDetails,
+        EmailUserDetails userDetails,
         PostWaitingRequestDto postWaitingRequestDto) {
 
         Restaurant restaurant = restaurantRepository.findById(
             postWaitingRequestDto.getRestaurantId()).orElseThrow();
 
-        Customer customer = customerRepository.findById(2L)
-            .orElseThrow(); // 추후 UserDetails 받고 수정 필요
+        Customer customer = (Customer) userDetails.getUser();
 
         Waiting waitingDuplicated = waitingRepository.findByRestaurantIdAndCustomerId(
             restaurant.getId(),
@@ -75,7 +75,9 @@ public class WaitingService {
     }
 
     // 단일 조회용 메서드
-    public WaitingResponseDto getWaiting(Long waitingId) {
+    public WaitingResponseDto getWaiting(
+        EmailUserDetails userDetails,
+        Long waitingId) {
 
         Waiting waiting = waitingRepository.findById(waitingId)
             .orElseThrow(() -> new WaitingNotFoundException(
@@ -88,7 +90,7 @@ public class WaitingService {
     // restaurant id에 맞는 Waiting들의 order를 하나씩 줄인다.
     @Transactional
     public void reduceAllWaitingOrders(
-//        UserDetailsImpl userDetails,
+        EmailUserDetails userDetails,
         Long restaurantId) {
         List<Waiting> waitingList = waitingRepository.findALLByRestaurantId(restaurantId);
         if (waitingList.isEmpty()) {
@@ -117,15 +119,16 @@ public class WaitingService {
     // 웨이팅 하나만 삭제하고 뒤 웨이팅 숫자 하나씩 감소
     @Transactional
     public void reduceOneWaitingOrders(
-        //        UserDetailsImpl userDetails,
+        EmailUserDetails userDetails,
         Long waitingId) {
         reduceWaitingOrders(waitingId, "reduce");
     }
 
     // 가게용 api
     // 예약 인원수와 요청사항만 변경 가능함 ( 추후 합의를 통해 ?건 이하의 순서일 때는 수정하지 못하도록 로직 수정 필요)
-    public WaitingResponseDto updateWaiting(Long waitingId,
-//        UserDetailsImpl userDetails,
+    public WaitingResponseDto updateWaiting(
+        EmailUserDetails userDetails,
+        Long waitingId,
         UpdateWaitingRequestDto updateWaitingRequestDto) {
 
         Waiting waiting = waitingRepository.findById(waitingId)
@@ -142,7 +145,7 @@ public class WaitingService {
     // 삭제 시, 메서드를 호출한 유저의 id와 취소하고자 하는 가게 id를 받아야 하는거 아닌가?
     // 프론트에서 어떤값을 주느냐에 따라 달라질 것 같다.
     public void deleteWaiting(
-//        UserDetailsImpl userDetails,
+        EmailUserDetails userDetails,
         Long waitingId) {
         reduceWaitingOrders(waitingId, "delete");
     }
@@ -159,7 +162,9 @@ public class WaitingService {
 
     }
 
-    public Page<WaitingResponseDto> getWaitingsByRestaurantId(Long restaurantId,
+    public Page<WaitingResponseDto> getWaitingsByRestaurantId(
+        EmailUserDetails userDetails,
+        Long restaurantId,
         Pageable pageable) {
         Page<Waiting> waitingPage = waitingRepository.findByRestaurantId(restaurantId, pageable);
 
@@ -169,7 +174,8 @@ public class WaitingService {
         return new PageImpl<>(waitingResponseDtos, pageable, waitingPage.getTotalElements());
     }
 
-    private WaitingResponseDto convertToDto(Waiting waiting) {
+    private WaitingResponseDto convertToDto(
+        Waiting waiting) {
         return WaitingResponseDto.of(waiting, waiting.getRestaurant().getName());
     }
 

@@ -1,5 +1,6 @@
 package com.sparta.goodbite.domain.customer.controller;
 
+import com.sparta.goodbite.auth.security.EmailUserDetails;
 import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
@@ -12,6 +13,7 @@ import com.sparta.goodbite.domain.customer.service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -51,7 +53,7 @@ public class CustomerController {
     @PatchMapping("/{customerId}/nickname")
     public ResponseEntity<MessageResponseDto> updateNickname(@PathVariable Long customerId,
         @Valid @RequestBody
-        UpdateNicknameRequestDto requestDto/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
+        UpdateNicknameRequestDto requestDto, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         customerService.updateNickname(customerId, requestDto);
         return ResponseUtil.updateOk();
@@ -67,7 +69,8 @@ public class CustomerController {
     @PatchMapping("/{customerId}/phone-number")
     public ResponseEntity<MessageResponseDto> updatePhoneNumber(@PathVariable Long customerId,
         @Valid @RequestBody
-        UpdatePhoneNumberRequestDto requestDto/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
+        UpdatePhoneNumberRequestDto requestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         customerService.updatePhoneNumber(customerId, requestDto);
         return ResponseUtil.updateOk();
@@ -82,7 +85,7 @@ public class CustomerController {
     @PatchMapping("/{customerId}/password")
     public ResponseEntity<MessageResponseDto> updatePassword(@PathVariable Long customerId,
         @Valid @RequestBody
-        UpdatePasswordRequestDto requestDto/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
+        UpdatePasswordRequestDto requestDto, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         customerService.updatePassword(customerId, requestDto);
         return ResponseUtil.updateOk();
@@ -96,7 +99,7 @@ public class CustomerController {
      */
     @GetMapping("/{customerId}")
     public ResponseEntity<DataResponseDto<CustomerResponseDto>> getCustomer(
-        @PathVariable Long customerId/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
+        @PathVariable Long customerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         return ResponseUtil.findOk(customerService.getCustomer(customerId));
     }
@@ -109,7 +112,7 @@ public class CustomerController {
      */
     @DeleteMapping("/{customerId}")
     public ResponseEntity<MessageResponseDto> deleteCustomer(
-        @PathVariable Long customerId/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
+        @PathVariable Long customerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         customerService.deleteCustomer(customerId);
         return ResponseUtil.deleteOk();

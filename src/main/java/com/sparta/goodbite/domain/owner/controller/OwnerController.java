@@ -1,5 +1,6 @@
 package com.sparta.goodbite.domain.owner.controller;
 
+import com.sparta.goodbite.auth.security.EmailUserDetails;
 import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
@@ -13,6 +14,7 @@ import com.sparta.goodbite.domain.owner.service.OwnerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -50,7 +52,7 @@ public class OwnerController {
      */
     @GetMapping("/{ownerId}")
     public ResponseEntity<DataResponseDto<OwnerResponseDto>> getOwner(
-        @PathVariable Long ownerId/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
+        @PathVariable Long ownerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         return ResponseUtil.findOk(ownerService.getOwner(ownerId));
     }
@@ -66,7 +68,8 @@ public class OwnerController {
     public ResponseEntity<MessageResponseDto> updateNickname(
         @PathVariable Long ownerId,
         @Valid @RequestBody
-        UpdateOwnerNicknameRequestDto requestDto/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
+        UpdateOwnerNicknameRequestDto requestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         ownerService.updateNickname(ownerId, requestDto);
         return ResponseUtil.updateOk();
@@ -81,7 +84,8 @@ public class OwnerController {
      */
     @PatchMapping("/{ownerId}/phone-number")
     public ResponseEntity<MessageResponseDto> updatePhoneNumber(@PathVariable Long ownerId,
-        @Valid @RequestBody UpdateOwnerPhoneNumberRequestDto requestDto/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
+        @Valid @RequestBody UpdateOwnerPhoneNumberRequestDto requestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         ownerService.updatePhoneNumber(ownerId, requestDto);
         return ResponseUtil.updateOk();
@@ -98,7 +102,8 @@ public class OwnerController {
     @PatchMapping("/{ownerId}/business-number")
     public ResponseEntity<MessageResponseDto> updateBusinessNumber(@PathVariable Long ownerId,
         @Valid @RequestBody
-        UpdateBusinessNumberRequestDto requestDto/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
+        UpdateBusinessNumberRequestDto requestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         ownerService.updateBusinessNumber(ownerId, requestDto);
         return ResponseUtil.updateOk();
@@ -115,7 +120,8 @@ public class OwnerController {
     @PatchMapping("/{ownerId}/password")
     public ResponseEntity<MessageResponseDto> updatePassword(@PathVariable Long ownerId,
         @Valid @RequestBody
-        UpdateOwnerPasswordRequestDto requestDto/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
+        UpdateOwnerPasswordRequestDto requestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         ownerService.updatePassword(ownerId, requestDto);
         return ResponseUtil.updateOk();
@@ -130,7 +136,7 @@ public class OwnerController {
 
     @DeleteMapping("/{ownerId}")
     public ResponseEntity<MessageResponseDto> deleteOwner(
-        @PathVariable Long ownerId/*,@AuthenticationPrincipal UserDetailsImpl userDetails*/
+        @PathVariable Long ownerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         ownerService.deleteOwner(ownerId);
         return ResponseUtil.deleteOk();

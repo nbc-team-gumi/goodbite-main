@@ -1,6 +1,6 @@
 package com.sparta.goodbite.auth.security;
 
-import com.sparta.goodbite.auth.UserRoleEnum;
+import com.sparta.goodbite.auth.UserRole;
 import com.sparta.goodbite.auth.util.JwtUtil;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -117,9 +117,9 @@ public class WebSecurityConfig {
                         "/users/refresh",
                         "/error")
                     .permitAll()
-                    .requestMatchers("/admins/**").hasRole(UserRoleEnum.ADMIN.name())
-                    .requestMatchers("/owners/**").hasRole(UserRoleEnum.OWNER.name())
-                    .requestMatchers("/customers/").hasRole(UserRoleEnum.CUSTOMER.name())
+                    .requestMatchers("/admins/**").hasRole(UserRole.ADMIN.name())
+                    .requestMatchers("/owners/**").hasRole(UserRole.OWNER.name())
+                    .requestMatchers("/customers/").hasRole(UserRole.CUSTOMER.name())
                     .anyRequest().authenticated())
 
             // 기본 폼 로그인을 비활성화, 중복 인증 방지

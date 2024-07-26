@@ -1,6 +1,6 @@
 package com.sparta.goodbite.auth.security;
 
-import com.sparta.goodbite.auth.UserRoleEnum;
+import com.sparta.goodbite.auth.UserRole;
 import com.sparta.goodbite.domain.user.admin.entity.Admin;
 import com.sparta.goodbite.domain.user.admin.repository.AdminRepository;
 import com.sparta.goodbite.domain.user.customer.entity.Customer;
@@ -29,7 +29,7 @@ public class EmailUserDetailsService implements UserDetailsService {
 //
 //        UserCredentials user;
 //
-//        switch (UserRoleEnum.valueOf(role)) {
+//        switch (UserRole.valueOf(role)) {
 //            case CUSTOMER -> user = (UserCredentials) customerRepository.findByEmailOrThrow(email);
 //            case OWNER -> user = (UserCredentials) ownerRepository.findByEmailOrThrow(email);
 //            case ADMIN -> user = (UserCredentials) adminRepository.findByEmailOrThrow(email);
@@ -38,7 +38,7 @@ public class EmailUserDetailsService implements UserDetailsService {
 //
 //        log.debug("user role case 통과!");
 //
-//        return new EmailUserDetails(user, UserRoleEnum.valueOf(role).getAuthority());
+//        return new EmailUserDetails(user, UserRole.valueOf(role).getAuthority());
 //    }
 
     /*
@@ -50,17 +50,17 @@ public class EmailUserDetailsService implements UserDetailsService {
 
         Optional<Customer> customer = customerRepository.findByEmail(username);
         if (customer.isPresent()) {
-            return new EmailUserDetails(customer.get(), UserRoleEnum.CUSTOMER.getAuthority());
+            return new EmailUserDetails(customer.get(), UserRole.CUSTOMER.getAuthority());
         }
 
         Optional<Owner> owner = ownerRepository.findByEmail(username);
         if (owner.isPresent()) {
-            return new EmailUserDetails(owner.get(), UserRoleEnum.OWNER.getAuthority());
+            return new EmailUserDetails(owner.get(), UserRole.OWNER.getAuthority());
         }
 
         Optional<Admin> admin = adminRepository.findByEmail(username);
         if (admin.isPresent()) {
-            return new EmailUserDetails(admin.get(), UserRoleEnum.ADMIN.getAuthority());
+            return new EmailUserDetails(admin.get(), UserRole.ADMIN.getAuthority());
         }
 
         return null;

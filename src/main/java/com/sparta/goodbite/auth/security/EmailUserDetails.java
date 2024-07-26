@@ -1,6 +1,6 @@
 package com.sparta.goodbite.auth.security;
 
-import com.sparta.goodbite.auth.dummy.UserCredentials;
+import com.sparta.goodbite.common.UserCredentials;
 import java.util.ArrayList;
 import java.util.Collection;
 import lombok.Getter;

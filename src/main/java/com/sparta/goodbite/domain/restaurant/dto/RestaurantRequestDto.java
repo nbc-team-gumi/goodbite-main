@@ -1,5 +1,6 @@
 package com.sparta.goodbite.domain.restaurant.dto;
 
+import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -8,7 +9,7 @@ import lombok.Getter;
 @Getter
 public class RestaurantRequestDto {
 
-    @NotNull(message = "사장님의 Id를 입력해주세요.")
+    //    @NotNull(message = "사장님의 Id를 입력해주세요.")
     private Long ownerId;
     @NotNull(message = "가게 이름을 입력해주세요.")
     private String name;
@@ -24,9 +25,9 @@ public class RestaurantRequestDto {
     @NotNull(message = "카테고리를 입력해주세요.")
     private String category;
 
-    public Restaurant toEntity() {
+    public Restaurant toEntity(Owner owner) {
         return Restaurant.builder()
-            .ownerId(ownerId)
+            .owner(owner)
             .name(name)
             .imageUrl(imageUrl)
             .address(address)

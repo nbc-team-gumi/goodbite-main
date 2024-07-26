@@ -1,12 +1,17 @@
 package com.sparta.goodbite.domain.restaurant.service;
 
+import com.sparta.goodbite.auth.security.EmailUserDetails;
 import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
 import com.sparta.goodbite.domain.operatinghour.entity.OperatingHour;
 import com.sparta.goodbite.domain.operatinghour.repository.OperatingHourRepository;
+import com.sparta.goodbite.domain.owner.entity.Owner;
+import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
+import com.sparta.goodbite.exception.restaurant.RestaurantErrorCode;
+import com.sparta.goodbite.exception.restaurant.detail.RestaurantNotAuthorizationException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,11 +23,16 @@ public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
     private final OperatingHourRepository operatingHourRepository;
+    private final OwnerRepository ownerRepository;
 
     @Transactional
-    public void createRestaurant(RestaurantRequestDto restaurantRequestDto) {
+    public void createRestaurant(RestaurantRequestDto restaurantRequestDto,
+        EmailUserDetails userDetails) {
 
-        restaurantRepository.save(restaurantRequestDto.toEntity());
+        String ownerEmail = userDetails.getUser().getEmail();
+        Owner owner = ownerRepository.findByEmailOrThrow(ownerEmail);
+
+        restaurantRepository.save(restaurantRequestDto.toEntity(owner));
     }
 
     @Transactional(readOnly = true)
@@ -43,16 +53,35 @@ public class RestaurantService {
     }
 
     @Transactional
-    public void updateRestaurant(Long restaurantId, RestaurantRequestDto restaurantRequestDto) {
+    public void updateRestaurant(Long restaurantId, RestaurantRequestDto restaurantRequestDto,
+        EmailUserDetails userDetails) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
+
+        String ownerEmail = userDetails.getUser().getEmail();
+        Owner owner = ownerRepository.findByEmailOrThrow(ownerEmail);
+
+        if (!owner.equals(restaurant.getOwner())) {
+            throw new RestaurantNotAuthorizationException(
+                RestaurantErrorCode.RESTAURANT_NOT_AUTHORIZATION);
+        }
+
         restaurant.update(restaurantRequestDto);
     }
 
     @Transactional
-    public void deleteRestaurant(Long restaurantId) {
+    public void deleteRestaurant(Long restaurantId, EmailUserDetails userDetails) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
+
+        String ownerEmail = userDetails.getUser().getEmail();
+        Owner owner = ownerRepository.findByEmailOrThrow(ownerEmail);
+
+        if (!owner.equals(restaurant.getOwner())) {
+            throw new RestaurantNotAuthorizationException(
+                RestaurantErrorCode.RESTAURANT_NOT_AUTHORIZATION);
+        }
+
         restaurantRepository.delete(restaurant);
     }
 

@@ -1,5 +1,6 @@
 package com.sparta.goodbite.domain.restaurant.controller;
 
+import com.sparta.goodbite.auth.security.EmailUserDetails;
 import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
@@ -11,6 +12,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,9 +31,10 @@ public class RestaurantController {
 
     @PostMapping
     public ResponseEntity<MessageResponseDto> createRestaurant(
-        @Valid @RequestBody RestaurantRequestDto restaurantRequestDto) {
+        @Valid @RequestBody RestaurantRequestDto restaurantRequestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        restaurantService.createRestaurant(restaurantRequestDto);
+        restaurantService.createRestaurant(restaurantRequestDto, userDetails);
         return ResponseUtil.createOk();
     }
 
@@ -50,16 +53,18 @@ public class RestaurantController {
 
     @PutMapping("/{restaurantId}")
     public ResponseEntity<MessageResponseDto> updateRestaurant(@PathVariable Long restaurantId,
-        @RequestBody RestaurantRequestDto restaurantRequestDto) {
+        @RequestBody RestaurantRequestDto restaurantRequestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        restaurantService.updateRestaurant(restaurantId, restaurantRequestDto);
+        restaurantService.updateRestaurant(restaurantId, restaurantRequestDto, userDetails);
         return ResponseUtil.updateOk();
     }
 
     @DeleteMapping("/{restaurantId}")
-    public ResponseEntity<MessageResponseDto> deleteRestaurant(@PathVariable Long restaurantId) {
+    public ResponseEntity<MessageResponseDto> deleteRestaurant(@PathVariable Long restaurantId,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        restaurantService.deleteRestaurant(restaurantId);
+        restaurantService.deleteRestaurant(restaurantId, userDetails);
         return ResponseUtil.deleteOk();
     }
 

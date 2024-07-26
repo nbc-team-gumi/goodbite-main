@@ -77,7 +77,7 @@ public class WaitingController {
     }
 
     // 가게 주인용 하나 선택 후 웨이팅 줄이기 메서드 호출
-    @PutMapping("/waitings/{waitingId}")
+    @PutMapping("/restaurants/waitings/{waitingId}")
     public ResponseEntity<MessageResponseDto> reduceOneWaitingOrders(
 //        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long waitingId

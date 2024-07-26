@@ -1,10 +1,17 @@
 package com.sparta.goodbite.domain.menu.service;
 
+import com.sparta.goodbite.common.UserCredentials;
 import com.sparta.goodbite.domain.menu.dto.CreateMenuRequestDto;
 import com.sparta.goodbite.domain.menu.dto.MenuResponseDto;
 import com.sparta.goodbite.domain.menu.dto.UpdateMenuRequestDto;
 import com.sparta.goodbite.domain.menu.entity.Menu;
 import com.sparta.goodbite.domain.menu.repository.MenuRepository;
+import com.sparta.goodbite.domain.owner.entity.Owner;
+import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
+import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
+import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
+import com.sparta.goodbite.exception.auth.AuthErrorCode;
+import com.sparta.goodbite.exception.auth.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +21,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class MenuService {
 
     private final MenuRepository menuRepository;
+    private final OwnerRepository ownerRepository;
+    private final RestaurantRepository restaurantRepository;
 
     @Transactional
-    public void createMenu(CreateMenuRequestDto createMenuRequestDto) { // User user
-        menuRepository.save(createMenuRequestDto.toEntity());
+    public void createMenu(CreateMenuRequestDto createMenuRequestDto, UserCredentials user) {
+        String email = user.getEmail();
+        Owner owner = ownerRepository.findByEmailOrThrow(email);
+        Restaurant restaurant = restaurantRepository.findByOwnerIdOrThrow(owner.getId());
+
+        menuRepository.save(createMenuRequestDto.toEntity(restaurant));
     }
 
     @Transactional(readOnly = true)
@@ -26,13 +39,34 @@ public class MenuService {
     }
 
     @Transactional
-    public void updateMenu(Long menuId, UpdateMenuRequestDto updateMenuRequestDto) {
+    public void updateMenu(Long menuId, UpdateMenuRequestDto updateMenuRequestDto,
+        UserCredentials user) {
+
+        Owner owner = ownerRepository.findByEmailOrThrow(user.getEmail());
         Menu menu = menuRepository.findByIdOrThrow(menuId);
+        Restaurant restaurant = restaurantRepository.findByOwnerIdOrThrow(owner.getId());
+
+        // 메뉴의 레스토랑과 소유자의 레스토랑이 일치하는지 검증
+        validateMenuOwnership(menu, restaurant);
+
         menu.update(updateMenuRequestDto);
     }
 
     @Transactional
-    public void deleteMenu(Long menuId) {
+    public void deleteMenu(Long menuId, UserCredentials user) {
+        Owner owner = ownerRepository.findByEmailOrThrow(user.getEmail());
+        Menu menu = menuRepository.findByIdOrThrow(menuId);
+        Restaurant restaurant = restaurantRepository.findByOwnerIdOrThrow(owner.getId());
+
+        // 메뉴의 레스토랑과 소유자의 레스토랑이 일치하는지 검증
+        validateMenuOwnership(menu, restaurant);
+
         menuRepository.delete(menuRepository.findByIdOrThrow(menuId));
+    }
+
+    private void validateMenuOwnership(Menu menu, Restaurant restaurant) {
+        if (!menu.getRestaurant().getId().equals(restaurant.getId())) {
+            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+        }
     }
 }

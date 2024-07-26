@@ -1,0 +1,41 @@
+@baseUrl = http://localhost:8080/menus
+
+@menuId = 5
+
+@price = 1000
+@name = "name"
+@description = "description"
+
+@updatedPrice = 2000
+@updatedName = "updated Name"
+@updatedDescription = "updated Description"
+
+
+### 메뉴 생성
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "price": {{price}},
+  "name": {{name}},
+  "description": {{description}}
+}
+
+
+### 메뉴 단건 조회
+GET {{baseUrl}}/{{menuId}}
+
+
+### 메뉴 수정
+PUT {{baseUrl}}/{{menuId}}
+Content-Type: application/json
+
+{
+  "price": {{updatedPrice}},
+  "name": {{updatedName}},
+  "description": {{updatedDescription}}
+}
+
+
+### 메뉴 삭제
+DELETE {{baseUrl}}/{{menuId}}

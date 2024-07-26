@@ -1,5 +1,8 @@
 package com.sparta.goodbite.common.response;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -44,5 +47,28 @@ public abstract class ResponseUtil {
     public static ResponseEntity<MessageResponseDto> updateOk() {
         return ResponseEntity.status(HttpStatus.OK)
             .body(new MessageResponseDto(HttpStatus.OK.value(), "수정 성공"));
+    }
+
+    /**
+     * 서블릿 컨테이너를 거치지 않고 사용자에게 응답 메시지를 반환
+     *
+     * @param response   서블릿 응답 객체
+     * @param httpStatus 응답 http 상태
+     * @param message    응답 메시지
+     * @throws IOException JSON <-> 객체 매핑 예외처리
+     */
+    public static void servletApi(HttpServletResponse response, int httpStatus,
+        String message) throws IOException {
+        // 응답 상태 설정
+        response.setStatus(httpStatus);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("utf-8");
+
+        // 응답 메시지 설정
+        String result = new ObjectMapper().writeValueAsString(
+            new MessageResponseDto(httpStatus, message));
+
+        // 응답 데이터 반환
+        response.getWriter().write(result);
     }
 }

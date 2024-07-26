@@ -32,33 +32,13 @@ public final class JwtUtil {
     // 액세스 토큰 생성
     // Prefix: Bearer
     public static String createAccessToken(String email, String authority) {
-        Date date = new Date();
-
-        String createdToken = BEARER_PREFIX +
-            Jwts.builder()
-                .setSubject(email) // 사용자 식별자값(ID)
-                .claim(AUTHORIZATION_KEY, authority) // 권한 (ROLE_CUSTOMER / ROLE_OWNER / ROLE_ADMIN)
-                .setExpiration(new Date(date.getTime() + 1000 * 60 * 60)) // 1시간
-                .setIssuedAt(date) // 발급일
-                .signWith(JwtConfig.key, SIGNATURE_ALGORITHM) // 암호화 알고리즘
-                .compact();
-
-        log.debug("사용자 토큰 생성: {}", createdToken);
-        return createdToken;
+        return BEARER_PREFIX + createToken(email, authority, 1000L * 60 * 60); // 1시간
     }
 
     // 리프레시 토큰 생성
     // Prefix: 없음
     public static String createRefreshToken(String email, String authority) {
-        Date date = new Date();
-
-        return Jwts.builder()
-            .setSubject(email)
-            .claim(AUTHORIZATION_KEY, authority) // 권한 (ROLE_CUSTOMER / ROLE_OWNER / ROLE_ADMIN)
-            .setExpiration(new Date(date.getTime() + 1000 * 60 * 60 * 24 * 7)) // 7일
-            .setIssuedAt(date)
-            .signWith(JwtConfig.key, SIGNATURE_ALGORITHM)
-            .compact();
+        return createToken(email, authority, 1000L * 60 * 60 * 24 * 7); // 7일
     }
 
     // JWT Cookie 에 저장
@@ -203,5 +183,17 @@ public final class JwtUtil {
         cookie.setPath("/");
         cookie.setMaxAge(0); // 쿠키 삭제를 위한 MaxAge 설정
         res.addCookie(cookie);
+    }
+
+    private static String createToken(String email, String authority, Long expiration) {
+        Date date = new Date();
+
+        return Jwts.builder()
+            .setSubject(email)
+            .claim(AUTHORIZATION_KEY, authority) // 권한 (ROLE_CUSTOMER / ROLE_OWNER / ROLE_ADMIN)
+            .setExpiration(new Date(date.getTime() + expiration))
+            .setIssuedAt(date)
+            .signWith(JwtConfig.key, SIGNATURE_ALGORITHM)
+            .compact();
     }
 }

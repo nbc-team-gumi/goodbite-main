@@ -1,0 +1,45 @@
+@baseUrl = http://localhost:8080/customers
+@customerId=1
+
+### 회원가입
+POST {{baseUrl}}/signup
+Content-Type: application/json
+
+{
+  "email": "testuser1@example.com",
+  "nickname": "사용자1",
+  "password": "Passw0rd!",
+  "phoneNumber": "010-0000-0001"
+}
+
+### 회원정보수정-닉네임
+PATCH {{baseUrl}}/{{customerId}}/nickname
+Content-Type: application/json
+
+{
+  "newNickname": "사용자2"
+}
+
+### 회원정보수정-전화번호
+PATCH {{baseUrl}}/{{customerId}}/phone-number
+Content-Type: application/json
+
+{
+  "newPhoneNumber": "010-0000-1111"
+}
+
+### 회원정보수정-비밀번호
+PATCH {{baseUrl}}/{{customerId}}/password
+Content-Type: application/json
+
+{
+  "currentPassword": "Passw0rd!",
+  "newPassword": "Passw0rd!@"
+}
+
+### 회원정보조회
+GET {{baseUrl}}/{{customerId}}
+
+### 회원탈퇴
+DELETE {{baseUrl}}/{{customerId}}
+

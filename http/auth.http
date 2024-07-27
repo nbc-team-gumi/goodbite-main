@@ -1,0 +1,25 @@
+@baseUrl = http://localhost:8080
+
+### 로그인 요청
+POST {{baseUrl}}/users/login
+
+{
+  "email": "testuser1@example.com",
+  "password": "Passw0rd!"
+}
+
+> {%
+  client.global.set("accessToken", response.cookies["Authorization"].value);
+  client.global.set("refreshToken", response.cookies["Refresh"].value);
+%}
+
+### 로그아웃 요청
+POST {{baseUrl}}/users/logout
+
+### 리프레시 요청
+POST {{baseUrl}}/users/refresh
+
+> {%
+  client.global.set("accessToken", response.cookies["Authorization"].value);
+%}
+

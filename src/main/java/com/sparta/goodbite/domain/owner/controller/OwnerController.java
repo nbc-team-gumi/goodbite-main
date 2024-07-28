@@ -54,7 +54,8 @@ public class OwnerController {
     public ResponseEntity<DataResponseDto<OwnerResponseDto>> getOwner(
         @PathVariable Long ownerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        return ResponseUtil.findOk(ownerService.getOwner(ownerId));
+        return ResponseUtil.findOk(
+            ownerService.getOwner(ownerId, userDetails.getRole(), userDetails.getUser()));
     }
 
     /**
@@ -71,7 +72,8 @@ public class OwnerController {
         UpdateOwnerNicknameRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        ownerService.updateNickname(ownerId, requestDto);
+        ownerService.updateNickname(ownerId, userDetails.getRole(), requestDto,
+            userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -87,7 +89,8 @@ public class OwnerController {
         @Valid @RequestBody UpdateOwnerPhoneNumberRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        ownerService.updatePhoneNumber(ownerId, requestDto);
+        String email = userDetails.getUser().getEmail();
+        ownerService.updatePhoneNumber(email, requestDto);
         return ResponseUtil.updateOk();
     }
 
@@ -105,7 +108,8 @@ public class OwnerController {
         UpdateBusinessNumberRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        ownerService.updateBusinessNumber(ownerId, requestDto);
+        String email = userDetails.getUser().getEmail();
+        //ownerService.updateBusinessNumber(email, requestDto);
         return ResponseUtil.updateOk();
     }
 
@@ -123,7 +127,8 @@ public class OwnerController {
         UpdateOwnerPasswordRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        ownerService.updatePassword(ownerId, requestDto);
+        String email = userDetails.getUser().getEmail();
+        ownerService.updatePassword(email, requestDto);
         return ResponseUtil.updateOk();
     }
 
@@ -138,7 +143,8 @@ public class OwnerController {
     public ResponseEntity<MessageResponseDto> deleteOwner(
         @PathVariable Long ownerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        ownerService.deleteOwner(ownerId);
+        String email = userDetails.getUser().getEmail();
+        ownerService.deleteOwner(email);
         return ResponseUtil.deleteOk();
     }
 

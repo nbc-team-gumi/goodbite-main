@@ -10,6 +10,7 @@ import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.exception.auth.AuthErrorCode;
 import com.sparta.goodbite.exception.auth.AuthException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,11 @@ public class MenuService {
     @Transactional(readOnly = true)
     public MenuResponseDto getMenu(Long menuId) {
         return MenuResponseDto.from(menuRepository.findByIdOrThrow(menuId));
+    }
+
+    @Transactional(readOnly = true)
+    public List<MenuResponseDto> getAllMenus() {
+        return menuRepository.findAll().stream().map(MenuResponseDto::from).toList();
     }
 
     @Transactional

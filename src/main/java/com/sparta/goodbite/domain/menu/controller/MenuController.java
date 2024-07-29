@@ -9,6 +9,7 @@ import com.sparta.goodbite.domain.menu.dto.MenuResponseDto;
 import com.sparta.goodbite.domain.menu.dto.UpdateMenuRequestDto;
 import com.sparta.goodbite.domain.menu.service.MenuService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,6 +43,11 @@ public class MenuController {
     @GetMapping("/{menuId}")
     public ResponseEntity<DataResponseDto<MenuResponseDto>> getMenu(@PathVariable Long menuId) {
         return ResponseUtil.findOk(menuService.getMenu(menuId));
+    }
+
+    @GetMapping
+    public ResponseEntity<DataResponseDto<List<MenuResponseDto>>> getAllMenus() {
+        return ResponseUtil.findOk(menuService.getAllMenus());
     }
 
     @PreAuthorize("hasRole('OWNER')")

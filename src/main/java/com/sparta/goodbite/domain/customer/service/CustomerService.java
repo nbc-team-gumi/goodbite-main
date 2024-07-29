@@ -2,7 +2,7 @@ package com.sparta.goodbite.domain.customer.service;
 
 import com.sparta.goodbite.common.UserCredentials;
 import com.sparta.goodbite.domain.customer.dto.CustomerResponseDto;
-import com.sparta.goodbite.domain.customer.dto.CustomerSignUpRequestDto;
+import com.sparta.goodbite.domain.customer.dto.CustomerSignupRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdateNicknameRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePasswordRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePhoneNumberRequestDto;
@@ -39,7 +39,7 @@ public class CustomerService {
 
     //회원가입
     @Transactional
-    public void signup(CustomerSignUpRequestDto requestDto) {
+    public void signup(CustomerSignupRequestDto requestDto) {
         String nickname = requestDto.getNickname();
         String email = requestDto.getEmail();
         String phoneNumber = requestDto.getPhoneNumber();

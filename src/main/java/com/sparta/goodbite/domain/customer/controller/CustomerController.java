@@ -70,8 +70,7 @@ public class CustomerController {
     public ResponseEntity<MessageResponseDto> updatePhoneNumber(@PathVariable Long customerId,
         @Valid @RequestBody
         UpdatePhoneNumberRequestDto requestDto,
-        @AuthenticationPrincipal EmailUserDetails userDetails
-    ) {
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
         customerService.updatePhoneNumber(customerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }

@@ -34,7 +34,7 @@ public class CustomerService {
     @Transactional(readOnly = true)
     public CustomerResponseDto getCustomer(Long customerId, UserCredentials user) {
         validateCustomerAccess(customerId, user);//본인인지 확인
-        return CustomerResponseDto.from(customerRepository.findByEmailOrThrow(user.getEmail()));
+        return CustomerResponseDto.from(customerRepository.findByIdOrThrow(user.getId()));
     }
 
     //회원가입

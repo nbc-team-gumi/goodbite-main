@@ -29,6 +29,7 @@ public class OwnerSignUpRequestDto {
     @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message = "휴대폰 번호 양식에 맞지 않습니다. ex) 010-0000-0000\n")
     private String phoneNumber;
 
+    @Pattern(regexp = "^\\d{10}$", message = "사업자 번호는 10자리 숫자여야 합니다.")
     @NotBlank(message = "사업자번호를 입력해주세요")
     private String businessNumber;
 }

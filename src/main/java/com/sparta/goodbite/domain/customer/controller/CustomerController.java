@@ -51,10 +51,10 @@ public class CustomerController {
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
     @PatchMapping("/{customerId}/nickname")
-    public ResponseEntity<MessageResponseDto> updateNickname(@PathVariable Long customerId,
-        @Valid @RequestBody
-        UpdateNicknameRequestDto requestDto, @AuthenticationPrincipal EmailUserDetails userDetails
-    ) {
+    public ResponseEntity<MessageResponseDto> updateNickname(
+        @PathVariable Long customerId,
+        @Valid @RequestBody UpdateNicknameRequestDto requestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
         customerService.updateNickname(customerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
@@ -67,9 +67,9 @@ public class CustomerController {
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
     @PatchMapping("/{customerId}/phone-number")
-    public ResponseEntity<MessageResponseDto> updatePhoneNumber(@PathVariable Long customerId,
-        @Valid @RequestBody
-        UpdatePhoneNumberRequestDto requestDto,
+    public ResponseEntity<MessageResponseDto> updatePhoneNumber(
+        @PathVariable Long customerId,
+        @Valid @RequestBody UpdatePhoneNumberRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
         customerService.updatePhoneNumber(customerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
@@ -82,10 +82,10 @@ public class CustomerController {
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
     @PatchMapping("/{customerId}/password")
-    public ResponseEntity<MessageResponseDto> updatePassword(@PathVariable Long customerId,
-        @Valid @RequestBody
-        UpdatePasswordRequestDto requestDto, @AuthenticationPrincipal EmailUserDetails userDetails
-    ) {
+    public ResponseEntity<MessageResponseDto> updatePassword(
+        @PathVariable Long customerId,
+        @Valid @RequestBody UpdatePasswordRequestDto requestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
         customerService.updatePassword(customerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
@@ -98,8 +98,8 @@ public class CustomerController {
      */
     @GetMapping("/{customerId}")
     public ResponseEntity<DataResponseDto<CustomerResponseDto>> getCustomer(
-        @PathVariable Long customerId, @AuthenticationPrincipal EmailUserDetails userDetails
-    ) {
+        @PathVariable Long customerId,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
         return ResponseUtil.findOk(customerService.getCustomer(customerId, userDetails.getUser()));
     }
 
@@ -111,8 +111,8 @@ public class CustomerController {
      */
     @DeleteMapping("/{customerId}")
     public ResponseEntity<MessageResponseDto> deleteCustomer(
-        @PathVariable Long customerId, @AuthenticationPrincipal EmailUserDetails userDetails
-    ) {
+        @PathVariable Long customerId,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
         customerService.deleteCustomer(customerId, userDetails.getUser());
         return ResponseUtil.deleteOk();
     }

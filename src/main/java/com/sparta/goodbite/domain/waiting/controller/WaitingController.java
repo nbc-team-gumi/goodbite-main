@@ -43,17 +43,20 @@ public class WaitingController {
     }
 
     // 웨이팅 전체 조회용 api
-    // api 권한 제한 없음
+    // 해당 가게 오너 + Admin
+    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
     @GetMapping("/restaurants/{restaurantId}/waitingList")
     public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getWaitingList(
+        @AuthenticationPrincipal EmailUserDetails userDetails,
         @PathVariable Long restaurantId,
         @PageableDefault(size = 5) Pageable pageable
     ) {
         return ResponseUtil.createOk(
-            waitingService.getWaitingsByRestaurantId(restaurantId,
+            waitingService.getWaitingsByRestaurantId(userDetails.getUser(), restaurantId,
                 pageable));
     }
 
+    // 단순 가게의 현재 웨이팅 갯수 받아오는 api
     // api 권한 제한 없음
     @GetMapping("/restaurants/{restaurantId}/waitings")
     public ResponseEntity<DataResponseDto<Long>> getWaitingLastNumber(
@@ -65,12 +68,13 @@ public class WaitingController {
     }
 
     // 웨이팅 단일 조회용 api
-    // api 권한 제한 없음
+    // 해당 가게 오너 또는 해당 웨이팅 등록 손님 + Admin
     @GetMapping("/waitings/{waitingId}")
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> getWaiting(
+        @AuthenticationPrincipal EmailUserDetails userDetails,
         @PathVariable Long waitingId
     ) {
-        return ResponseUtil.findOk(waitingService.getWaiting(waitingId));
+        return ResponseUtil.findOk(waitingService.getWaiting(userDetails.getUser(), waitingId));
     }
 
     // 가게 주인용 가게 전체 하나씩 웨이팅 줄이기 메서드 호출
@@ -100,13 +104,14 @@ public class WaitingController {
     // 가게용 웨이팅 정보 업데이트
     // 해당 가게 오너 또는 해당 웨이팅 등록 손님 + Admin
     @PatchMapping("/waitings/{waitingId}")
-    public ResponseEntity<MessageResponseDto> updateWaiting(
+    public ResponseEntity<DataResponseDto<WaitingResponseDto>> updateWaiting(
         @AuthenticationPrincipal EmailUserDetails userDetails,
         @PathVariable Long waitingId,
         @Valid @RequestBody UpdateWaitingRequestDto updateWaitingRequestDto
     ) {
-        waitingService.updateWaiting(userDetails.getUser(), waitingId, updateWaitingRequestDto);
-        return ResponseUtil.updateOk();
+
+        return ResponseUtil.updateOk(waitingService.updateWaiting(userDetails.getUser(), waitingId,
+            updateWaitingRequestDto));
     }
 
     // 가게/손님용 취소

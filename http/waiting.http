@@ -19,7 +19,6 @@ POST {{baseUrl}}/users/login
 ### Waiting 손님이 등록
 POST {{baseUrl}}/waitings
 Content-Type: application/json
-Cookie: Authorization=Bearer {{accessToken}}
 
 {
   "restaurantId": 3,
@@ -43,7 +42,6 @@ GET {{baseUrl}}/restaurants/{{restaurantId}}/waitings
 ### Waiting 가게에서 정보 수정
 PATCH {{baseUrl}}/waitings/{{waitingId}}
 Content-Type: application/json
-Cookie: Authorization=Bearer {{accessToken}}
 
 {
   "partySize": 4,
@@ -69,7 +67,7 @@ GET {{baseUrl}}/restaurants/{{restaurantId}}/waitingList?page=0&size=5
 POST {{baseUrl}}/users/login
 
 {
-  "email": "testowner1@email.com",
+  "email": "testowner2@email.com",
   "password": "Passw0rd!"
 }
 

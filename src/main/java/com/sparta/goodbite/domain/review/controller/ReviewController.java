@@ -40,7 +40,6 @@ public class ReviewController {
         return ResponseUtil.createOk();
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{reviewId}")
     public ResponseEntity<DataResponseDto<ReviewResponseDto>> getReview(
         @PathVariable Long reviewId) {
@@ -48,7 +47,6 @@ public class ReviewController {
         return ResponseUtil.findOk(reviewService.getReview(reviewId));
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<DataResponseDto<List<ReviewResponseDto>>> getAllReviews() {
         return ResponseUtil.findOk(reviewService.getAllReviews());

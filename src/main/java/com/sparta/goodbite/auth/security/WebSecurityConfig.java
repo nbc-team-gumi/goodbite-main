@@ -7,6 +7,7 @@ import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -122,6 +123,7 @@ public class WebSecurityConfig {
                     .requestMatchers("/admins/**").hasRole(UserRole.ADMIN.name())
                     .requestMatchers("/owners/**").hasRole(UserRole.OWNER.name())
                     .requestMatchers("/customers/").hasRole(UserRole.CUSTOMER.name())
+                    .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll() // 리뷰 조회는 모두 가능
                     .anyRequest().authenticated())
 
             // 기본 폼 로그인을 비활성화, 중복 인증 방지

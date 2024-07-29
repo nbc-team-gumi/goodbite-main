@@ -101,7 +101,6 @@ public class CustomerController {
     public ResponseEntity<DataResponseDto<CustomerResponseDto>> getCustomer(
         @PathVariable Long customerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        String email = userDetails.getUser().getEmail();
         return ResponseUtil.findOk(customerService.getCustomer(customerId, userDetails.getUser()));
     }
 

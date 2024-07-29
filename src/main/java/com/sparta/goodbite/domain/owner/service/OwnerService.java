@@ -149,7 +149,7 @@ public class OwnerService {
         //UserCredential타입의 객체를 Owner타입으로 캐스팅
         Owner owner = (Owner) user;
 
-        // 이미 탈퇴한 사용자인지 확인합니다.
+        // 이미 탈퇴한 사용자인지 확인
         if (owner.getDeletedAt() != null) {
             throw new OwnerAlreadyDeletedException(OwnerErrorCode.OWNER_ALREADY_DELETED);
         }

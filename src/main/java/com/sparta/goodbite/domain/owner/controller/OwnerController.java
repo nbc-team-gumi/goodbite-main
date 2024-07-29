@@ -14,7 +14,6 @@ import com.sparta.goodbite.domain.owner.service.OwnerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,7 +50,6 @@ public class OwnerController {
      * @param ownerId 조회할 고객의 ID
      * @return ResponseEntity
      */
-    @PreAuthorize("hasRole('ROLE_OWNER')")
     @GetMapping("/{ownerId}")
     public ResponseEntity<DataResponseDto<OwnerResponseDto>> getOwner(
         @PathVariable Long ownerId, @AuthenticationPrincipal EmailUserDetails userDetails
@@ -67,7 +65,6 @@ public class OwnerController {
      * @param requestDto 새로운 닉네임을 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
-    @PreAuthorize("hasRole('ROLE_OWNER')")
     @PatchMapping("/{ownerId}/nickname")
     public ResponseEntity<MessageResponseDto> updateNickname(
         @PathVariable Long ownerId,
@@ -86,7 +83,6 @@ public class OwnerController {
      * @param requestDto 새로운 전화번호를 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
-    @PreAuthorize("hasRole('ROLE_OWNER')")
     @PatchMapping("/{ownerId}/phone-number")
     public ResponseEntity<MessageResponseDto> updatePhoneNumber(@PathVariable Long ownerId,
         @Valid @RequestBody UpdateOwnerPhoneNumberRequestDto requestDto,
@@ -103,7 +99,6 @@ public class OwnerController {
      * @param requestDto 새로운 사업자번호을 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
-    @PreAuthorize("hasRole('ROLE_OWNER')")
     @PatchMapping("/{ownerId}/business-number")
     public ResponseEntity<MessageResponseDto> updateBusinessNumber(@PathVariable Long ownerId,
         @Valid @RequestBody
@@ -121,7 +116,6 @@ public class OwnerController {
      * @param requestDto 새로운 비밀번호를 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
-    @PreAuthorize("hasRole('ROLE_OWNER')")
     @PatchMapping("/{ownerId}/password")
     public ResponseEntity<MessageResponseDto> updatePassword(@PathVariable Long ownerId,
         @Valid @RequestBody
@@ -138,7 +132,6 @@ public class OwnerController {
      * @param ownerId 탈퇴할 사장의 ID
      * @return 성공 메시지를 담은 ResponseEntity
      */
-    @PreAuthorize("hasRole('ROLE_OWNER')")
     @DeleteMapping("/{ownerId}")
     public ResponseEntity<MessageResponseDto> deleteOwner(
         @PathVariable Long ownerId, @AuthenticationPrincipal EmailUserDetails userDetails

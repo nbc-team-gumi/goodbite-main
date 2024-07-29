@@ -22,10 +22,6 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Menu extends Timestamped {
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "restaurant_id", nullable = false)
-//    Restaurant restaurant;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,17 +31,16 @@ public class Menu extends Timestamped {
     private String description;
 //    private String imageUrl;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
-
     @Builder
-    public Menu(int price, String name, String description) {
+    public Menu(int price, String name, String description, Restaurant restaurant) {
         this.price = price;
         this.name = name;
         this.description = description;
+        this.restaurant = restaurant;
     }
 
     public void update(UpdateMenuRequestDto updateMenuRequestDto) {

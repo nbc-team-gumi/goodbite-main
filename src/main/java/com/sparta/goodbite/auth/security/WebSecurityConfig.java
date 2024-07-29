@@ -123,6 +123,7 @@ public class WebSecurityConfig {
                     .requestMatchers("/admins/**").hasRole(UserRole.ADMIN.name())
                     .requestMatchers("/owners/**").hasRole(UserRole.OWNER.name())
                     .requestMatchers("/customers/").hasRole(UserRole.CUSTOMER.name())
+                    .requestMatchers(HttpMethod.GET, "/menus/**").permitAll() // 메뉴 조회는 모두 가능
                     .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll() // 리뷰 조회는 모두 가능
                     .anyRequest().authenticated())
 

@@ -12,6 +12,7 @@ import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.exception.restaurant.RestaurantErrorCode;
 import com.sparta.goodbite.exception.restaurant.detail.RestaurantNotAuthorizationException;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,7 +88,7 @@ public class RestaurantService {
     }
 
     private void checkOwnerByRestaurant(Owner owner, Restaurant restaurant) {
-        if (!owner.equals(restaurant.getOwner())) {
+        if (!Objects.equals(restaurant.getOwner(), owner)) {
             throw new RestaurantNotAuthorizationException(
                 RestaurantErrorCode.RESTAURANT_NOT_AUTHORIZATION);
         }

@@ -25,6 +25,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 @RequiredArgsConstructor
 @EnableMethodSecurity // @PreAuthorize 애너테이션 활성화
 @EnableWebSecurity // Spring Security 사용
+@EnableMethodSecurity
 public class WebSecurityConfig {
 
     // Bean 객체 authenticationConfiguration 으로부터 인증매니저를 get 가능 : getAuthenticationManager()
@@ -123,6 +124,7 @@ public class WebSecurityConfig {
                     .requestMatchers("/admins/**").hasRole(UserRole.ADMIN.name())
                     .requestMatchers("/owners/**").hasRole(UserRole.OWNER.name())
                     .requestMatchers("/customers/").hasRole(UserRole.CUSTOMER.name())
+                    .requestMatchers(HttpMethod.GET, "/menus/**").permitAll() // 메뉴 조회는 모두 가능
                     .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll() // 리뷰 조회는 모두 가능
                     .requestMatchers(HttpMethod.GET, "/restaurants/**")
                     .permitAll() // 레스토랑 조회는 모두 가능

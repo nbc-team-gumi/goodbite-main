@@ -16,8 +16,8 @@ public interface OwnerRepository extends JpaRepository<Owner, Long> {
 
     Optional<Owner> findByBusinessNumber(String businessNumber);
 
-    default Owner findByIdOrThrow(Long id) {
-        return findById(id).orElseThrow(
+    default Owner findByIdOrThrow(Long ownerId) {
+        return findById(ownerId).orElseThrow(
             () -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
     }
 }

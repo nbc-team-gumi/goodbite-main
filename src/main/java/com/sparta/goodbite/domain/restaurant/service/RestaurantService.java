@@ -1,6 +1,8 @@
 package com.sparta.goodbite.domain.restaurant.service;
 
 import com.sparta.goodbite.common.UserCredentials;
+import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
+import com.sparta.goodbite.domain.operatinghour.repository.OperatingHourRepository;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
@@ -32,27 +34,28 @@ public class RestaurantService {
 
     @Transactional(readOnly = true)
     public RestaurantResponseDto getRestaurant(Long restaurantId) {
-
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
         return RestaurantResponseDto.from(restaurant);
     }
 
     @Transactional(readOnly = true)
     public List<RestaurantResponseDto> getAllRestaurants() {
-
-        List<Restaurant> restaurants = restaurantRepository.findAll();
-
-        return restaurants.stream()
-            .map(RestaurantResponseDto::from)
-            .toList();
+        return restaurantRepository.findAll().stream().map(RestaurantResponseDto::from).toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<OperatingHourResponseDto> getAllOperatingHoursByRestaurantId(Long restaurantId) {
+        restaurantRepository.findByIdOrThrow(restaurantId);
+        return operatingHourRepository.findAllByRestaurantId(restaurantId).stream()
+            .map(OperatingHourResponseDto::from).toList();
+    }
+
 
     @Transactional
     public void updateRestaurant(Long restaurantId, RestaurantRequestDto restaurantRequestDto,
         UserCredentials user) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
-
         Owner owner = ownerRepository.findByIdOrThrow(user.getId());
 
         validateRestaurantOwnership(owner, restaurant);
@@ -64,7 +67,6 @@ public class RestaurantService {
     public void deleteRestaurant(Long restaurantId, UserCredentials user) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
-
         Owner owner = ownerRepository.findByIdOrThrow(user.getId());
 
         validateRestaurantOwnership(owner, restaurant);

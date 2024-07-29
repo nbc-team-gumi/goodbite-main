@@ -1,5 +1,6 @@
 package com.sparta.goodbite.domain.menu.controller;
 
+import com.sparta.goodbite.auth.security.EmailUserDetails;
 import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
@@ -8,8 +9,11 @@ import com.sparta.goodbite.domain.menu.dto.MenuResponseDto;
 import com.sparta.goodbite.domain.menu.dto.UpdateMenuRequestDto;
 import com.sparta.goodbite.domain.menu.service.MenuService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,11 +30,13 @@ public class MenuController {
 
     private final MenuService menuService;
 
+    @PreAuthorize("hasRole('OWNER')")
     @PostMapping
     public ResponseEntity<MessageResponseDto> createMenu(
-        @Valid @RequestBody CreateMenuRequestDto createMenuRequestDto) {
+        @Valid @RequestBody CreateMenuRequestDto createMenuRequestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        menuService.createMenu(createMenuRequestDto);
+        menuService.createMenu(createMenuRequestDto, userDetails.getUser());
         return ResponseUtil.createOk();
     }
 
@@ -39,17 +45,27 @@ public class MenuController {
         return ResponseUtil.findOk(menuService.getMenu(menuId));
     }
 
+    @GetMapping
+    public ResponseEntity<DataResponseDto<List<MenuResponseDto>>> getAllMenus() {
+        return ResponseUtil.findOk(menuService.getAllMenus());
+    }
+
+    @PreAuthorize("hasRole('OWNER')")
     @PutMapping("/{menuId}")
     public ResponseEntity<MessageResponseDto> updateMenu(
-        @PathVariable Long menuId, @RequestBody UpdateMenuRequestDto updateMenuRequestDto) {
+        @PathVariable Long menuId, @Valid @RequestBody UpdateMenuRequestDto updateMenuRequestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        menuService.updateMenu(menuId, updateMenuRequestDto);
+        menuService.updateMenu(menuId, updateMenuRequestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
+    @PreAuthorize("hasRole('OWNER')")
     @DeleteMapping("/{menuId}")
-    public ResponseEntity<MessageResponseDto> deleteMenu(@PathVariable Long menuId) {
-        menuService.deleteMenu(menuId);
+    public ResponseEntity<MessageResponseDto> deleteMenu(@PathVariable Long menuId,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
+
+        menuService.deleteMenu(menuId, userDetails.getUser());
         return ResponseUtil.deleteOk();
     }
 }

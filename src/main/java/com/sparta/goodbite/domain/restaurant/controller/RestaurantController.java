@@ -4,6 +4,8 @@ import com.sparta.goodbite.auth.security.EmailUserDetails;
 import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
+import com.sparta.goodbite.domain.menu.dto.MenuResponseDto;
+import com.sparta.goodbite.domain.menu.service.MenuService;
 import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
 import com.sparta.goodbite.domain.operatinghour.service.OperatingHourService;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
@@ -31,6 +33,7 @@ public class RestaurantController {
 
     private final RestaurantService restaurantService;
     private final OperatingHourService operatingHourService;
+    private final MenuService menuService;
 
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping
@@ -51,16 +54,22 @@ public class RestaurantController {
 
     @GetMapping
     public ResponseEntity<DataResponseDto<List<RestaurantResponseDto>>> getAllRestaurants() {
-
         return ResponseUtil.findOk(restaurantService.getAllRestaurants());
     }
 
     @GetMapping("/{restaurantId}/operating-hours")
-    public ResponseEntity<DataResponseDto<List<OperatingHourResponseDto>>> getAllOperatingHoursByRestaurant(
+    public ResponseEntity<DataResponseDto<List<OperatingHourResponseDto>>> getAllOperatingHoursByRestaurantId(
         @PathVariable Long restaurantId) {
 
         return ResponseUtil.findOk(
-            operatingHourService.getAllOperatingHoursByRestaurant(restaurantId));
+            restaurantService.getAllOperatingHoursByRestaurantId(restaurantId));
+    }
+
+    @GetMapping("/{restaurantId}/menus")
+    public ResponseEntity<DataResponseDto<List<MenuResponseDto>>> getAllMenusByRestaurantId(
+        @PathVariable Long restaurantId) {
+
+        return ResponseUtil.findOk(menuService.getAllMenusByRestaurantId(restaurantId));
     }
 
     @PreAuthorize("hasRole('OWNER')")

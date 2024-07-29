@@ -1,5 +1,6 @@
 package com.sparta.goodbite.domain.operatinghour.controller;
 
+import com.sparta.goodbite.auth.security.EmailUserDetails;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
 import com.sparta.goodbite.domain.operatinghour.dto.CreateOperatingHourRequestDto;
@@ -8,6 +9,7 @@ import com.sparta.goodbite.domain.operatinghour.service.OperatingHourService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,26 +27,30 @@ public class OperatingHourController {
 
     @PostMapping
     public ResponseEntity<MessageResponseDto> createOperatingHour(@Valid @RequestBody
-    CreateOperatingHourRequestDto createOperatingHourRequestDto) {
+    CreateOperatingHourRequestDto createOperatingHourRequestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        operatingHourService.createOperatingHour(createOperatingHourRequestDto);
+        operatingHourService.createOperatingHour(createOperatingHourRequestDto, userDetails);
         return ResponseUtil.createOk();
     }
 
     @PutMapping("/{operatingHourId}")
     public ResponseEntity<MessageResponseDto> updateOperatingHour(
         @PathVariable Long operatingHourId,
-        @Valid @RequestBody UpdateOperatingHourRequestDto updateOperatingHourRequestDto) {
+        @Valid @RequestBody UpdateOperatingHourRequestDto updateOperatingHourRequestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        operatingHourService.updateOperatingHour(operatingHourId, updateOperatingHourRequestDto);
+        operatingHourService.updateOperatingHour(operatingHourId, updateOperatingHourRequestDto,
+            userDetails);
         return ResponseUtil.updateOk();
     }
 
     @DeleteMapping("/{operatingHourId}")
     public ResponseEntity<MessageResponseDto> deleteOperatingHour(
-        @PathVariable Long operatingHourId) {
+        @PathVariable Long operatingHourId,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        operatingHourService.deleteOperatingHour(operatingHourId);
+        operatingHourService.deleteOperatingHour(operatingHourId, userDetails);
         return ResponseUtil.deleteOk();
     }
 }

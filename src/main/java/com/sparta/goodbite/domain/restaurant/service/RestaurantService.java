@@ -59,7 +59,7 @@ public class RestaurantService {
 
         Owner owner = ownerRepository.findByIdOrThrow(user.getId());
 
-        checkOwnerByRestaurant(owner, restaurant);
+        validateRestaurantOwnership(owner, restaurant);
 
         restaurant.update(restaurantRequestDto);
     }
@@ -71,7 +71,7 @@ public class RestaurantService {
 
         Owner owner = ownerRepository.findByIdOrThrow(user.getId());
 
-        checkOwnerByRestaurant(owner, restaurant);
+        validateRestaurantOwnership(owner, restaurant);
 
         restaurantRepository.delete(restaurant);
     }
@@ -88,7 +88,7 @@ public class RestaurantService {
             .toList();
     }
 
-    private void checkOwnerByRestaurant(Owner owner, Restaurant restaurant) {
+    private void validateRestaurantOwnership(Owner owner, Restaurant restaurant) {
         if (!Objects.equals(restaurant.getOwner(), owner)) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }

@@ -39,5 +39,4 @@ public class RestaurantRequestDto {
             .category(category)
             .build();
     }
-
 }

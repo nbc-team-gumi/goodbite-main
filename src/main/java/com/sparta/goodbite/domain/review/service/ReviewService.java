@@ -3,8 +3,8 @@ package com.sparta.goodbite.domain.review.service;
 import com.sparta.goodbite.common.UserCredentials;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
-import com.sparta.goodbite.domain.menu.entity.Menu;
-import com.sparta.goodbite.domain.menu.repository.MenuRepository;
+import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
+import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.domain.review.dto.CreateReviewRequestDto;
 import com.sparta.goodbite.domain.review.dto.ReviewResponseDto;
 import com.sparta.goodbite.domain.review.dto.UpdateReviewRequestDto;
@@ -21,15 +21,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ReviewService {
 
-    private final MenuRepository menuRepository;
+    private final RestaurantRepository restaurantRepository;
     private final ReviewRepository reviewRepository;
     private final CustomerRepository customerRepository;
 
     @Transactional
     public void createReview(CreateReviewRequestDto createReviewRequestDto, UserCredentials user) {
-        Menu menu = menuRepository.findByIdOrThrow(createReviewRequestDto.getMenuId());
+        Restaurant restaurant = restaurantRepository.findByIdOrThrow(
+            createReviewRequestDto.getRestaurantId());
         Customer customer = customerRepository.findByIdOrThrow(user.getId());
-        reviewRepository.save(createReviewRequestDto.toEntity(menu, customer));
+        reviewRepository.save(createReviewRequestDto.toEntity(restaurant, customer));
     }
 
     @Transactional(readOnly = true)

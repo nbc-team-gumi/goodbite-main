@@ -14,6 +14,7 @@ import com.sparta.goodbite.domain.owner.service.OwnerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,6 +66,7 @@ public class OwnerController {
      * @param requestDto 새로운 닉네임을 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
+    @PreAuthorize("hasRole('ROLE_OWNER')")
     @PatchMapping("/{ownerId}/nickname")
     public ResponseEntity<MessageResponseDto> updateNickname(
         @PathVariable Long ownerId,
@@ -72,8 +74,7 @@ public class OwnerController {
         UpdateOwnerNicknameRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        ownerService.updateNickname(ownerId, userDetails.getRole(), requestDto,
-            userDetails.getUser());
+        ownerService.updateNickname(ownerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -89,8 +90,9 @@ public class OwnerController {
         @Valid @RequestBody UpdateOwnerPhoneNumberRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        String email = userDetails.getUser().getEmail();
-        ownerService.updatePhoneNumber(email, requestDto);
+        //String email = userDetails.getUser().getEmail();
+        ownerService.updatePhoneNumber(ownerId, userDetails.getRole(), requestDto,
+            userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -128,7 +130,7 @@ public class OwnerController {
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         String email = userDetails.getUser().getEmail();
-        ownerService.updatePassword(email, requestDto);
+        //ownerService.updatePassword(email, requestDto);
         return ResponseUtil.updateOk();
     }
 

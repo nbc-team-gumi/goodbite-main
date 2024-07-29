@@ -33,6 +33,7 @@ public class OwnerService {
     private final OwnerRepository ownerRepository;
     private final PasswordEncoder passwordEncoder;
 
+    //가입
     @Transactional
     public void signup(OwnerSignUpRequestDto requestDto) {
         String nickname = requestDto.getNickname();
@@ -73,11 +74,15 @@ public class OwnerService {
     }
 
 
+    //조회
     @Transactional(readOnly = true)
     public OwnerResponseDto getOwner(Long ownerId, String role, UserCredentials user) {
         //본인인지 확인, Owner인지 확인
-        if (!Objects.equals(user.getId(), ownerId) || !Objects.equals(role,
+        /*if (!Objects.equals(user.getId(), ownerId) || !Objects.equals(role,
             "ROLE_OWNER")) {//롤 확인 -> 지금은 확인하는게 나을듯
+            throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
+        }*/
+        if (!Objects.equals(user.getId(), ownerId)) {//롤 확인 -> 지금은 확인하는게 나을듯
             throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
         }
 
@@ -85,6 +90,86 @@ public class OwnerService {
             -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND)));
     }
 
+    // 수정-닉네임
+    @Transactional
+    public void updateNickname(Long ownerId, UpdateOwnerNicknameRequestDto requestDto,
+        UserCredentials user) {
+
+        String newNickname = requestDto.getNewNickname();
+
+        // 본인인지 확인 & 권한확인(사장이 맞는지 Owner인지 확인)
+        if (!Objects.equals(user.getId(), ownerId)) {
+            throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
+        }
+
+        //UserCredential타입의 객체를 Owner타입으로 캐스팅
+        Owner owner = (Owner) user;
+
+        // Owner 조회 -> 어처피 인증된 객체가 들어온다는건 DB에 있다는 말이기도 하니까 확인할 필요없는거 아닌가?
+        /*Owner owner = ownerRepository.findById(user.getId())
+            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));*/
+
+        // 닉네임 중복 검사
+        ownerRepository.findByNickname(newNickname).ifPresent(unused -> {
+            throw new DuplicateNicknameException(OwnerErrorCode.DUPLICATE_NICKNAME);
+        });
+
+        owner.updateNickname(newNickname);
+        ownerRepository.save(owner);
+    }
+
+    //수정-전화번호
+    @Transactional
+    public void updatePhoneNumber(Long ownerId, String role,
+        UpdateOwnerPhoneNumberRequestDto requestDto, UserCredentials user) {
+        String newPhoneNumber = requestDto.getNewPhoneNumber();
+
+        // 본인인지 확인 & 권한확인(사장이 맞는지.Owner인지 확인)
+        if (!Objects.equals(user.getId(), ownerId) || !Objects.equals(role,
+            "ROLE_OWNER")) {//롤 확인 -> 지금은 확인하는게 나을듯
+            throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
+        }
+
+        //UserCredential타입의 객체를 Owner타입으로 캐스팅
+        Owner owner = (Owner) user;
+
+        // Owner 조회 -> 어처피 인증된 객체가 들어온다는건 DB에 있다는 말이기도 하니까 확인할 필요없는거 아닌가?
+        /*Owner owner = ownerRepository.findById(user.getId())
+            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
+*/
+        // 전화번호 중복 검사
+        ownerRepository.findByPhoneNumber(newPhoneNumber).ifPresent(unused -> {
+            throw new DuplicatePhoneNumberException(OwnerErrorCode.DUPLICATE_PHONE_NUMBER);
+        });
+
+        // 전화번호 업데이트
+        owner.updatePhoneNumber(newPhoneNumber);
+
+        // owner 객체가 영속성 컨텍스트에 포함되어 있는지 확인
+        ownerRepository.save(owner);  // 이 라인은 엔티티가 이미 영속성 컨텍스트에 있는 경우 생략 가능
+    }
+
+
+    // 수정-사업자번호
+    @Transactional
+    public void updateBusinessNumber(Long ownerId, UpdateBusinessNumberRequestDto requestDto,
+        UserCredentials user) {
+        String newBusinessNumber = requestDto.getNewBusinessNumber();
+
+        // Owner 조회
+        /*Owner owner = ownerRepository.findByEmail(ownerEmail)
+            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
+*/
+        // 사업자번호 중복 검사
+        ownerRepository.findByBusinessNumber(newBusinessNumber).ifPresent(unused -> {
+            throw new DuplicateBusinessNumberException(OwnerErrorCode.DUPLICATE_BUSINESS_NUMBER);
+        });
+
+        // 사업자번호 업데이트
+        //owner.updateBusinessNumber(newBusinessNumber);
+
+        //사업자번호 인증상태 미인증으로 변환
+    }
 
     @Transactional
     public void updateBusinessNumber(String ownerEmail, UpdateBusinessNumberRequestDto requestDto) {
@@ -105,28 +190,7 @@ public class OwnerService {
         //사업자번호 인증상태 미인증으로 변환
     }
 
-/*    @Transactional
-    public void updateBusinessNumber(Long ownerId, UpdateBusinessNumberRequestDto requestDto,
-        UserCredentials user) {
-        String newBusinessNumber = requestDto.getNewBusinessNumber();
-*//*
-
-        // Owner 조회
-        Owner owner = ownerRepository.findByEmail(ownerEmail)
-            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
-*//*
-
-        // 사업자번호 중복 검사
-        ownerRepository.findByBusinessNumber(newBusinessNumber).ifPresent(unused -> {
-            throw new DuplicateBusinessNumberException(OwnerErrorCode.DUPLICATE_BUSINESS_NUMBER);
-        });
-
-        // 사업자번호 업데이트
-        //owner.updateBusinessNumber(newBusinessNumber);
-
-        //사업자번호 인증상태 미인증으로 변환
-    }*/
-
+    // 수정-비밀번호
     @Transactional
     public void updatePassword(String ownerEmail,
         UpdateOwnerPasswordRequestDto requestDto) {
@@ -150,46 +214,7 @@ public class OwnerService {
 
     }
 
-    @Transactional
-    public void updatePhoneNumber(String ownerEmail, UpdateOwnerPhoneNumberRequestDto requestDto) {
-        String newPhoneNumber = requestDto.getNewPhoneNumber();
-
-        // Owner 조회
-        Owner owner = ownerRepository.findByEmail(ownerEmail)
-            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
-
-        // 전화번호 중복 검사
-        ownerRepository.findByPhoneNumber(newPhoneNumber).ifPresent(unused -> {
-            throw new DuplicatePhoneNumberException(OwnerErrorCode.DUPLICATE_PHONE_NUMBER);
-        });
-
-        // 전화번호 업데이트
-        owner.updatePhoneNumber(newPhoneNumber);
-    }
-
-    @Transactional
-    public void updateNickname(Long ownerId, String role, UpdateOwnerNicknameRequestDto requestDto,
-        UserCredentials user) {
-        String newNickname = requestDto.getNewNickname();
-        // 본인인지 확인 & 권한확인(사장이 맞는지)
-        //본인인지 확인, Owner인지 확인
-        if (!Objects.equals(user.getId(), ownerId) || !Objects.equals(role,
-            "ROLE_OWNER")) {//롤 확인 -> 지금은 확인하는게 나을듯
-            throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
-        }
-
-        /*// Owner 조회 -> 어처피 인증된 객체가 들어온다는건 디비에 있다는 말이기도 하니까 확인할 필요없는거 아닌가?
-        Owner owner = ownerRepository.findByEmail(ownerEmail)
-            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));*/
-
-        // 닉네임 중복 검사
-        ownerRepository.findByNickname(newNickname).ifPresent(unused -> {
-            throw new DuplicateNicknameException(OwnerErrorCode.DUPLICATE_NICKNAME);
-        });
-
-        user.updateNickname(newNickname);
-    }
-
+    //삭제
     @Transactional
     public void deleteOwner(String ownerEmail) {
         // Owner 조회
@@ -213,4 +238,5 @@ public class OwnerService {
     }*/
 
     //정보를 조회하고자 하는 사용자id와
+
 }

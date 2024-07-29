@@ -33,8 +33,8 @@ public class CustomerService {
     //조회
     @Transactional(readOnly = true)
     public CustomerResponseDto getCustomer(Long customerId, UserCredentials user) {
-        validateOwnerAccess(customerId, user);//본인인지 확인
-        return CustomerResponseDto.from(customerRepository.findByEmailOrThrow(user.getEmail()));
+        validateCustomerAccess(customerId, user);//본인인지 확인
+        return CustomerResponseDto.from(customerRepository.findByIdOrThrow(user.getId()));
     }
 
     //회원가입
@@ -65,7 +65,7 @@ public class CustomerService {
     public void updateNickname(Long customerId, UpdateNicknameRequestDto requestDto,
         UserCredentials user) {
         String newNickname = requestDto.getNewNickname();
-        validateOwnerAccess(customerId, user); //본인확인
+        validateCustomerAccess(customerId, user); //본인확인
         validateDuplicateNickname(newNickname); //중복닉네임확인
 
         //UserCredential타입의 객체를 Customer타입으로 캐스팅
@@ -84,7 +84,7 @@ public class CustomerService {
         UserCredentials user) {
         String newPhoneNumber = requestDto.getNewPhoneNumber();
 
-        validateOwnerAccess(customerId, user);
+        validateCustomerAccess(customerId, user);
         validateDuplicatePhoneNumber(newPhoneNumber);
 
         //UserCredential타입의 객체를 Customer타입으로 캐스팅
@@ -101,7 +101,7 @@ public class CustomerService {
     @Transactional
     public void updatePassword(Long customerId, UpdatePasswordRequestDto requestDto
         , UserCredentials user) {
-        validateOwnerAccess(customerId, user);
+        validateCustomerAccess(customerId, user);
 
         //UserCredential타입의 객체를 Customer타입으로 캐스팅
         Customer customer = (Customer) user;
@@ -129,7 +129,7 @@ public class CustomerService {
 
     @Transactional
     public void deleteCustomer(Long customerId, UserCredentials user) {
-        validateOwnerAccess(customerId, user);
+        validateCustomerAccess(customerId, user);
 
         //UserCredential타입의 객체를 Customer타입으로 캐스팅
         Customer customer = (Customer) user;
@@ -175,7 +175,7 @@ public class CustomerService {
     }
 
     //권한이 있는 유저인지 검증
-    private void validateOwnerAccess(Long customerId, UserCredentials user) {
+    private void validateCustomerAccess(Long customerId, UserCredentials user) {
         if (!Objects.equals(user.getId(), customerId)) {
             throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
         }

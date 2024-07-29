@@ -124,6 +124,8 @@ public class WebSecurityConfig {
                     .requestMatchers("/owners/**").hasRole(UserRole.OWNER.name())
                     .requestMatchers("/customers/").hasRole(UserRole.CUSTOMER.name())
                     .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll() // 리뷰 조회는 모두 가능
+                    .requestMatchers(HttpMethod.GET, "/restaurants/**")
+                    .permitAll() // 레스토랑 조회는 모두 가능
                     .anyRequest().authenticated())
 
             // 기본 폼 로그인을 비활성화, 중복 인증 방지

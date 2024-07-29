@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +31,8 @@ public class WaitingController {
 
     private final WaitingService waitingService;
 
+    // 손님만 등록
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping("/waitings")
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> createWaiting(
         @AuthenticationPrincipal EmailUserDetails userDetails,
@@ -40,6 +43,7 @@ public class WaitingController {
     }
 
     // 웨이팅 전체 조회용 api
+    // api 권한 제한 없음
     @GetMapping("/restaurants/{restaurantId}/waitingList")
     public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getWaitingList(
         @AuthenticationPrincipal EmailUserDetails userDetails,
@@ -50,6 +54,7 @@ public class WaitingController {
             waitingService.getWaitingsByRestaurantId(userDetails, restaurantId, pageable));
     }
 
+    // api 권한 제한 없음
     @GetMapping("/restaurants/{restaurantId}/waitings")
     public ResponseEntity<DataResponseDto<Long>> getWaitingLastNumber(
         @AuthenticationPrincipal EmailUserDetails userDetails,
@@ -61,6 +66,7 @@ public class WaitingController {
     }
 
     // 웨이팅 단일 조회용 api
+    // api 권한 제한 없음
     @GetMapping("/waitings/{waitingId}")
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> getWaiting(
         @AuthenticationPrincipal EmailUserDetails userDetails,
@@ -70,6 +76,8 @@ public class WaitingController {
     }
 
     // 가게 주인용 가게 전체 하나씩 웨이팅 줄이기 메서드 호출
+    // 해당 가게 오너만 가능
+    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
     @PutMapping("/restaurants/{restaurantId}/waitings")
     public ResponseEntity<MessageResponseDto> reduceAllWaitingOrders(
         @AuthenticationPrincipal EmailUserDetails userDetails,
@@ -80,6 +88,7 @@ public class WaitingController {
     }
 
     // 가게 주인용 하나 선택 후 웨이팅 줄이기 메서드 호출
+    // 해당 가게 오너 또는 해당 웨이팅 등록 손님 + Admin
     @PutMapping("/restaurants/waitings/{waitingId}")
     public ResponseEntity<MessageResponseDto> reduceOneWaitingOrders(
         @AuthenticationPrincipal EmailUserDetails userDetails,
@@ -90,6 +99,7 @@ public class WaitingController {
     }
 
     // 가게용 웨이팅 정보 업데이트
+    // 해당 가게 오너 또는 해당 웨이팅 등록 손님 + Admin
     @PatchMapping("/waitings/{waitingId}")
     public ResponseEntity<MessageResponseDto> updateWaiting(
         @AuthenticationPrincipal EmailUserDetails userDetails,
@@ -101,6 +111,7 @@ public class WaitingController {
     }
 
     // 가게/손님용 취소
+    // 해당 가게 오너 또는 해당 웨이팅 등록 손님 + Admin
     @DeleteMapping("/waitings/{waitingId}")
     public ResponseEntity<MessageResponseDto> deleteWaiting(
         @AuthenticationPrincipal EmailUserDetails userDetails,

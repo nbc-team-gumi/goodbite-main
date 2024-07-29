@@ -120,13 +120,12 @@ public class OwnerService {
 
     //수정-전화번호
     @Transactional
-    public void updatePhoneNumber(Long ownerId, String role,
-        UpdateOwnerPhoneNumberRequestDto requestDto, UserCredentials user) {
+    public void updatePhoneNumber(Long ownerId, UpdateOwnerPhoneNumberRequestDto requestDto,
+        UserCredentials user) {
         String newPhoneNumber = requestDto.getNewPhoneNumber();
 
-        // 본인인지 확인 & 권한확인(사장이 맞는지.Owner인지 확인)
-        if (!Objects.equals(user.getId(), ownerId) || !Objects.equals(role,
-            "ROLE_OWNER")) {//롤 확인 -> 지금은 확인하는게 나을듯
+        // 본인인지 확인
+        if (!Objects.equals(user.getId(), ownerId)) {//롤 확인 -> 지금은 확인하는게 나을듯
             throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
         }
 

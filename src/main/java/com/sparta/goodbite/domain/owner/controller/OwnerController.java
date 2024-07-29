@@ -85,14 +85,13 @@ public class OwnerController {
      * @param requestDto 새로운 전화번호를 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
+    @PreAuthorize("hasRole('ROLE_OWNER')")
     @PatchMapping("/{ownerId}/phone-number")
     public ResponseEntity<MessageResponseDto> updatePhoneNumber(@PathVariable Long ownerId,
         @Valid @RequestBody UpdateOwnerPhoneNumberRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        //String email = userDetails.getUser().getEmail();
-        ownerService.updatePhoneNumber(ownerId, userDetails.getRole(), requestDto,
-            userDetails.getUser());
+        ownerService.updatePhoneNumber(ownerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 

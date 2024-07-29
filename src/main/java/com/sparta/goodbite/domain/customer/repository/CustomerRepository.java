@@ -8,15 +8,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
-    //Optional<Customer> findById(Long customerId);
     Optional<Customer> findByNickname(String nickname);
 
     Optional<Customer> findByEmail(String email);
 
     Optional<Customer> findByPhoneNumber(String phoneNumber);
 
-    default Customer findByEmailOrThrow(String email) {
-        return findByEmail(email).orElseThrow(
+    default Customer findByIdOrThrow(Long customerId) {
+        return findById(customerId).orElseThrow(
             () -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
     }
 }

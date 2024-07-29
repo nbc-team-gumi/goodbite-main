@@ -1,14 +1,13 @@
 package com.sparta.goodbite.domain.restaurant.dto;
 
-import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 
-public record RestaurantResponseDto(Owner owner, String name, String imageUrl, String address,
+public record RestaurantResponseDto(Long id, String name, String imageUrl, String address,
                                     String area, String phoneNumber, String category) {
 
     public static RestaurantResponseDto from(Restaurant restaurant) {
         return new RestaurantResponseDto(
-            restaurant.getOwner(),
+            restaurant.getId(),
             restaurant.getName(),
             restaurant.getImageUrl(),
             restaurant.getAddress(),

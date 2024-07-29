@@ -12,6 +12,7 @@ import com.sparta.goodbite.exception.operatinghour.OperatingHourErrorCode;
 import com.sparta.goodbite.exception.operatinghour.detail.OperatingHourDuplicatedException;
 import com.sparta.goodbite.exception.restaurant.RestaurantErrorCode;
 import com.sparta.goodbite.exception.restaurant.detail.RestaurantNotAuthorizationException;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +33,7 @@ public class OperatingHourService {
 
         Owner owner = (Owner) userDetails.getUser();
 
-        if (!owner.equals(restaurant.getOwner())) {
+        if (!Objects.equals(restaurant.getOwner(), owner)) {
             throw new RestaurantNotAuthorizationException(
                 RestaurantErrorCode.RESTAURANT_NOT_AUTHORIZATION);
         }
@@ -74,7 +75,7 @@ public class OperatingHourService {
     }
 
     private void checkOwnerByOperatingHour(Owner owner, OperatingHour operatingHour) {
-        if (!owner.equals(operatingHour.getRestaurant().getOwner())) {
+        if (!Objects.equals(operatingHour.getRestaurant().getOwner(), owner)) {
             throw new RestaurantNotAuthorizationException(
                 RestaurantErrorCode.RESTAURANT_NOT_AUTHORIZATION);
         }

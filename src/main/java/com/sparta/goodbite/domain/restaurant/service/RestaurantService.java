@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
-    private final OperatingHourRepository operatingHourRepository;
     private final OwnerRepository ownerRepository;
 
     @Transactional

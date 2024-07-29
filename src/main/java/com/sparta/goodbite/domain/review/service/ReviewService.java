@@ -28,7 +28,7 @@ public class ReviewService {
     @Transactional
     public void createReview(CreateReviewRequestDto createReviewRequestDto, UserCredentials user) {
         Menu menu = menuRepository.findByIdOrThrow(createReviewRequestDto.getMenuId());
-        Customer customer = customerRepository.findByEmailOrThrow(user.getEmail());
+        Customer customer = customerRepository.findByIdOrThrow(user.getId());
         reviewRepository.save(createReviewRequestDto.toEntity(menu, customer));
     }
 
@@ -58,9 +58,8 @@ public class ReviewService {
 
     private Review getReviewByIdAndValidateCustomer(Long reviewId, UserCredentials user) {
         Review review = reviewRepository.findByIdOrThrow(reviewId);
-        Customer customer = customerRepository.findByEmailOrThrow(user.getEmail());
 
-        if (!review.getCustomer().getId().equals(customer.getId())) {
+        if (!review.getCustomer().getId().equals(user.getId())) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
 

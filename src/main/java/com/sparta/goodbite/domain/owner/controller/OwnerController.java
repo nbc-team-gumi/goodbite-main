@@ -51,12 +51,13 @@ public class OwnerController {
      * @param ownerId 조회할 고객의 ID
      * @return ResponseEntity
      */
+    @PreAuthorize("hasRole('ROLE_OWNER')")
     @GetMapping("/{ownerId}")
     public ResponseEntity<DataResponseDto<OwnerResponseDto>> getOwner(
         @PathVariable Long ownerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         return ResponseUtil.findOk(
-            ownerService.getOwner(ownerId, userDetails.getRole(), userDetails.getUser()));
+            ownerService.getOwner(ownerId, userDetails.getUser()));
     }
 
     /**

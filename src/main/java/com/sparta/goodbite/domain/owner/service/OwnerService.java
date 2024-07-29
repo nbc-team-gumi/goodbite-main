@@ -15,7 +15,6 @@ import com.sparta.goodbite.exception.owner.detail.DuplicateEmailException;
 import com.sparta.goodbite.exception.owner.detail.DuplicateNicknameException;
 import com.sparta.goodbite.exception.owner.detail.DuplicatePhoneNumberException;
 import com.sparta.goodbite.exception.owner.detail.OwnerAlreadyDeletedException;
-import com.sparta.goodbite.exception.owner.detail.OwnerNotFoundException;
 import com.sparta.goodbite.exception.user.UserErrorCode;
 import com.sparta.goodbite.exception.user.detail.PasswordMismatchException;
 import com.sparta.goodbite.exception.user.detail.SamePasswordException;
@@ -36,38 +35,19 @@ public class OwnerService {
     //가입
     @Transactional
     public void signup(OwnerSignUpRequestDto requestDto) {
-        String nickname = requestDto.getNickname();
-        String email = requestDto.getEmail();
-        String phoneNumber = requestDto.getPhoneNumber();
-        String businessNumber = requestDto.getBusinessNumber();
-
-        // 닉네임 중복 검사
-        ownerRepository.findByNickname(nickname).ifPresent(u -> {
-            throw new DuplicateNicknameException(OwnerErrorCode.DUPLICATE_NICKNAME);
-        });
-        // 이메일 중복 검사
-        ownerRepository.findByEmail(email).ifPresent(u -> {
-            throw new DuplicateEmailException(OwnerErrorCode.DUPLICATE_EMAIL);
-        });
-        // 전화번호 중복 검사
-        ownerRepository.findByPhoneNumber(phoneNumber).ifPresent(u -> {
-            throw new DuplicatePhoneNumberException(OwnerErrorCode.DUPLICATE_PHONE_NUMBER);
-        });
-        // 사업자번호 중복 검사
-        ownerRepository.findByBusinessNumber(businessNumber).ifPresent(u -> {
-            throw new DuplicateBusinessNumberException(OwnerErrorCode.DUPLICATE_BUSINESS_NUMBER);
-        });
+        validateDuplicateFields(requestDto.getNickname(), requestDto.getEmail(),
+            requestDto.getPhoneNumber(), requestDto.getBusinessNumber());
 
         // 비밀번호 암호화 -> 인증인가연결시 config에서 PasswordEncoder Bean등록
         String password = passwordEncoder.encode(requestDto.getPassword());
 
         // User DB에 저장
         Owner owner = Owner.builder()
-            .email(email)
-            .nickname(nickname)
+            .email(requestDto.getEmail())
+            .nickname(requestDto.getNickname())
             .password(password)
-            .phoneNumber(phoneNumber)
-            .businessNumber(businessNumber)
+            .phoneNumber(requestDto.getPhoneNumber())
+            .businessNumber(requestDto.getBusinessNumber())
             .build();
 
         ownerRepository.save(owner);
@@ -76,43 +56,21 @@ public class OwnerService {
 
     //조회
     @Transactional(readOnly = true)
-    public OwnerResponseDto getOwner(Long ownerId, String role, UserCredentials user) {
-        //본인인지 확인, Owner인지 확인
-        /*if (!Objects.equals(user.getId(), ownerId) || !Objects.equals(role,
-            "ROLE_OWNER")) {//롤 확인 -> 지금은 확인하는게 나을듯
-            throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
-        }*/
-        if (!Objects.equals(user.getId(), ownerId)) {//롤 확인 -> 지금은 확인하는게 나을듯
-            throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
-        }
-
-        return OwnerResponseDto.from(ownerRepository.findByEmail(user.getEmail()).orElseThrow(()
-            -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND)));
+    public OwnerResponseDto getOwner(Long ownerId, UserCredentials user) {
+        validateOwnerAccess(ownerId, user);//본인인지 확인
+        return OwnerResponseDto.from(ownerRepository.findByEmailOrThrow(user.getEmail()));
     }
 
     // 수정-닉네임
     @Transactional
     public void updateNickname(Long ownerId, UpdateOwnerNicknameRequestDto requestDto,
         UserCredentials user) {
-
         String newNickname = requestDto.getNewNickname();
-
-        // 본인인지 확인 & 권한확인(사장이 맞는지 Owner인지 확인)
-        if (!Objects.equals(user.getId(), ownerId)) {
-            throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
-        }
+        validateOwnerAccess(ownerId, user); //본인확인
+        validateDuplicateNickname(newNickname); //중복닉네임확인
 
         //UserCredential타입의 객체를 Owner타입으로 캐스팅
         Owner owner = (Owner) user;
-
-        // Owner 조회 -> 어처피 인증된 객체가 들어온다는건 DB에 있다는 말이기도 하니까 확인할 필요없는거 아닌가?
-        /*Owner owner = ownerRepository.findById(user.getId())
-            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));*/
-
-        // 닉네임 중복 검사
-        ownerRepository.findByNickname(newNickname).ifPresent(unused -> {
-            throw new DuplicateNicknameException(OwnerErrorCode.DUPLICATE_NICKNAME);
-        });
 
         owner.updateNickname(newNickname);
         ownerRepository.save(owner);
@@ -124,22 +82,11 @@ public class OwnerService {
         UserCredentials user) {
         String newPhoneNumber = requestDto.getNewPhoneNumber();
 
-        // 본인인지 확인
-        if (!Objects.equals(user.getId(), ownerId)) {//롤 확인 -> 지금은 확인하는게 나을듯
-            throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
-        }
+        validateOwnerAccess(ownerId, user);
+        validateDuplicatePhoneNumber(newPhoneNumber);
 
         //UserCredential타입의 객체를 Owner타입으로 캐스팅
         Owner owner = (Owner) user;
-
-        // Owner 조회 -> 어처피 인증된 객체가 들어온다는건 DB에 있다는 말이기도 하니까 확인할 필요없는거 아닌가?
-        /*Owner owner = ownerRepository.findById(user.getId())
-            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
-*/
-        // 전화번호 중복 검사
-        ownerRepository.findByPhoneNumber(newPhoneNumber).ifPresent(unused -> {
-            throw new DuplicatePhoneNumberException(OwnerErrorCode.DUPLICATE_PHONE_NUMBER);
-        });
 
         // 전화번호 업데이트
         owner.updatePhoneNumber(newPhoneNumber);
@@ -155,36 +102,12 @@ public class OwnerService {
         UserCredentials user) {
         String newBusinessNumber = requestDto.getNewBusinessNumber();
 
-        // Owner 조회
-        /*Owner owner = ownerRepository.findByEmail(ownerEmail)
-            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
-*/
-        // 사업자번호 중복 검사
-        ownerRepository.findByBusinessNumber(newBusinessNumber).ifPresent(unused -> {
-            throw new DuplicateBusinessNumberException(OwnerErrorCode.DUPLICATE_BUSINESS_NUMBER);
-        });
+        validateOwnerAccess(ownerId, user);
+        validateDuplicateBusinessNumber(requestDto.getNewBusinessNumber());
 
+        // 비즈니스 로직 추가 필요
         // 사업자번호 업데이트
         //owner.updateBusinessNumber(newBusinessNumber);
-
-        //사업자번호 인증상태 미인증으로 변환
-    }
-
-    @Transactional
-    public void updateBusinessNumber(String ownerEmail, UpdateBusinessNumberRequestDto requestDto) {
-        String newBusinessNumber = requestDto.getNewBusinessNumber();
-
-        // Owner 조회
-        Owner owner = ownerRepository.findByEmail(ownerEmail)
-            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
-
-        // 사업자번호 중복 검사
-        ownerRepository.findByBusinessNumber(newBusinessNumber).ifPresent(unused -> {
-            throw new DuplicateBusinessNumberException(OwnerErrorCode.DUPLICATE_BUSINESS_NUMBER);
-        });
-
-        // 사업자번호 업데이트
-        owner.updateBusinessNumber(newBusinessNumber);
 
         //사업자번호 인증상태 미인증으로 변환
     }
@@ -193,16 +116,10 @@ public class OwnerService {
     @Transactional
     public void updatePassword(Long ownerId,
         UpdateOwnerPasswordRequestDto requestDto, UserCredentials user) {
-        // 본인인지 확인
-        if (!Objects.equals(user.getId(), ownerId)) {//롤 확인 -> 지금은 확인하는게 나을듯
-            throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
-        }
+        validateOwnerAccess(ownerId, user);
 
         //UserCredential타입의 객체를 Owner타입으로 캐스팅
         Owner owner = (Owner) user;
-        /*// Owner 조회
-        Owner owner = ownerRepository.findByEmail(ownerEmail)
-            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));*/
 
         //입력한 비밀번호와 사용자의 비밀번호 일치유무 확인
         if (!passwordEncoder.matches(requestDto.getCurrentPassword(), owner.getPassword())) {
@@ -227,10 +144,8 @@ public class OwnerService {
     //삭제
     @Transactional
     public void deleteOwner(Long ownerId, UserCredentials user) {
-        // 본인인지 확인
-        if (!Objects.equals(user.getId(), ownerId)) {//롤 확인 -> 지금은 확인하는게 나을듯
-            throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
-        }
+        validateOwnerAccess(ownerId, user);
+
         //UserCredential타입의 객체를 Owner타입으로 캐스팅
         Owner owner = (Owner) user;
 
@@ -245,6 +160,50 @@ public class OwnerService {
         //명시적으로 저장
         ownerRepository.save(owner);
 
+    }
+
+    // 중복 필드 검증 메서드
+    private void validateDuplicateFields(String nickname, String email, String phoneNumber,
+        String businessNumber) {
+        validateDuplicateNickname(nickname);
+        validateDuplicateEmail(email);
+        validateDuplicatePhoneNumber(phoneNumber);
+        validateDuplicateBusinessNumber(businessNumber);
+    }
+
+    //닉네임 중복 확인 메서드
+    private void validateDuplicateNickname(String nickname) {
+        ownerRepository.findByNickname(nickname).ifPresent(u -> {
+            throw new DuplicateNicknameException(OwnerErrorCode.DUPLICATE_NICKNAME);
+        });
+    }
+
+    //이메일 중복 확인 메서드
+    private void validateDuplicateEmail(String email) {
+        ownerRepository.findByEmail(email).ifPresent(u -> {
+            throw new DuplicateEmailException(OwnerErrorCode.DUPLICATE_EMAIL);
+        });
+    }
+
+    //사업자번호 중복 확인 메서드
+    private void validateDuplicateBusinessNumber(String businessNumber) {
+        ownerRepository.findByBusinessNumber(businessNumber).ifPresent(u -> {
+            throw new DuplicateBusinessNumberException(OwnerErrorCode.DUPLICATE_BUSINESS_NUMBER);
+        });
+    }
+
+    //전화번호 중복 확인 메서드
+    private void validateDuplicatePhoneNumber(String phoneNumber) {
+        ownerRepository.findByPhoneNumber(phoneNumber).ifPresent(u -> {
+            throw new DuplicatePhoneNumberException(OwnerErrorCode.DUPLICATE_PHONE_NUMBER);
+        });
+    }
+
+    //권한이 있는 유저인지 검증
+    private void validateOwnerAccess(Long ownerId, UserCredentials user) {
+        if (!Objects.equals(user.getId(), ownerId)) {
+            throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
+        }
     }
 
 }

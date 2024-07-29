@@ -5,7 +5,7 @@ import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
 import com.sparta.goodbite.domain.customer.dto.CustomerResponseDto;
-import com.sparta.goodbite.domain.customer.dto.CustomerSignUpRequestDto;
+import com.sparta.goodbite.domain.customer.dto.CustomerSignupRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdateNicknameRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePasswordRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePhoneNumberRequestDto;
@@ -38,7 +38,7 @@ public class CustomerController {
      */
     @PostMapping("/signup")
     public ResponseEntity<MessageResponseDto> signup(
-        @Valid @RequestBody CustomerSignUpRequestDto requestDto) {
+        @Valid @RequestBody CustomerSignupRequestDto requestDto) {
         customerService.signup(requestDto);
         return ResponseUtil.createOk();
     }

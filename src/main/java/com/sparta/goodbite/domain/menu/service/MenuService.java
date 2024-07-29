@@ -34,6 +34,12 @@ public class MenuService {
     }
 
     @Transactional(readOnly = true)
+    public List<MenuResponseDto> getAllMenusByRestaurantId(Long restaurantId) {
+        restaurantRepository.findByIdOrThrow(restaurantId);
+        return menuRepository.findAllByRestaurantId(restaurantId).stream()
+            .map(MenuResponseDto::from).toList();
+
+    @Transactional(readOnly = true)
     public List<MenuResponseDto> getAllMenus() {
         return menuRepository.findAll().stream().map(MenuResponseDto::from).toList();
     }

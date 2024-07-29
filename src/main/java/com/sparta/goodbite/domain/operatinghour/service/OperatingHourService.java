@@ -58,7 +58,7 @@ public class OperatingHourService {
 
         Owner owner = ownerRepository.findByIdOrThrow(user.getId());
 
-        checkOwnerByOperatingHour(owner, operatingHour);
+        validateOperatingHourOwnership(owner, operatingHour);
 
         operatingHour.update(updateOperatingHourRequestDto);
     }
@@ -70,12 +70,12 @@ public class OperatingHourService {
 
         Owner owner = ownerRepository.findByIdOrThrow(user.getId());
 
-        checkOwnerByOperatingHour(owner, operatingHour);
+        validateOperatingHourOwnership(owner, operatingHour);
 
         operatingHourRepository.delete(operatingHour);
     }
 
-    private void checkOwnerByOperatingHour(Owner owner, OperatingHour operatingHour) {
+    private void validateOperatingHourOwnership(Owner owner, OperatingHour operatingHour) {
         if (!Objects.equals(operatingHour.getRestaurant().getOwner().getId(), owner.getId())) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }

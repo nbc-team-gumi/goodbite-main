@@ -6,8 +6,6 @@ import com.sparta.goodbite.domain.menu.dto.MenuResponseDto;
 import com.sparta.goodbite.domain.menu.dto.UpdateMenuRequestDto;
 import com.sparta.goodbite.domain.menu.entity.Menu;
 import com.sparta.goodbite.domain.menu.repository.MenuRepository;
-import com.sparta.goodbite.domain.owner.entity.Owner;
-import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.exception.auth.AuthErrorCode;
@@ -21,14 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class MenuService {
 
     private final MenuRepository menuRepository;
-    private final OwnerRepository ownerRepository;
     private final RestaurantRepository restaurantRepository;
 
     @Transactional
     public void createMenu(CreateMenuRequestDto createMenuRequestDto, UserCredentials user) {
-        Owner owner = ownerRepository.findByIdOrThrow(user.getId());
-        Restaurant restaurant = restaurantRepository.findByOwnerIdOrThrow(owner.getId());
-
+        Restaurant restaurant = restaurantRepository.findByOwnerIdOrThrow(user.getId());
         menuRepository.save(createMenuRequestDto.toEntity(restaurant));
     }
 

@@ -55,9 +55,7 @@ public class WaitingService {
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
             postWaitingRequestDto.getRestaurantId());
 
-        String Email = user.getEmail();
-
-        Customer customer = customerRepository.findByEmail(Email)
+        Customer customer = customerRepository.findByEmail(user.getEmail())
             .orElseThrow(() -> new CustomerException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
 
         Waiting waitingDuplicated = waitingRepository.findByRestaurantIdAndCustomerId(
@@ -159,7 +157,7 @@ public class WaitingService {
         validateWaitingRequest(user, waitingId);
 
         Waiting waiting = waitingRepository.findByIdOrElseThrowException(waitingId);
-        
+
         String restaurantName = waiting.getRestaurant().getName();
 
         waiting.update(updateWaitingRequestDto.getPartySize(), updateWaitingRequestDto.getDemand());

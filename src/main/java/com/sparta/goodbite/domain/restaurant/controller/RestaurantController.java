@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,12 +30,13 @@ public class RestaurantController {
 
     private final RestaurantService restaurantService;
 
+    @PreAuthorize("hasRole('OWNER')")
     @PostMapping
     public ResponseEntity<MessageResponseDto> createRestaurant(
         @Valid @RequestBody RestaurantRequestDto restaurantRequestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        restaurantService.createRestaurant(restaurantRequestDto, userDetails);
+        restaurantService.createRestaurant(restaurantRequestDto, userDetails.getUser());
         return ResponseUtil.createOk();
     }
 
@@ -51,20 +53,23 @@ public class RestaurantController {
         return ResponseUtil.findOk(restaurantService.getAllRestaurants());
     }
 
+    @PreAuthorize("hasRole('OWNER')")
     @PutMapping("/{restaurantId}")
     public ResponseEntity<MessageResponseDto> updateRestaurant(@PathVariable Long restaurantId,
         @RequestBody RestaurantRequestDto restaurantRequestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        restaurantService.updateRestaurant(restaurantId, restaurantRequestDto, userDetails);
+        restaurantService.updateRestaurant(restaurantId, restaurantRequestDto,
+            userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
+    @PreAuthorize("hasRole('OWNER')")
     @DeleteMapping("/{restaurantId}")
     public ResponseEntity<MessageResponseDto> deleteRestaurant(@PathVariable Long restaurantId,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        restaurantService.deleteRestaurant(restaurantId, userDetails);
+        restaurantService.deleteRestaurant(restaurantId, userDetails.getUser());
         return ResponseUtil.deleteOk();
     }
 

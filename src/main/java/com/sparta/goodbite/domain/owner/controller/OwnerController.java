@@ -143,7 +143,6 @@ public class OwnerController {
     public ResponseEntity<MessageResponseDto> deleteOwner(
         @PathVariable Long ownerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        String email = userDetails.getUser().getEmail();
         ownerService.deleteOwner(ownerId, userDetails.getUser());
         return ResponseUtil.deleteOk();
     }

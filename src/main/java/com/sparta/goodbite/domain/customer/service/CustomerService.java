@@ -26,13 +26,19 @@ public class CustomerService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
-    public CustomerResponseDto getCustomer(Long customerId) {
-        return CustomerResponseDto.from(customerRepository.findById(customerId).orElseThrow(()
+    public CustomerResponseDto getCustomerid(String customerEmail) {
+        return CustomerResponseDto.from(customerRepository.findByEmail(customerEmail).orElseThrow(()
+            -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND)));
+    }
+
+    @Transactional(readOnly = true)
+    public CustomerResponseDto getCustomer(String customerEmail) {
+        return CustomerResponseDto.from(customerRepository.findByEmail(customerEmail).orElseThrow(()
             -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND)));
     }
 
     @Transactional
-    public void signUp(CustomerSignUpRequestDto requestDto) {
+    public void signup(CustomerSignUpRequestDto requestDto) {
         String nickname = requestDto.getNickname();
         String email = requestDto.getEmail();
         String phoneNumber = requestDto.getPhoneNumber();

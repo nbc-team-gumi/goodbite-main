@@ -22,11 +22,11 @@ public interface OwnerRepository extends JpaRepository<Owner, Long> {
         ));
     }
 
-    default Owner findByNicknameOrThrow(String nickname) {
-        return findByNickname(nickname).orElseThrow(() -> new OwnerNotFoundException(
-            OwnerErrorCode.OWNER_NOT_FOUND
-        ));
-    }
+    /*default void findByNicknameOrThrow(String nickname) {
+        findByNickname(nickname).ifPresent(u -> {
+            throw new DuplicateNicknameException(OwnerErrorCode.DUPLICATE_NICKNAME);
+        });
+    }*/
 
     default Owner findByEmailOrThrow(String email) {
         return findByEmail(email).orElseThrow(() -> new OwnerNotFoundException(

@@ -37,9 +37,9 @@ public class CustomerController {
      * @return 성공 메시지를 담은 ResponseEntity
      */
     @PostMapping("/signup")
-    public ResponseEntity<MessageResponseDto> signUp(
+    public ResponseEntity<MessageResponseDto> signup(
         @Valid @RequestBody CustomerSignUpRequestDto requestDto) {
-        customerService.signUp(requestDto);
+        customerService.signup(requestDto);
         return ResponseUtil.createOk();
     }
 
@@ -101,7 +101,11 @@ public class CustomerController {
     public ResponseEntity<DataResponseDto<CustomerResponseDto>> getCustomer(
         @PathVariable Long customerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        return ResponseUtil.findOk(customerService.getCustomer(customerId));
+        String email = userDetails.getUser().getEmail();
+        //Customer customer = customerRepository.findByEmail(email);
+        //customer.getId();
+        //return ResponseUtil.findOk(customerService.getCustomer(customerId));
+        return ResponseUtil.findOk(customerService.getCustomer(email));
     }
 
     /**

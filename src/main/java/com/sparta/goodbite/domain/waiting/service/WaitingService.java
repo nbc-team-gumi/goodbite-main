@@ -105,7 +105,7 @@ public class WaitingService {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
 
-        Owner owner = ownerRepository.findById(restaurant.getOwnerId())
+        Owner owner = ownerRepository.findById(restaurant.getOwner().getId())
             .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED));
 
         if (!user.getEmail().equals(owner.getEmail())) {
@@ -198,7 +198,7 @@ public class WaitingService {
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
             restaurantId);
 
-        Owner owner = ownerRepository.findById(restaurant.getOwnerId())
+        Owner owner = ownerRepository.findById(restaurant.getOwner().getId())
             .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED));
 
         // api요청한 유저가 해당 레스토랑의 '오너'와 같지 않다면
@@ -268,7 +268,7 @@ public class WaitingService {
         Customer customer = customerRepository.findById(waiting.getCustomer().getId())
             .orElseThrow(() -> new CustomerException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
 
-        Owner owner = ownerRepository.findById(restaurant.getOwnerId())
+        Owner owner = ownerRepository.findById(restaurant.getOwner().getId())
             .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED));
 
         // api요청한 유저가 해당 레스토랑의 '오너'와 같던가 혹은 웨이팅 등록한 '손님'과 같던가

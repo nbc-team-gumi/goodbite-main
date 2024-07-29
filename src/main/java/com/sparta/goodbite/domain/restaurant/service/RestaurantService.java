@@ -23,6 +23,7 @@ public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
     private final OwnerRepository ownerRepository;
+    private final OperatingHourRepository operatingHourRepository;
 
     @Transactional
     public void createRestaurant(RestaurantRequestDto restaurantRequestDto, UserCredentials user) {

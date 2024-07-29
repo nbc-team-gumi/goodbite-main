@@ -4,7 +4,9 @@ import com.sparta.goodbite.auth.UserRole;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
 import com.sparta.goodbite.domain.owner.entity.Owner;
+import com.sparta.goodbite.domain.owner.entity.OwnerStatus;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +54,8 @@ public class EmailUserDetailsService implements UserDetailsService {
         }
 
         Optional<Owner> owner = ownerRepository.findByEmail(username);
-        if (owner.isPresent()) {
+        if (owner.isPresent() && Objects.equals(owner.get().getOwnerStatus(),
+            OwnerStatus.VERIFIED)) {
             return new EmailUserDetails(owner.get(), UserRole.OWNER.getAuthority());
         }
 

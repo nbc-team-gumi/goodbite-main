@@ -1,6 +1,6 @@
 package com.sparta.goodbite.domain.waiting.entity;
 
-import com.sparta.goodbite.common.ExtendedTimestamped;
+import com.sparta.goodbite.common.Timestamped;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import jakarta.persistence.Column;
@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Entity
-public class Waiting extends ExtendedTimestamped {
+public class Waiting extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

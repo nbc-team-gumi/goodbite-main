@@ -25,6 +25,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 @RequiredArgsConstructor
 @EnableMethodSecurity // @PreAuthorize 애너테이션 활성화
 @EnableWebSecurity // Spring Security 사용
+@EnableMethodSecurity
 public class WebSecurityConfig {
 
     // Bean 객체 authenticationConfiguration 으로부터 인증매니저를 get 가능 : getAuthenticationManager()

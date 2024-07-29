@@ -9,6 +9,7 @@ import com.sparta.goodbite.domain.operatinghour.service.OperatingHourService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,15 +26,18 @@ public class OperatingHourController {
 
     private final OperatingHourService operatingHourService;
 
+    @PreAuthorize("hasRole('OWNER')")
     @PostMapping
     public ResponseEntity<MessageResponseDto> createOperatingHour(@Valid @RequestBody
     CreateOperatingHourRequestDto createOperatingHourRequestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        operatingHourService.createOperatingHour(createOperatingHourRequestDto, userDetails);
+        operatingHourService.createOperatingHour(createOperatingHourRequestDto,
+            userDetails.getUser());
         return ResponseUtil.createOk();
     }
 
+    @PreAuthorize("hasRole('OWNER')")
     @PutMapping("/{operatingHourId}")
     public ResponseEntity<MessageResponseDto> updateOperatingHour(
         @PathVariable Long operatingHourId,
@@ -41,16 +45,17 @@ public class OperatingHourController {
         @AuthenticationPrincipal EmailUserDetails userDetails) {
 
         operatingHourService.updateOperatingHour(operatingHourId, updateOperatingHourRequestDto,
-            userDetails);
+            userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
+    @PreAuthorize("hasRole('OWNER')")
     @DeleteMapping("/{operatingHourId}")
     public ResponseEntity<MessageResponseDto> deleteOperatingHour(
         @PathVariable Long operatingHourId,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        operatingHourService.deleteOperatingHour(operatingHourId, userDetails);
+        operatingHourService.deleteOperatingHour(operatingHourId, userDetails.getUser());
         return ResponseUtil.deleteOk();
     }
 }

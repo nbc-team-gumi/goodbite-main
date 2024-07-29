@@ -1,17 +1,18 @@
 package com.sparta.goodbite.domain.operatinghour.service;
 
-import com.sparta.goodbite.auth.security.EmailUserDetails;
+import com.sparta.goodbite.common.UserCredentials;
 import com.sparta.goodbite.domain.operatinghour.dto.CreateOperatingHourRequestDto;
 import com.sparta.goodbite.domain.operatinghour.dto.UpdateOperatingHourRequestDto;
 import com.sparta.goodbite.domain.operatinghour.entity.OperatingHour;
 import com.sparta.goodbite.domain.operatinghour.repository.OperatingHourRepository;
 import com.sparta.goodbite.domain.owner.entity.Owner;
+import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
+import com.sparta.goodbite.exception.auth.AuthErrorCode;
+import com.sparta.goodbite.exception.auth.AuthException;
 import com.sparta.goodbite.exception.operatinghour.OperatingHourErrorCode;
 import com.sparta.goodbite.exception.operatinghour.detail.OperatingHourDuplicatedException;
-import com.sparta.goodbite.exception.restaurant.RestaurantErrorCode;
-import com.sparta.goodbite.exception.restaurant.detail.RestaurantNotAuthorizationException;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,19 +24,19 @@ public class OperatingHourService {
 
     private final OperatingHourRepository operatingHourRepository;
     private final RestaurantRepository restaurantRepository;
+    private final OwnerRepository ownerRepository;
 
     @Transactional
     public void createOperatingHour(CreateOperatingHourRequestDto createOperatingHourRequestDto,
-        EmailUserDetails userDetails) {
+        UserCredentials user) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
             createOperatingHourRequestDto.getRestaurantId());
 
-        Owner owner = (Owner) userDetails.getUser();
+        Owner owner = ownerRepository.findByIdOrThrow(user.getId());
 
         if (!Objects.equals(restaurant.getOwner(), owner)) {
-            throw new RestaurantNotAuthorizationException(
-                RestaurantErrorCode.RESTAURANT_NOT_AUTHORIZATION);
+            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
 
         boolean isDuplicated = operatingHourRepository.existsByDayOfWeekAndRestaurant(
@@ -51,11 +52,11 @@ public class OperatingHourService {
 
     @Transactional
     public void updateOperatingHour(Long operatingHourId,
-        UpdateOperatingHourRequestDto updateOperatingHourRequestDto, EmailUserDetails userDetails) {
+        UpdateOperatingHourRequestDto updateOperatingHourRequestDto, UserCredentials user) {
 
         OperatingHour operatingHour = operatingHourRepository.findByIdOrThrow(operatingHourId);
 
-        Owner owner = (Owner) userDetails.getUser();
+        Owner owner = ownerRepository.findByIdOrThrow(user.getId());
 
         checkOwnerByOperatingHour(owner, operatingHour);
 
@@ -63,11 +64,11 @@ public class OperatingHourService {
     }
 
     @Transactional
-    public void deleteOperatingHour(Long operatingHourId, EmailUserDetails userDetails) {
+    public void deleteOperatingHour(Long operatingHourId, UserCredentials user) {
 
         OperatingHour operatingHour = operatingHourRepository.findByIdOrThrow(operatingHourId);
 
-        Owner owner = (Owner) userDetails.getUser();
+        Owner owner = ownerRepository.findByIdOrThrow(user.getId());
 
         checkOwnerByOperatingHour(owner, operatingHour);
 
@@ -76,8 +77,7 @@ public class OperatingHourService {
 
     private void checkOwnerByOperatingHour(Owner owner, OperatingHour operatingHour) {
         if (!Objects.equals(operatingHour.getRestaurant().getOwner(), owner)) {
-            throw new RestaurantNotAuthorizationException(
-                RestaurantErrorCode.RESTAURANT_NOT_AUTHORIZATION);
+            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
     }
 }

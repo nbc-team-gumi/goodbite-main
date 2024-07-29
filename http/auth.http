@@ -5,7 +5,7 @@ POST {{baseUrl}}/users/login
 
 {
   "email": "testuser1@example.com",
-  "password": "password123!@"
+  "password": "Passw0rd!"
 }
 
 > {%
@@ -13,19 +13,13 @@ POST {{baseUrl}}/users/login
   client.global.set("refreshToken", response.cookies["Refresh"].value);
 %}
 
-
 ### 로그아웃 요청
 POST {{baseUrl}}/users/logout
-Content-Type: application/json
-Cookie: Authorization=Bearer {{accessToken}}
-
 
 ### 리프레시 요청
 POST {{baseUrl}}/users/refresh
-Content-Type: application/json
-Cookie: Refresh={{refreshToken}}
-
 
 > {%
   client.global.set("accessToken", response.cookies["Authorization"].value);
 %}
+

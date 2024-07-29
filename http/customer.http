@@ -8,7 +8,7 @@ Content-Type: application/json
 {
   "email": "testuser1@example.com",
   "nickname": "사용자1",
-  "password": "Passw120rd!",
+  "password": "Passw0rd!",
   "phoneNumber": "010-0000-0001"
 }
 

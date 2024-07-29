@@ -26,8 +26,7 @@ public class MenuService {
 
     @Transactional
     public void createMenu(CreateMenuRequestDto createMenuRequestDto, UserCredentials user) {
-        String email = user.getEmail();
-        Owner owner = ownerRepository.findByEmailOrThrow(email);
+        Owner owner = ownerRepository.findByIdOrThrow(user.getId());
         Restaurant restaurant = restaurantRepository.findByOwnerIdOrThrow(owner.getId());
 
         menuRepository.save(createMenuRequestDto.toEntity(restaurant));
@@ -42,9 +41,8 @@ public class MenuService {
     public void updateMenu(Long menuId, UpdateMenuRequestDto updateMenuRequestDto,
         UserCredentials user) {
 
-        Owner owner = ownerRepository.findByEmailOrThrow(user.getEmail());
         Menu menu = menuRepository.findByIdOrThrow(menuId);
-        Restaurant restaurant = restaurantRepository.findByOwnerIdOrThrow(owner.getId());
+        Restaurant restaurant = restaurantRepository.findByOwnerIdOrThrow(user.getId());
 
         // 메뉴의 레스토랑과 소유자의 레스토랑이 일치하는지 검증
         validateMenuOwnership(menu, restaurant);
@@ -54,14 +52,13 @@ public class MenuService {
 
     @Transactional
     public void deleteMenu(Long menuId, UserCredentials user) {
-        Owner owner = ownerRepository.findByEmailOrThrow(user.getEmail());
         Menu menu = menuRepository.findByIdOrThrow(menuId);
-        Restaurant restaurant = restaurantRepository.findByOwnerIdOrThrow(owner.getId());
+        Restaurant restaurant = restaurantRepository.findByOwnerIdOrThrow(user.getId());
 
         // 메뉴의 레스토랑과 소유자의 레스토랑이 일치하는지 검증
         validateMenuOwnership(menu, restaurant);
 
-        menuRepository.delete(menuRepository.findByIdOrThrow(menuId));
+        menuRepository.delete(menu);
     }
 
     private void validateMenuOwnership(Menu menu, Restaurant restaurant) {

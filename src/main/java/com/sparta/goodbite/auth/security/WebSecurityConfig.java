@@ -121,7 +121,7 @@ public class WebSecurityConfig {
                     .permitAll()
                     .requestMatchers("/admins/**").hasRole(UserRole.ADMIN.name())
                     .requestMatchers("/owners/**").hasRole(UserRole.OWNER.name())
-                    .requestMatchers("/customers/").hasRole(UserRole.CUSTOMER.name())
+                    .requestMatchers("/customers/**").hasRole(UserRole.CUSTOMER.name())
                     .anyRequest().authenticated())
 
             // 기본 폼 로그인을 비활성화, 중복 인증 방지

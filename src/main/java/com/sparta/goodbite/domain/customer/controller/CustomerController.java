@@ -55,7 +55,7 @@ public class CustomerController {
         @Valid @RequestBody
         UpdateNicknameRequestDto requestDto, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        customerService.updateNickname(customerId, requestDto);
+        customerService.updateNickname(customerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -72,7 +72,7 @@ public class CustomerController {
         UpdatePhoneNumberRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        customerService.updatePhoneNumber(customerId, requestDto);
+        customerService.updatePhoneNumber(customerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -87,7 +87,7 @@ public class CustomerController {
         @Valid @RequestBody
         UpdatePasswordRequestDto requestDto, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        customerService.updatePassword(customerId, requestDto);
+        customerService.updatePassword(customerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -102,9 +102,6 @@ public class CustomerController {
         @PathVariable Long customerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         String email = userDetails.getUser().getEmail();
-        //Customer customer = customerRepository.findByEmail(email);
-        //customer.getId();
-        //return ResponseUtil.findOk(customerService.getCustomer(customerId));
         return ResponseUtil.findOk(customerService.getCustomer(email));
     }
 

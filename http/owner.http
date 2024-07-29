@@ -1,5 +1,5 @@
 @baseUrl=http://localhost:8080/owners
-@ownerId=2
+@ownerId=1
 ### 회원가입
 POST {{baseUrl}}/signup
 Content-Type: application/json
@@ -20,7 +20,7 @@ PATCH {{baseUrl}}/{{ownerId}}/nickname
 Content-Type: application/json
 
 {
-  "newNickname": "가게2"
+  "newNickname": "가게0001"
 }
 
 ### 회원정보수정-전화번호
@@ -28,7 +28,7 @@ PATCH {{baseUrl}}/{{ownerId}}/phone-number
 Content-Type: application/json
 
 {
-  "newPhoneNumber": "010-1111-0000"
+  "newPhoneNumber": "010-1012-0000"
 }
 
 ### 회원정보수정-비밀번호
@@ -37,7 +37,7 @@ Content-Type: application/json
 
 {
   "currentPassword": "Passw0rd!",
-  "newPassword": "Passw0rd!@"
+  "newPassword": "Passw0rd!!"
 }
 
 ### 회원정보수정-사업자번호

@@ -5,7 +5,7 @@ import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
 import com.sparta.goodbite.domain.customer.dto.CustomerResponseDto;
-import com.sparta.goodbite.domain.customer.dto.CustomerSignUpRequestDto;
+import com.sparta.goodbite.domain.customer.dto.CustomerSignupRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdateNicknameRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePasswordRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePhoneNumberRequestDto;
@@ -37,9 +37,9 @@ public class CustomerController {
      * @return 성공 메시지를 담은 ResponseEntity
      */
     @PostMapping("/signup")
-    public ResponseEntity<MessageResponseDto> signUp(
-        @Valid @RequestBody CustomerSignUpRequestDto requestDto) {
-        customerService.signUp(requestDto);
+    public ResponseEntity<MessageResponseDto> signup(
+        @Valid @RequestBody CustomerSignupRequestDto requestDto) {
+        customerService.signup(requestDto);
         return ResponseUtil.createOk();
     }
 
@@ -55,7 +55,7 @@ public class CustomerController {
         @Valid @RequestBody
         UpdateNicknameRequestDto requestDto, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        customerService.updateNickname(customerId, requestDto);
+        customerService.updateNickname(customerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -70,9 +70,8 @@ public class CustomerController {
     public ResponseEntity<MessageResponseDto> updatePhoneNumber(@PathVariable Long customerId,
         @Valid @RequestBody
         UpdatePhoneNumberRequestDto requestDto,
-        @AuthenticationPrincipal EmailUserDetails userDetails
-    ) {
-        customerService.updatePhoneNumber(customerId, requestDto);
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
+        customerService.updatePhoneNumber(customerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -87,7 +86,7 @@ public class CustomerController {
         @Valid @RequestBody
         UpdatePasswordRequestDto requestDto, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        customerService.updatePassword(customerId, requestDto);
+        customerService.updatePassword(customerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -101,7 +100,7 @@ public class CustomerController {
     public ResponseEntity<DataResponseDto<CustomerResponseDto>> getCustomer(
         @PathVariable Long customerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        return ResponseUtil.findOk(customerService.getCustomer(customerId));
+        return ResponseUtil.findOk(customerService.getCustomer(customerId, userDetails.getUser()));
     }
 
     /**
@@ -114,7 +113,7 @@ public class CustomerController {
     public ResponseEntity<MessageResponseDto> deleteCustomer(
         @PathVariable Long customerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        customerService.deleteCustomer(customerId);
+        customerService.deleteCustomer(customerId, userDetails.getUser());
         return ResponseUtil.deleteOk();
     }
 

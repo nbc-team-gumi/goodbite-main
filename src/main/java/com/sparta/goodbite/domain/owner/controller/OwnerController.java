@@ -54,7 +54,8 @@ public class OwnerController {
     public ResponseEntity<DataResponseDto<OwnerResponseDto>> getOwner(
         @PathVariable Long ownerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        return ResponseUtil.findOk(ownerService.getOwner(ownerId));
+        return ResponseUtil.findOk(
+            ownerService.getOwner(ownerId, userDetails.getUser()));
     }
 
     /**
@@ -71,7 +72,7 @@ public class OwnerController {
         UpdateOwnerNicknameRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        ownerService.updateNickname(ownerId, requestDto);
+        ownerService.updateNickname(ownerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -87,7 +88,7 @@ public class OwnerController {
         @Valid @RequestBody UpdateOwnerPhoneNumberRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        ownerService.updatePhoneNumber(ownerId, requestDto);
+        ownerService.updatePhoneNumber(ownerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -98,14 +99,13 @@ public class OwnerController {
      * @param requestDto 새로운 사업자번호을 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
-
     @PatchMapping("/{ownerId}/business-number")
     public ResponseEntity<MessageResponseDto> updateBusinessNumber(@PathVariable Long ownerId,
         @Valid @RequestBody
         UpdateBusinessNumberRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        ownerService.updateBusinessNumber(ownerId, requestDto);
+        //ownerService.updateBusinessNumber(email, requestDto,userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -116,14 +116,13 @@ public class OwnerController {
      * @param requestDto 새로운 비밀번호를 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
-
     @PatchMapping("/{ownerId}/password")
     public ResponseEntity<MessageResponseDto> updatePassword(@PathVariable Long ownerId,
         @Valid @RequestBody
         UpdateOwnerPasswordRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        ownerService.updatePassword(ownerId, requestDto);
+        ownerService.updatePassword(ownerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -133,12 +132,11 @@ public class OwnerController {
      * @param ownerId 탈퇴할 사장의 ID
      * @return 성공 메시지를 담은 ResponseEntity
      */
-
     @DeleteMapping("/{ownerId}")
     public ResponseEntity<MessageResponseDto> deleteOwner(
         @PathVariable Long ownerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        ownerService.deleteOwner(ownerId);
+        ownerService.deleteOwner(ownerId, userDetails.getUser());
         return ResponseUtil.deleteOk();
     }
 

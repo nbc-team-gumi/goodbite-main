@@ -105,7 +105,7 @@ public class OwnerController {
         UpdateBusinessNumberRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        //ownerService.updateBusinessNumber(email, requestDto,userDetails.getUser());
+        ownerService.updateBusinessNumber(ownerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -139,6 +139,5 @@ public class OwnerController {
         ownerService.deleteOwner(ownerId, userDetails.getUser());
         return ResponseUtil.deleteOk();
     }
-
 
 }

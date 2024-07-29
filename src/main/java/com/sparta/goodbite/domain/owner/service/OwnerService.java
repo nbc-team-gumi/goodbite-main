@@ -14,6 +14,7 @@ import com.sparta.goodbite.exception.owner.detail.DuplicateBusinessNumberExcepti
 import com.sparta.goodbite.exception.owner.detail.DuplicateEmailException;
 import com.sparta.goodbite.exception.owner.detail.DuplicateNicknameException;
 import com.sparta.goodbite.exception.owner.detail.DuplicatePhoneNumberException;
+import com.sparta.goodbite.exception.owner.detail.InvalidBusinessNumberException;
 import com.sparta.goodbite.exception.owner.detail.OwnerAlreadyDeletedException;
 import com.sparta.goodbite.exception.user.UserErrorCode;
 import com.sparta.goodbite.exception.user.detail.PasswordMismatchException;
@@ -102,13 +103,24 @@ public class OwnerService {
         UserCredentials user) {
         String newBusinessNumber = requestDto.getNewBusinessNumber();
 
+        // 사업자 등록번호 유효성 검사
+        if (!isValidBusinessNumber(newBusinessNumber)) {
+            throw new InvalidBusinessNumberException(OwnerErrorCode.INVALID_BUSINESS_NUMBER);
+        }
+
         validateOwnerAccess(ownerId, user);
         validateDuplicateBusinessNumber(requestDto.getNewBusinessNumber());
 
-        // 비즈니스 로직 추가 필요
-        // 사업자번호 업데이트
-        //owner.updateBusinessNumber(newBusinessNumber);
+        // UserCredential타입의 객체를 Owner타입으로 캐스팅
+        Owner owner = (Owner) user;
 
+        // 사업자번호 업데이트
+        owner.updateBusinessNumber(newBusinessNumber);
+
+        // 명시적으로 저장
+        ownerRepository.save(owner);
+
+        // 비즈니스 로직 추가 필요
         //사업자번호 인증상태 미인증으로 변환
     }
 
@@ -204,6 +216,29 @@ public class OwnerService {
         if (!Objects.equals(user.getId(), ownerId)) {
             throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
         }
+    }
+
+    //유효하지 않은 사업자 등록번호를 사전에 필터링
+    private boolean isValidBusinessNumber(String businessNumber) {
+        //dto에서 유효성검사를 하고 들어오긴하지만 일단은 체크
+        if (businessNumber == null || businessNumber.length() != 10) {
+            return false;
+        }
+
+        //인증키
+        int[] checkArr = {1, 3, 7, 1, 3, 7, 1, 3, 1};
+        int sum = 0;
+
+        for (int i = 0; i < 9; i++) {
+            sum += (businessNumber.charAt(i) - '0') * checkArr[i];
+        }
+
+        sum += ((businessNumber.charAt(8) - '0') * 5) / 10;
+        int remainder = sum % 10;
+        int checkDigit = (10 - remainder) % 10;
+
+        //계산된 체크 디지트와 사업자 등록번호의 마지막 자리 숫자가 일치하는지 비교
+        return checkDigit == (businessNumber.charAt(9) - '0');
     }
 
 }

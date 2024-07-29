@@ -35,7 +35,7 @@ public class OperatingHourService {
 
         Owner owner = ownerRepository.findByIdOrThrow(user.getId());
 
-        if (!Objects.equals(restaurant.getOwner(), owner)) {
+        if (!Objects.equals(restaurant.getOwner().getId(), owner.getId())) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
 
@@ -76,7 +76,7 @@ public class OperatingHourService {
     }
 
     private void checkOwnerByOperatingHour(Owner owner, OperatingHour operatingHour) {
-        if (!Objects.equals(operatingHour.getRestaurant().getOwner(), owner)) {
+        if (!Objects.equals(operatingHour.getRestaurant().getOwner().getId(), owner.getId())) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
     }

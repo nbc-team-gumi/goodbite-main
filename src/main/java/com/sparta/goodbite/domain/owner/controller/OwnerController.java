@@ -137,13 +137,13 @@ public class OwnerController {
      * @param ownerId 탈퇴할 사장의 ID
      * @return 성공 메시지를 담은 ResponseEntity
      */
-
+    @PreAuthorize("hasRole('ROLE_OWNER')")
     @DeleteMapping("/{ownerId}")
     public ResponseEntity<MessageResponseDto> deleteOwner(
         @PathVariable Long ownerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         String email = userDetails.getUser().getEmail();
-        ownerService.deleteOwner(email);
+        ownerService.deleteOwner(ownerId, userDetails.getUser());
         return ResponseUtil.deleteOk();
     }
 

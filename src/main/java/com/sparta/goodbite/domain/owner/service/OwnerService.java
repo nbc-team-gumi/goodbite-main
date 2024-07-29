@@ -226,10 +226,13 @@ public class OwnerService {
 
     //삭제
     @Transactional
-    public void deleteOwner(String ownerEmail) {
-        // Owner 조회
-        Owner owner = ownerRepository.findByEmail(ownerEmail)
-            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
+    public void deleteOwner(Long ownerId, UserCredentials user) {
+        // 본인인지 확인
+        if (!Objects.equals(user.getId(), ownerId)) {//롤 확인 -> 지금은 확인하는게 나을듯
+            throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
+        }
+        //UserCredential타입의 객체를 Owner타입으로 캐스팅
+        Owner owner = (Owner) user;
 
         // 이미 탈퇴한 사용자인지 확인합니다.
         if (owner.getDeletedAt() != null) {
@@ -239,14 +242,9 @@ public class OwnerService {
         // 소프트 삭제를 위해 deletedAt 필드를 현재 시간으로 설정
         owner.deactivate();
 
+        //명시적으로 저장
+        ownerRepository.save(owner);
+
     }
-
-    /*private void validate(Menu menu, Restaurant restaurant) {
-        if (!menu.getRestaurant().getId().equals(restaurant.getId())) {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
-        }
-    }*/
-
-    //정보를 조회하고자 하는 사용자id와
 
 }

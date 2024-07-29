@@ -2,7 +2,7 @@ package com.sparta.goodbite.domain.review.entity;
 
 import com.sparta.goodbite.common.Timestamped;
 import com.sparta.goodbite.domain.customer.entity.Customer;
-import com.sparta.goodbite.domain.menu.entity.Menu;
+import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.review.dto.UpdateReviewRequestDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -31,18 +31,18 @@ public class Review extends Timestamped {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_id", nullable = false)
-    private Menu menu;
+    @JoinColumn(name = "restaurant_id", nullable = false)
+    private Restaurant restaurant;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
     @Builder
-    public Review(float rating, String content, Menu menu, Customer customer) {
+    public Review(float rating, String content, Restaurant restaurant, Customer customer) {
         this.rating = rating;
         this.content = content;
-        this.menu = menu;
+        this.restaurant = restaurant;
         this.customer = customer;
     }
 

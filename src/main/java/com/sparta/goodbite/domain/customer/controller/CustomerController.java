@@ -115,7 +115,7 @@ public class CustomerController {
     public ResponseEntity<MessageResponseDto> deleteCustomer(
         @PathVariable Long customerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        customerService.deleteCustomer(customerId);
+        customerService.deleteCustomer(customerId, userDetails.getUser());
         return ResponseUtil.deleteOk();
     }
 

@@ -10,7 +10,6 @@ import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
 import com.sparta.goodbite.exception.customer.CustomerErrorCode;
 import com.sparta.goodbite.exception.customer.detail.CustomerAlreadyDeletedException;
-import com.sparta.goodbite.exception.customer.detail.CustomerNotFoundException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateEmailException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateNicknameException;
 import com.sparta.goodbite.exception.customer.detail.DuplicatePhoneNumberException;
@@ -129,10 +128,11 @@ public class CustomerService {
     }
 
     @Transactional
-    public void deleteCustomer(Long customerId) {
-        // 고객 엔티티 조회
-        Customer customer = customerRepository.findById(customerId)
-            .orElseThrow(() -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
+    public void deleteCustomer(Long customerId, UserCredentials user) {
+        validateOwnerAccess(customerId, user);
+
+        //UserCredential타입의 객체를 Customer타입으로 캐스팅
+        Customer customer = (Customer) user;
 
         // 이미 탈퇴한 사용자인지 확인합니다.
         if (customer.getDeletedAt() != null) {
@@ -141,6 +141,9 @@ public class CustomerService {
 
         // 소프트 삭제를 위해 deletedAt 필드를 현재 시간으로 설정
         customer.deactivate();
+
+        //명시적으로 저장
+        customerRepository.save(customer);
     }
 
     // 중복 필드 검증 메서드

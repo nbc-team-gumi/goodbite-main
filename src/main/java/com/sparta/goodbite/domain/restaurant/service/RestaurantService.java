@@ -61,10 +61,7 @@ public class RestaurantService {
         String ownerEmail = userDetails.getUser().getEmail();
         Owner owner = ownerRepository.findByEmailOrThrow(ownerEmail);
 
-        if (!owner.equals(restaurant.getOwner())) {
-            throw new RestaurantNotAuthorizationException(
-                RestaurantErrorCode.RESTAURANT_NOT_AUTHORIZATION);
-        }
+        checkOwnerByRestaurant(owner, restaurant);
 
         restaurant.update(restaurantRequestDto);
     }
@@ -77,10 +74,7 @@ public class RestaurantService {
         String ownerEmail = userDetails.getUser().getEmail();
         Owner owner = ownerRepository.findByEmailOrThrow(ownerEmail);
 
-        if (!owner.equals(restaurant.getOwner())) {
-            throw new RestaurantNotAuthorizationException(
-                RestaurantErrorCode.RESTAURANT_NOT_AUTHORIZATION);
-        }
+        checkOwnerByRestaurant(owner, restaurant);
 
         restaurantRepository.delete(restaurant);
     }
@@ -95,5 +89,12 @@ public class RestaurantService {
         return operatingHours.stream()
             .map(OperatingHourResponseDto::from)
             .toList();
+    }
+
+    private void checkOwnerByRestaurant(Owner owner, Restaurant restaurant) {
+        if (!owner.equals(restaurant.getOwner())) {
+            throw new RestaurantNotAuthorizationException(
+                RestaurantErrorCode.RESTAURANT_NOT_AUTHORIZATION);
+        }
     }
 }

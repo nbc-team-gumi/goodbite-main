@@ -1,5 +1,6 @@
 package com.sparta.goodbite.domain.review.controller;
 
+import com.sparta.goodbite.auth.security.EmailUserDetails;
 import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
@@ -11,6 +12,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,11 +30,13 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping
     public ResponseEntity<MessageResponseDto> createReview(
-        @Valid @RequestBody CreateReviewRequestDto createReviewRequestDto) {
+        @Valid @RequestBody CreateReviewRequestDto createReviewRequestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        reviewService.createReview(createReviewRequestDto);
+        reviewService.createReview(createReviewRequestDto, userDetails.getUser());
         return ResponseUtil.createOk();
     }
 
@@ -47,17 +52,22 @@ public class ReviewController {
         return ResponseUtil.findOk(reviewService.getAllReviews());
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PutMapping("/{reviewId}")
     public ResponseEntity<MessageResponseDto> updateReview(@PathVariable Long reviewId,
-        @Valid @RequestBody UpdateReviewRequestDto updateReviewRequestDto) {
+        @Valid @RequestBody UpdateReviewRequestDto updateReviewRequestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        reviewService.updateReview(reviewId, updateReviewRequestDto);
+        reviewService.updateReview(reviewId, updateReviewRequestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN')")
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity<MessageResponseDto> deleteReview(@PathVariable Long reviewId) {
-        reviewService.deleteReview(reviewId);
+    public ResponseEntity<MessageResponseDto> deleteReview(@PathVariable Long reviewId,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
+
+        reviewService.deleteReview(reviewId, userDetails.getUser());
         return ResponseUtil.deleteOk();
     }
 }

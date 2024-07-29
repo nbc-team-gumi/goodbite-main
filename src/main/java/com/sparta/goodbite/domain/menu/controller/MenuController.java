@@ -39,7 +39,6 @@ public class MenuController {
         return ResponseUtil.createOk();
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{menuId}")
     public ResponseEntity<DataResponseDto<MenuResponseDto>> getMenu(@PathVariable Long menuId) {
         return ResponseUtil.findOk(menuService.getMenu(menuId));

@@ -102,7 +102,7 @@ public class CustomerController {
         @PathVariable Long customerId, @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         String email = userDetails.getUser().getEmail();
-        return ResponseUtil.findOk(customerService.getCustomer(email));
+        return ResponseUtil.findOk(customerService.getCustomer(customerId, userDetails.getUser()));
     }
 
     /**

@@ -33,9 +33,9 @@ public class CustomerService {
 
     //조회
     @Transactional(readOnly = true)
-    public CustomerResponseDto getCustomer(String customerEmail) {
-        return CustomerResponseDto.from(customerRepository.findByEmail(customerEmail).orElseThrow(()
-            -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND)));
+    public CustomerResponseDto getCustomer(Long customerId, UserCredentials user) {
+        validateOwnerAccess(customerId, user);//본인인지 확인
+        return CustomerResponseDto.from(customerRepository.findByEmailOrThrow(user.getEmail()));
     }
 
     //회원가입

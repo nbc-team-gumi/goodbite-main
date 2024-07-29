@@ -191,17 +191,25 @@ public class OwnerService {
 
     // 수정-비밀번호
     @Transactional
-    public void updatePassword(String ownerEmail,
-        UpdateOwnerPasswordRequestDto requestDto) {
-        // Owner 조회
-        Owner owner = ownerRepository.findByEmail(ownerEmail)
-            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));
+    public void updatePassword(Long ownerId,
+        UpdateOwnerPasswordRequestDto requestDto, UserCredentials user) {
+        // 본인인지 확인
+        if (!Objects.equals(user.getId(), ownerId)) {//롤 확인 -> 지금은 확인하는게 나을듯
+            throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
+        }
 
-        //
+        //UserCredential타입의 객체를 Owner타입으로 캐스팅
+        Owner owner = (Owner) user;
+        /*// Owner 조회
+        Owner owner = ownerRepository.findByEmail(ownerEmail)
+            .orElseThrow(() -> new OwnerNotFoundException(OwnerErrorCode.OWNER_NOT_FOUND));*/
+
+        //입력한 비밀번호와 사용자의 비밀번호 일치유무 확인
         if (!passwordEncoder.matches(requestDto.getCurrentPassword(), owner.getPassword())) {
             throw new PasswordMismatchException(UserErrorCode.PASSWORD_MISMATCH);
         }
 
+        //새로 입력한 비밀번호가 기존의 비밀번호와 일치하는지 확인
         if (passwordEncoder.matches(requestDto.getNewPassword(), owner.getPassword())) {
             throw new SamePasswordException(UserErrorCode.SAME_PASSWORD);
         }
@@ -210,6 +218,9 @@ public class OwnerService {
 
         // 비밀번호 업데이트
         owner.updatePassword(newPassword);
+
+        //명시적으로 저장
+        ownerRepository.save(owner);
 
     }
 

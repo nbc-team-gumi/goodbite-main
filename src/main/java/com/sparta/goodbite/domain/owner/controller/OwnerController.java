@@ -102,15 +102,14 @@ public class OwnerController {
      * @param requestDto 새로운 사업자번호을 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
-
+    @PreAuthorize("hasRole('ROLE_OWNER')")
     @PatchMapping("/{ownerId}/business-number")
     public ResponseEntity<MessageResponseDto> updateBusinessNumber(@PathVariable Long ownerId,
         @Valid @RequestBody
         UpdateBusinessNumberRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        String email = userDetails.getUser().getEmail();
-        //ownerService.updateBusinessNumber(email, requestDto);
+        //ownerService.updateBusinessNumber(email, requestDto,userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -121,15 +120,14 @@ public class OwnerController {
      * @param requestDto 새로운 비밀번호를 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
-
+    @PreAuthorize("hasRole('ROLE_OWNER')")
     @PatchMapping("/{ownerId}/password")
     public ResponseEntity<MessageResponseDto> updatePassword(@PathVariable Long ownerId,
         @Valid @RequestBody
         UpdateOwnerPasswordRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        String email = userDetails.getUser().getEmail();
-        //ownerService.updatePassword(email, requestDto);
+        ownerService.updatePassword(ownerId, requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 

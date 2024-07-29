@@ -2,7 +2,7 @@ package com.sparta.goodbite.domain.restaurant.dto;
 
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 
-public record RestaurantResponseDto(Long id, String name, String imageUrl, String address,
+public record RestaurantResponseDto(Long restaurantId, String name, String imageUrl, String address,
                                     String area, String phoneNumber, String category) {
 
     public static RestaurantResponseDto from(Restaurant restaurant) {
@@ -15,5 +15,4 @@ public record RestaurantResponseDto(Long id, String name, String imageUrl, Strin
             restaurant.getPhoneNumber(),
             restaurant.getCategory());
     }
-
 }

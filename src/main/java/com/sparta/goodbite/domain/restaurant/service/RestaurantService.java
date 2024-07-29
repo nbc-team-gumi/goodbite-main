@@ -1,7 +1,6 @@
 package com.sparta.goodbite.domain.restaurant.service;
 
 import com.sparta.goodbite.common.UserCredentials;
-import com.sparta.goodbite.domain.operatinghour.repository.OperatingHourRepository;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
-    private final OperatingHourRepository operatingHourRepository;
     private final OwnerRepository ownerRepository;
 
     @Transactional

@@ -1,7 +1,6 @@
 package com.sparta.goodbite.domain.waiting.service;
 
-import com.sparta.goodbite.auth.UserRole;
-import com.sparta.goodbite.auth.security.EmailUserDetails;
+import com.sparta.goodbite.common.UserCredentials;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
 import com.sparta.goodbite.domain.owner.entity.Owner;
@@ -50,13 +49,13 @@ public class WaitingService {
     private final Map<Long, Integer> waitingList = new HashMap<>();
 
     public WaitingResponseDto createWaiting(
-        EmailUserDetails userDetails,
+        UserCredentials user,
         PostWaitingRequestDto postWaitingRequestDto) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
             postWaitingRequestDto.getRestaurantId());
 
-        String Email = userDetails.getUser().getEmail();
+        String Email = user.getEmail();
 
         Customer customer = customerRepository.findByEmail(Email)
             .orElseThrow(() -> new CustomerException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
@@ -87,7 +86,6 @@ public class WaitingService {
 
     // 단일 조회용 메서드
     public WaitingResponseDto getWaiting(
-        EmailUserDetails userDetails,
         Long waitingId) {
 
         Waiting waiting = waitingRepository.findById(waitingId)
@@ -97,11 +95,11 @@ public class WaitingService {
     }
 
     //    //가게 주인용 api
-//    //해당 메서드 동작 시, 가게의 id가 들어간 orders가 하나씩 줄게 된다.
+    //해당 메서드 동작 시, 가게의 id가 들어간 orders가 하나씩 줄게 된다.
     // restaurant id에 맞는 Waiting들의 order를 하나씩 줄인다.
     @Transactional
     public void reduceAllWaitingOrders(
-        EmailUserDetails userDetails,
+        UserCredentials user,
         Long restaurantId) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
@@ -109,7 +107,7 @@ public class WaitingService {
         Owner owner = ownerRepository.findById(restaurant.getOwnerId())
             .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED));
 
-        if (!userDetails.getUser().getEmail().equals(owner.getEmail())) {
+        if (!user.getEmail().equals(owner.getEmail())) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
 
@@ -140,10 +138,10 @@ public class WaitingService {
     // 웨이팅 하나만 삭제하고 뒤 웨이팅 숫자 하나씩 감소
     @Transactional
     public void reduceOneWaitingOrders(
-        EmailUserDetails userDetails,
+        UserCredentials user,
         Long waitingId) {
 
-        validateWaitingRequest(userDetails, waitingId);
+        validateWaitingRequest(user, waitingId);
 
         reduceWaitingOrders(waitingId, "reduce");
     }
@@ -151,11 +149,11 @@ public class WaitingService {
     // 가게용 api
     // 예약 인원수와 요청사항만 변경 가능함 ( 추후 합의를 통해 ?건 이하의 순서일 때는 수정하지 못하도록 로직 수정 필요)
     public WaitingResponseDto updateWaiting(
-        EmailUserDetails userDetails,
+        UserCredentials user,
         Long waitingId,
         UpdateWaitingRequestDto updateWaitingRequestDto) {
 
-        validateWaitingRequest(userDetails, waitingId);
+        validateWaitingRequest(user, waitingId);
 
         Waiting waiting = waitingRepository.findById(waitingId)
             .orElseThrow(() -> new WaitingNotFoundException(
@@ -168,13 +166,12 @@ public class WaitingService {
         return WaitingResponseDto.of(waiting, restaurantName);
     }
 
-
     // 취소 메서드
     public void deleteWaiting(
-        EmailUserDetails userDetails,
+        UserCredentials user,
         Long waitingId) {
 
-        validateWaitingRequest(userDetails, waitingId);
+        validateWaitingRequest(user, waitingId);
 
         reduceWaitingOrders(waitingId, "delete");
     }
@@ -191,8 +188,9 @@ public class WaitingService {
 
     }
 
+
+    // 페이지 네이션 말고 list로 하면 무슨 장점이 있을까요?
     public Page<WaitingResponseDto> getWaitingsByRestaurantId(
-        EmailUserDetails userDetails,
         Long restaurantId,
         Pageable pageable) {
         Page<Waiting> waitingPage = waitingRepository.findByRestaurantId(restaurantId, pageable);
@@ -247,7 +245,9 @@ public class WaitingService {
         messagingTemplate.convertAndSend("/topic/notifications/" + customerId, message);
     }
 
-    private void validateWaitingRequest(EmailUserDetails userDetails, Long waitingId) {
+    private void validateWaitingRequest(UserCredentials user, Long waitingId) {
+
+        System.out.println(user.getEmail());
 
         Waiting waiting = waitingRepository.findByIdOrElseThrowException(waitingId);
 
@@ -261,12 +261,12 @@ public class WaitingService {
             .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED));
 
         // api요청한 유저가 해당 레스토랑의 '오너'와 같던가 혹은 웨이팅 등록한 '손님'과 같던가
-        if (userDetails.getRole().equals(UserRole.OWNER.getAuthority()) && !userDetails.getUser()
-            .getEmail().equals(owner.getEmail())) {
+        if (user.getClass().equals(Owner.class) && !user.getEmail()
+            .equals(owner.getEmail())) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
-        if (userDetails.getRole().equals(UserRole.CUSTOMER.getAuthority()) && !userDetails.getUser()
-            .getEmail().equals(customer.getEmail())) {
+        if (user.getClass().equals(Customer.class) && !user.getEmail()
+            .equals(customer.getEmail())) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
 

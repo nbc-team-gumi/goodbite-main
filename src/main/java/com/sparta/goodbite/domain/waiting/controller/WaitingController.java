@@ -39,25 +39,24 @@ public class WaitingController {
         @Valid @RequestBody PostWaitingRequestDto postWaitingRequestDto
     ) {
         return ResponseUtil.createOk(
-            waitingService.createWaiting(userDetails, postWaitingRequestDto));
+            waitingService.createWaiting(userDetails.getUser(), postWaitingRequestDto));
     }
 
     // 웨이팅 전체 조회용 api
     // api 권한 제한 없음
     @GetMapping("/restaurants/{restaurantId}/waitingList")
     public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getWaitingList(
-        @AuthenticationPrincipal EmailUserDetails userDetails,
         @PathVariable Long restaurantId,
         @PageableDefault(size = 5) Pageable pageable
     ) {
         return ResponseUtil.createOk(
-            waitingService.getWaitingsByRestaurantId(userDetails, restaurantId, pageable));
+            waitingService.getWaitingsByRestaurantId(restaurantId,
+                pageable));
     }
 
     // api 권한 제한 없음
     @GetMapping("/restaurants/{restaurantId}/waitings")
     public ResponseEntity<DataResponseDto<Long>> getWaitingLastNumber(
-        @AuthenticationPrincipal EmailUserDetails userDetails,
         @PathVariable Long restaurantId
     ) {
         return ResponseUtil.findOk(
@@ -69,10 +68,9 @@ public class WaitingController {
     // api 권한 제한 없음
     @GetMapping("/waitings/{waitingId}")
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> getWaiting(
-        @AuthenticationPrincipal EmailUserDetails userDetails,
         @PathVariable Long waitingId
     ) {
-        return ResponseUtil.findOk(waitingService.getWaiting(userDetails, waitingId));
+        return ResponseUtil.findOk(waitingService.getWaiting(waitingId));
     }
 
     // 가게 주인용 가게 전체 하나씩 웨이팅 줄이기 메서드 호출
@@ -83,18 +81,19 @@ public class WaitingController {
         @AuthenticationPrincipal EmailUserDetails userDetails,
         @PathVariable Long restaurantId
     ) {
-        waitingService.reduceAllWaitingOrders(userDetails, restaurantId);
+        waitingService.reduceAllWaitingOrders(userDetails.getUser(), restaurantId);
         return ResponseUtil.updateOk();
     }
 
     // 가게 주인용 하나 선택 후 웨이팅 줄이기 메서드 호출
-    // 해당 가게 오너 또는 해당 웨이팅 등록 손님 + Admin
+    // 해당 가게 오너 + Admin
+    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
     @PutMapping("/restaurants/waitings/{waitingId}")
     public ResponseEntity<MessageResponseDto> reduceOneWaitingOrders(
         @AuthenticationPrincipal EmailUserDetails userDetails,
         @PathVariable Long waitingId
     ) {
-        waitingService.reduceOneWaitingOrders(userDetails, waitingId);
+        waitingService.reduceOneWaitingOrders(userDetails.getUser(), waitingId);
         return ResponseUtil.updateOk();
     }
 
@@ -106,7 +105,7 @@ public class WaitingController {
         @PathVariable Long waitingId,
         @Valid @RequestBody UpdateWaitingRequestDto updateWaitingRequestDto
     ) {
-        waitingService.updateWaiting(userDetails, waitingId, updateWaitingRequestDto);
+        waitingService.updateWaiting(userDetails.getUser(), waitingId, updateWaitingRequestDto);
         return ResponseUtil.updateOk();
     }
 
@@ -117,7 +116,7 @@ public class WaitingController {
         @AuthenticationPrincipal EmailUserDetails userDetails,
         @PathVariable Long waitingId
     ) {
-        waitingService.deleteWaiting(userDetails, waitingId);
+        waitingService.deleteWaiting(userDetails.getUser(), waitingId);
         return ResponseUtil.deleteOk();
     }
 

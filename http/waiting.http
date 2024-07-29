@@ -1,4 +1,4 @@
-@restaurantId = 3
+@restaurantId = 2
 @baseUrl = http://localhost:8080
 ### Passw120rd! / Passw0rd!
 
@@ -6,7 +6,7 @@
 POST {{baseUrl}}/users/login
 
 {
-  "email": "testuser2@example.com",
+  "email": "testuser3@example.com",
   "password": "Passw0rd!"
 }
 
@@ -22,7 +22,7 @@ Content-Type: application/json
 Cookie: Authorization=Bearer {{accessToken}}
 
 {
-  "restaurantId": 1,
+  "restaurantId": 3,
   "partySize": 123,
   "waitingType": "OFFLINE",
   "demand": "널널한 자리로 주세요~"

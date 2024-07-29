@@ -29,8 +29,7 @@ public class ReviewService {
     public void createReview(CreateReviewRequestDto createReviewRequestDto, UserCredentials user) {
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
             createReviewRequestDto.getRestaurantId());
-        Customer customer = customerRepository.findByIdOrThrow(user.getId());
-        reviewRepository.save(createReviewRequestDto.toEntity(restaurant, customer));
+        reviewRepository.save(createReviewRequestDto.toEntity(restaurant, (Customer) user));
     }
 
     @Transactional(readOnly = true)

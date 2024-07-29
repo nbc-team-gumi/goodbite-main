@@ -5,7 +5,6 @@ import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
 import com.sparta.goodbite.domain.operatinghour.entity.OperatingHour;
 import com.sparta.goodbite.domain.operatinghour.repository.OperatingHourRepository;
 import com.sparta.goodbite.domain.owner.entity.Owner;
-import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
@@ -23,14 +22,12 @@ public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
     private final OperatingHourRepository operatingHourRepository;
-    private final OwnerRepository ownerRepository;
 
     @Transactional
     public void createRestaurant(RestaurantRequestDto restaurantRequestDto,
         EmailUserDetails userDetails) {
 
-        String ownerEmail = userDetails.getUser().getEmail();
-        Owner owner = ownerRepository.findByEmailOrThrow(ownerEmail);
+        Owner owner = (Owner) userDetails.getUser();
 
         restaurantRepository.save(restaurantRequestDto.toEntity(owner));
     }
@@ -58,8 +55,7 @@ public class RestaurantService {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
 
-        String ownerEmail = userDetails.getUser().getEmail();
-        Owner owner = ownerRepository.findByEmailOrThrow(ownerEmail);
+        Owner owner = (Owner) userDetails.getUser();
 
         checkOwnerByRestaurant(owner, restaurant);
 
@@ -71,8 +67,7 @@ public class RestaurantService {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
 
-        String ownerEmail = userDetails.getUser().getEmail();
-        Owner owner = ownerRepository.findByEmailOrThrow(ownerEmail);
+        Owner owner = (Owner) userDetails.getUser();
 
         checkOwnerByRestaurant(owner, restaurant);
 

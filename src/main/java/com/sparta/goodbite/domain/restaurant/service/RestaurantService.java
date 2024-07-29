@@ -1,8 +1,6 @@
 package com.sparta.goodbite.domain.restaurant.service;
 
 import com.sparta.goodbite.common.UserCredentials;
-import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
-import com.sparta.goodbite.domain.operatinghour.entity.OperatingHour;
 import com.sparta.goodbite.domain.operatinghour.repository.OperatingHourRepository;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
@@ -74,18 +72,6 @@ public class RestaurantService {
         validateRestaurantOwnership(owner, restaurant);
 
         restaurantRepository.delete(restaurant);
-    }
-
-    @Transactional(readOnly = true)
-    public List<OperatingHourResponseDto> getAllOperatingHoursByRestaurant(Long restaurantId) {
-
-        restaurantRepository.findByIdOrThrow(restaurantId);
-        List<OperatingHour> operatingHours = operatingHourRepository.findAllByRestaurantId(
-            restaurantId);
-
-        return operatingHours.stream()
-            .map(OperatingHourResponseDto::from)
-            .toList();
     }
 
     private void validateRestaurantOwnership(Owner owner, Restaurant restaurant) {

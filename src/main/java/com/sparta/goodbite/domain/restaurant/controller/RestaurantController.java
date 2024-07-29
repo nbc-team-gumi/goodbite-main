@@ -5,6 +5,7 @@ import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
 import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
+import com.sparta.goodbite.domain.operatinghour.service.OperatingHourService;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
 import com.sparta.goodbite.domain.restaurant.service.RestaurantService;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RestaurantController {
 
     private final RestaurantService restaurantService;
+    private final OperatingHourService operatingHourService;
 
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping
@@ -53,6 +55,14 @@ public class RestaurantController {
         return ResponseUtil.findOk(restaurantService.getAllRestaurants());
     }
 
+    @GetMapping("/{restaurantId}/operating-hours")
+    public ResponseEntity<DataResponseDto<List<OperatingHourResponseDto>>> getAllOperatingHoursByRestaurant(
+        @PathVariable Long restaurantId) {
+
+        return ResponseUtil.findOk(
+            operatingHourService.getAllOperatingHoursByRestaurant(restaurantId));
+    }
+
     @PreAuthorize("hasRole('OWNER')")
     @PutMapping("/{restaurantId}")
     public ResponseEntity<MessageResponseDto> updateRestaurant(@PathVariable Long restaurantId,
@@ -71,13 +81,5 @@ public class RestaurantController {
 
         restaurantService.deleteRestaurant(restaurantId, userDetails.getUser());
         return ResponseUtil.deleteOk();
-    }
-
-    @GetMapping("/{restaurantId}/operating-hours")
-    public ResponseEntity<DataResponseDto<List<OperatingHourResponseDto>>> getAllOperatingHoursByRestaurant(
-        @PathVariable Long restaurantId) {
-
-        return ResponseUtil.findOk(
-            restaurantService.getAllOperatingHoursByRestaurant(restaurantId));
     }
 }

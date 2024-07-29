@@ -1,11 +1,14 @@
 package com.sparta.goodbite.domain.restaurant.entity;
 
 import com.sparta.goodbite.common.Timestamped;
+import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +21,11 @@ public class Restaurant extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long ownerId;
+
+    @OneToOne
+    @JoinColumn(name = "owner_id")
+    private Owner owner;
+
     private String name;
     private String imageUrl;
     private String address;
@@ -27,9 +34,9 @@ public class Restaurant extends Timestamped {
     private String category;
 
     @Builder
-    public Restaurant(Long ownerId, String name, String imageUrl, String address, String area,
+    public Restaurant(Owner owner, String name, String imageUrl, String address, String area,
         String phoneNumber, String category) {
-        this.ownerId = ownerId;
+        this.owner = owner;
         this.name = name;
         this.imageUrl = imageUrl;
         this.address = address;

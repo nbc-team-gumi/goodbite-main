@@ -1,12 +1,28 @@
-@restaurantId = 1
+@restaurantId = 3
 @baseUrl = http://localhost:8080
+### Passw120rd! / Passw0rd!
+
+### 로그인 요청
+POST {{baseUrl}}/users/login
+
+{
+  "email": "testuser2@example.com",
+  "password": "Passw0rd!"
+}
+
+> {%
+  client.global.set("accessToken", response.cookies["Authorization"].value);
+  client.global.set("refreshToken", response.cookies["Refresh"].value);
+%}
+
 
 ### Waiting 손님이 등록
 POST {{baseUrl}}/waitings
 Content-Type: application/json
+Cookie: Authorization=Bearer {{accessToken}}
 
 {
-  "restaurantId": 2,
+  "restaurantId": 1,
   "partySize": 123,
   "waitingType": "OFFLINE",
   "demand": "널널한 자리로 주세요~"
@@ -20,7 +36,6 @@ Content-Type: application/json
 ### Waiting 단일 정보 조회
 GET {{baseUrl}}/waitings/{{waitingId}}
 
-
 ### Restaurant의 마지막 Waiting번호 가져오기
 GET {{baseUrl}}/restaurants/{{restaurantId}}/waitings
 
@@ -28,6 +43,7 @@ GET {{baseUrl}}/restaurants/{{restaurantId}}/waitings
 ### Waiting 가게에서 정보 수정
 PATCH {{baseUrl}}/waitings/{{waitingId}}
 Content-Type: application/json
+Cookie: Authorization=Bearer {{accessToken}}
 
 {
   "partySize": 4,
@@ -47,4 +63,18 @@ PUT {{baseUrl}}/restaurants/waitings/{{waitingId}}
 
 ### 가게 웨이팅 리스트 페이지네이션 해서 보기
 GET {{baseUrl}}/restaurants/{{restaurantId}}/waitingList?page=0&size=5
+
+
+### 오너 로그인 요청
+POST {{baseUrl}}/users/login
+
+{
+  "email": "testowner1@email.com",
+  "password": "Passw0rd!"
+}
+
+> {%
+  client.global.set("accessToken", response.cookies["Authorization"].value);
+  client.global.set("refreshToken", response.cookies["Refresh"].value);
+%}
 

@@ -1,8 +1,11 @@
 package com.sparta.goodbite.domain.waiting.service;
 
+import com.sparta.goodbite.auth.UserRole;
 import com.sparta.goodbite.auth.security.EmailUserDetails;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
+import com.sparta.goodbite.domain.owner.entity.Owner;
+import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.domain.waiting.dto.PostWaitingRequestDto;
@@ -11,6 +14,10 @@ import com.sparta.goodbite.domain.waiting.dto.WaitingResponseDto;
 import com.sparta.goodbite.domain.waiting.entity.Waiting;
 import com.sparta.goodbite.domain.waiting.entity.Waiting.WaitingStatus;
 import com.sparta.goodbite.domain.waiting.repository.WaitingRepository;
+import com.sparta.goodbite.exception.auth.AuthErrorCode;
+import com.sparta.goodbite.exception.auth.AuthException;
+import com.sparta.goodbite.exception.customer.CustomerErrorCode;
+import com.sparta.goodbite.exception.customer.CustomerException;
 import com.sparta.goodbite.exception.waiting.WaitingErrorCode;
 import com.sparta.goodbite.exception.waiting.WaitingException;
 import com.sparta.goodbite.exception.waiting.detail.WaitingNotFoundException;
@@ -37,6 +44,7 @@ public class WaitingService {
     private final RestaurantRepository restaurantRepository;
     private final CustomerRepository customerRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final OwnerRepository ownerRepository;
 
     private final Map<Long, SseEmitter> emitters = new HashMap<>();
     private final Map<Long, Integer> waitingList = new HashMap<>();
@@ -45,10 +53,13 @@ public class WaitingService {
         EmailUserDetails userDetails,
         PostWaitingRequestDto postWaitingRequestDto) {
 
-        Restaurant restaurant = restaurantRepository.findById(
-            postWaitingRequestDto.getRestaurantId()).orElseThrow();
+        Restaurant restaurant = restaurantRepository.findByIdOrThrow(
+            postWaitingRequestDto.getRestaurantId());
 
-        Customer customer = (Customer) userDetails.getUser();
+        String Email = userDetails.getUser().getEmail();
+
+        Customer customer = customerRepository.findByEmail(Email)
+            .orElseThrow(() -> new CustomerException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
 
         Waiting waitingDuplicated = waitingRepository.findByRestaurantIdAndCustomerId(
             restaurant.getId(),
@@ -92,6 +103,16 @@ public class WaitingService {
     public void reduceAllWaitingOrders(
         EmailUserDetails userDetails,
         Long restaurantId) {
+
+        Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
+
+        Owner owner = ownerRepository.findById(restaurant.getOwnerId())
+            .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED));
+
+        if (!userDetails.getUser().getEmail().equals(owner.getEmail())) {
+            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+        }
+
         List<Waiting> waitingList = waitingRepository.findALLByRestaurantId(restaurantId);
         if (waitingList.isEmpty()) {
             throw new WaitingException(WaitingErrorCode.WAITING_NOT_FOUND);
@@ -103,8 +124,8 @@ public class WaitingService {
             waiting.reduceWaitingOrder();
             if (waiting.getWaitingOrder() == 0) {
                 // 그리고 여기서 알람이나 그런거 해야 함
-                System.out.println("0번은 입장하세요~");
-                //알람!
+                sendNotificationToCustomer(waiting.getCustomer().getId(),
+                    "가게로 들어와 주세요.");
                 waitingRepository.delete(waiting);
             } else {
                 waitingArrayList.add(waiting);
@@ -121,6 +142,9 @@ public class WaitingService {
     public void reduceOneWaitingOrders(
         EmailUserDetails userDetails,
         Long waitingId) {
+
+        validateWaitingRequest(userDetails, waitingId);
+
         reduceWaitingOrders(waitingId, "reduce");
     }
 
@@ -130,6 +154,8 @@ public class WaitingService {
         EmailUserDetails userDetails,
         Long waitingId,
         UpdateWaitingRequestDto updateWaitingRequestDto) {
+
+        validateWaitingRequest(userDetails, waitingId);
 
         Waiting waiting = waitingRepository.findById(waitingId)
             .orElseThrow(() -> new WaitingNotFoundException(
@@ -142,11 +168,14 @@ public class WaitingService {
         return WaitingResponseDto.of(waiting, restaurantName);
     }
 
-    // 삭제 시, 메서드를 호출한 유저의 id와 취소하고자 하는 가게 id를 받아야 하는거 아닌가?
-    // 프론트에서 어떤값을 주느냐에 따라 달라질 것 같다.
+
+    // 취소 메서드
     public void deleteWaiting(
         EmailUserDetails userDetails,
         Long waitingId) {
+
+        validateWaitingRequest(userDetails, waitingId);
+
         reduceWaitingOrders(waitingId, "delete");
     }
 
@@ -195,7 +224,7 @@ public class WaitingService {
                 if (type.equals("delete")) {
                     message = "웨이팅이 취소되었습니다.";
                 } else if (type.equals("reduce")) {
-                    message = "가게로 들어와 주세요.";
+                    message = "손님, 가게로 들어와 주세요.";
                 }
                 sendNotificationToCustomer(waiting.getCustomer().getId(),
                     message);
@@ -216,6 +245,35 @@ public class WaitingService {
 
     private void sendNotificationToCustomer(Long customerId, String message) {
         messagingTemplate.convertAndSend("/topic/notifications/" + customerId, message);
+    }
+
+    private void validateWaitingRequest(EmailUserDetails userDetails, Long waitingId) {
+
+        Waiting waiting = waitingRepository.findByIdOrElseThrowException(waitingId);
+
+        Restaurant restaurant = restaurantRepository.findByIdOrThrow(
+            waiting.getRestaurant().getId());
+
+        Customer customer = customerRepository.findById(waiting.getCustomer().getId())
+            .orElseThrow(() -> new CustomerException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
+
+        Owner owner = ownerRepository.findById(restaurant.getOwnerId())
+            .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED));
+
+        // api요청한 유저가 해당 레스토랑의 '오너'와 같던가 혹은 웨이팅 등록한 '손님'과 같던가
+        if (userDetails.getRole().equals(UserRole.OWNER.getAuthority()) && !userDetails.getUser()
+            .getEmail().equals(owner.getEmail())) {
+            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+        }
+        if (userDetails.getRole().equals(UserRole.CUSTOMER.getAuthority()) && !userDetails.getUser()
+            .getEmail().equals(customer.getEmail())) {
+            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+        }
+
+        List<Waiting> waitingList = waitingRepository.findALLByRestaurantId(restaurant.getId());
+        if (waitingList.isEmpty()) {
+            throw new WaitingException(WaitingErrorCode.WAITING_NOT_FOUND);
+        }
     }
 
 }

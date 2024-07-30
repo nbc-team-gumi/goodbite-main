@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GOOD BITE - 오너 가입 후 메인</title>
+  <style>
+    body {
+      font-family: 'Nanum Gothic', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: #f4f4f4;
+    }
+
+    .header {
+      background-color: #ff9800;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .nav-menu {
+      display: flex;
+    }
+
+    .nav-menu a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+    }
+
+    .container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .start-btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .start-btn:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+<header class="header">
+  <div class="logo">GOOD BITE</div>
+  <nav class="nav-menu">
+    <a href="ownerdashboard.html">홈</a>
+    <a href="#">마이페이지</a>
+  </nav>
+</header>
+
+<div class="container">
+  <button class="start-btn" onclick="startApp()">식당을 등록해주세요.</button>
+</div>
+
+<script>
+  function startApp() {
+    alert('식당 등록 페이지로 이동합니다.');
+    window.location.href = 'restaurantCreateForm.html';
+  }
+</script>
+</body>
+</html>

@@ -10,10 +10,6 @@ import com.sparta.goodbite.domain.owner.dto.UpdateOwnerPhoneNumberRequestDto;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.exception.owner.OwnerErrorCode;
-import com.sparta.goodbite.exception.owner.detail.DuplicateBusinessNumberException;
-import com.sparta.goodbite.exception.owner.detail.DuplicateEmailException;
-import com.sparta.goodbite.exception.owner.detail.DuplicateNicknameException;
-import com.sparta.goodbite.exception.owner.detail.DuplicatePhoneNumberException;
 import com.sparta.goodbite.exception.owner.detail.InvalidBusinessNumberException;
 import com.sparta.goodbite.exception.owner.detail.OwnerAlreadyDeletedException;
 import com.sparta.goodbite.exception.user.UserErrorCode;
@@ -68,7 +64,7 @@ public class OwnerService {
         UserCredentials user) {
         String newNickname = requestDto.getNewNickname();
         validateOwnerAccess(ownerId, user); //본인확인
-        validateDuplicateNickname(newNickname); //중복닉네임확인
+        ownerRepository.validateDuplicateNickname(newNickname); //중복닉네임확인
 
         //UserCredential타입의 객체를 Owner타입으로 캐스팅
         Owner owner = (Owner) user;
@@ -84,7 +80,7 @@ public class OwnerService {
         String newPhoneNumber = requestDto.getNewPhoneNumber();
 
         validateOwnerAccess(ownerId, user);
-        validateDuplicatePhoneNumber(newPhoneNumber);
+        ownerRepository.validateDuplicatePhoneNumber(newPhoneNumber);
 
         //UserCredential타입의 객체를 Owner타입으로 캐스팅
         Owner owner = (Owner) user;
@@ -109,7 +105,7 @@ public class OwnerService {
         }
 
         validateOwnerAccess(ownerId, user);
-        validateDuplicateBusinessNumber(requestDto.getNewBusinessNumber());
+        ownerRepository.validateDuplicateBusinessNumber(requestDto.getNewBusinessNumber());
 
         // UserCredential타입의 객체를 Owner타입으로 캐스팅
         Owner owner = (Owner) user;
@@ -171,44 +167,15 @@ public class OwnerService {
 
         //명시적으로 저장
         ownerRepository.save(owner);
-
     }
 
     // 중복 필드 검증 메서드
     private void validateDuplicateFields(String nickname, String email, String phoneNumber,
         String businessNumber) {
-        validateDuplicateNickname(nickname);
-        validateDuplicateEmail(email);
-        validateDuplicatePhoneNumber(phoneNumber);
-        validateDuplicateBusinessNumber(businessNumber);
-    }
-
-    //닉네임 중복 확인 메서드
-    private void validateDuplicateNickname(String nickname) {
-        ownerRepository.findByNickname(nickname).ifPresent(u -> {
-            throw new DuplicateNicknameException(OwnerErrorCode.DUPLICATE_NICKNAME);
-        });
-    }
-
-    //이메일 중복 확인 메서드
-    private void validateDuplicateEmail(String email) {
-        ownerRepository.findByEmail(email).ifPresent(u -> {
-            throw new DuplicateEmailException(OwnerErrorCode.DUPLICATE_EMAIL);
-        });
-    }
-
-    //사업자번호 중복 확인 메서드
-    private void validateDuplicateBusinessNumber(String businessNumber) {
-        ownerRepository.findByBusinessNumber(businessNumber).ifPresent(u -> {
-            throw new DuplicateBusinessNumberException(OwnerErrorCode.DUPLICATE_BUSINESS_NUMBER);
-        });
-    }
-
-    //전화번호 중복 확인 메서드
-    private void validateDuplicatePhoneNumber(String phoneNumber) {
-        ownerRepository.findByPhoneNumber(phoneNumber).ifPresent(u -> {
-            throw new DuplicatePhoneNumberException(OwnerErrorCode.DUPLICATE_PHONE_NUMBER);
-        });
+        ownerRepository.validateDuplicateNickname(nickname);
+        ownerRepository.validateDuplicateEmail(email);
+        ownerRepository.validateDuplicatePhoneNumber(phoneNumber);
+        ownerRepository.validateDuplicateBusinessNumber(businessNumber);
     }
 
     //권한이 있는 유저인지 검증
@@ -240,5 +207,4 @@ public class OwnerService {
         //계산된 체크 디지트와 사업자 등록번호의 마지막 자리 숫자가 일치하는지 비교
         return checkDigit == (businessNumber.charAt(9) - '0');
     }
-
 }

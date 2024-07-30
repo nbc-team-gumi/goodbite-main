@@ -10,9 +10,6 @@ import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
 import com.sparta.goodbite.exception.customer.CustomerErrorCode;
 import com.sparta.goodbite.exception.customer.detail.CustomerAlreadyDeletedException;
-import com.sparta.goodbite.exception.customer.detail.DuplicateEmailException;
-import com.sparta.goodbite.exception.customer.detail.DuplicateNicknameException;
-import com.sparta.goodbite.exception.customer.detail.DuplicatePhoneNumberException;
 import com.sparta.goodbite.exception.user.UserErrorCode;
 import com.sparta.goodbite.exception.user.detail.PasswordMismatchException;
 import com.sparta.goodbite.exception.user.detail.SamePasswordException;
@@ -66,7 +63,7 @@ public class CustomerService {
         UserCredentials user) {
         String newNickname = requestDto.getNewNickname();
         validateCustomerAccess(customerId, user); //본인확인
-        validateDuplicateNickname(newNickname); //중복닉네임확인
+        customerRepository.validateDuplicateNickname(newNickname); //중복닉네임확인
 
         //UserCredential타입의 객체를 Customer타입으로 캐스팅
         Customer customer = (Customer) user;
@@ -85,7 +82,7 @@ public class CustomerService {
         String newPhoneNumber = requestDto.getNewPhoneNumber();
 
         validateCustomerAccess(customerId, user);
-        validateDuplicatePhoneNumber(newPhoneNumber);
+        customerRepository.validateDuplicatePhoneNumber(newPhoneNumber);
 
         //UserCredential타입의 객체를 Customer타입으로 캐스팅
         Customer customer = (Customer) user;
@@ -148,30 +145,9 @@ public class CustomerService {
 
     // 중복 필드 검증 메서드
     private void validateDuplicateFields(String nickname, String email, String phoneNumber) {
-        validateDuplicateNickname(nickname);
-        validateDuplicateEmail(email);
-        validateDuplicatePhoneNumber(phoneNumber);
-    }
-
-    //닉네임 중복 확인 메서드
-    private void validateDuplicateNickname(String nickname) {
-        customerRepository.findByNickname(nickname).ifPresent(u -> {
-            throw new DuplicateNicknameException(CustomerErrorCode.DUPLICATE_NICKNAME);
-        });
-    }
-
-    //이메일 중복 확인 메서드
-    private void validateDuplicateEmail(String email) {
-        customerRepository.findByEmail(email).ifPresent(u -> {
-            throw new DuplicateEmailException(CustomerErrorCode.DUPLICATE_EMAIL);
-        });
-    }
-
-    //전화번호 중복 확인 메서드
-    private void validateDuplicatePhoneNumber(String phoneNumber) {
-        customerRepository.findByPhoneNumber(phoneNumber).ifPresent(u -> {
-            throw new DuplicatePhoneNumberException(CustomerErrorCode.DUPLICATE_PHONE_NUMBER);
-        });
+        customerRepository.validateDuplicateNickname(nickname);
+        customerRepository.validateDuplicateEmail(email);
+        customerRepository.validateDuplicatePhoneNumber(phoneNumber);
     }
 
     //권한이 있는 유저인지 검증
@@ -180,5 +156,4 @@ public class CustomerService {
             throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
         }
     }
-
 }

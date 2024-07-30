@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>GoodBite - 회원가입</title>
+  <link href="./styles/signup.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <h1>GoodBite 회원가입</h1>
+  <form id="signupForm">
+    <div class="form-group">
+      <label for="email">이메일</label>
+      <input id="email" name="email" required type="email">
+    </div>
+    <div class="form-group">
+      <label for="nickname">닉네임</label>
+      <input id="nickname" name="nickname" required type="text">
+    </div>
+    <div class="form-group">
+      <label for="password">비밀번호</label>
+      <input id="password" name="password" required type="password">
+    </div>
+    <div class="form-group">
+      <label for="phoneNumber">휴대폰 번호</label>
+      <input id="phoneNumber" name="phoneNumber" placeholder="010-1234-5678" required type="tel">
+    </div>
+    <div class="form-group">
+      <label for="userType">사용자 유형</label>
+      <select id="userType" name="userType" required>
+        <option value="">선택해주세요</option>
+        <option value="customer">일반 사용자</option>
+        <option value="owner">사업자</option>
+        <option value="admin">관리자</option>
+      </select>
+    </div>
+    <div class="form-group" id="businessNumberGroup">
+      <label for="businessNumber">사업자 등록 번호</label>
+      <input id="businessNumber" name="businessNumber" placeholder="예: 123-45-67890" type="text">
+    </div>
+    <button class="submit-btn" type="submit">회원가입</button>
+  </form>
+</div>
+
+<script>
+  const signupForm = document.getElementById('signupForm');
+  const userTypeSelect = document.getElementById('userType');
+  const businessNumberGroup = document.getElementById('businessNumberGroup');
+  const businessNumberInput = document.getElementById('businessNumber');
+
+  userTypeSelect.addEventListener('change', function () {
+    if (this.value === 'owner') {
+      businessNumberGroup.style.display = 'block';
+      businessNumberInput.setAttribute('required', '');
+    } else {
+      businessNumberGroup.style.display = 'none';
+      businessNumberInput.removeAttribute('required');
+    }
+  });
+
+  signupForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    // 기존 에러 메시지 제거
+    const existingErrors = document.querySelectorAll('.error-message');
+    existingErrors.forEach(error => error.remove());
+
+    let hasError = false;
+
+    // 사용자 유형 선택 확인
+    const userType = userTypeSelect.value;
+    if (!userType) {
+      showError(userTypeSelect, '사용자 유형을 선택해주세요.');
+      hasError = true;
+    }
+
+    // 사업자 등록 번호 확인
+    if (userType === 'owner' && !businessNumberInput.value) {
+      showError(businessNumberInput, '사업자 등록 번호를 입력해주세요.');
+      hasError = true;
+    }
+
+    if (!hasError) {
+      // 폼 데이터 수집
+      const formData = new FormData(signupForm);
+      const userData = Object.fromEntries(formData.entries());
+      const filteredUserData = {...userData};
+
+      if (userType === 'customer') {
+        delete filteredUserData.businessNumber;
+        delete filteredUserData.userType;
+      } else if (userType === 'owner') {
+        delete filteredUserData.userType;
+      }
+
+      console.log("filteredUserData:", filteredUserData);
+
+      let apiEndpoint = 'http://localhost:8080/signup'; // 기본값 설정
+      if (userType === 'customer') {
+        apiEndpoint = 'http://localhost:8080/customers/signup';
+      } else if (userType === 'owner') {
+        apiEndpoint = 'http://localhost:8080/owners/signup';
+      }
+
+      try {
+        const response = await fetch(apiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(filteredUserData),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          const errorMessages = Object.values(errorData).join('\n');
+          throw new Error(errorMessages);
+        }
+
+        const responseData = await response.json();
+        console.log('회원가입 성공:', responseData);
+
+        // 임시 성공 메시지
+        alert('회원가입이 완료되었습니다!');
+        signupForm.reset();
+        businessNumberGroup.style.display = 'none';
+      } catch (error) {
+        console.error('회원가입 에러:', error);
+        alert(`회원가입 중 오류가 발생했습니다: ${error.message}`);
+      }
+    }
+  });
+
+  function showError(inputElement, message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.textContent = message;
+    inputElement.parentNode.appendChild(errorDiv);
+  }
+</script>
+</body>
+</html>

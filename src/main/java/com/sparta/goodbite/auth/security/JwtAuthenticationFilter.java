@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -109,7 +110,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         JwtUtil.addJwtToCookie(accessToken, response);
         JwtUtil.addJwtToCookie(refreshToken, response);
 
-        ResponseUtil.servletApi(response, HttpStatus.OK.value(), "로그인 성공");
+        // JSON 응답에 토큰 추가
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(new ObjectMapper().writeValueAsString(
+            Map.of("accessToken", accessToken, "refreshToken", refreshToken, "message", "로그인 성공")));
+
+//        ResponseUtil.servletApi(response, HttpStatus.OK.value(), "로그인 성공");
     }
 
     @Override

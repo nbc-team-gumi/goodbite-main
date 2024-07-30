@@ -48,23 +48,15 @@ public class WaitingService {
     private final Map<Long, SseEmitter> emitters = new HashMap<>();
     private final Map<Long, Integer> waitingList = new HashMap<>();
 
-    public WaitingResponseDto createWaiting(
-        UserCredentials user,
+    public WaitingResponseDto createWaiting(UserCredentials user,
         PostWaitingRequestDto postWaitingRequestDto) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
             postWaitingRequestDto.getRestaurantId());
 
-        Customer customer = customerRepository.findByEmail(user.getEmail())
-            .orElseThrow(() -> new CustomerException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
+        Customer customer = customerRepository.findByIdOrThrow(user.getId());
 
-        Waiting waitingDuplicated = waitingRepository.findByRestaurantIdAndCustomerId(
-            restaurant.getId(),
-            customer.getId());
-
-        if (waitingDuplicated != null) {
-            throw new WaitingException(WaitingErrorCode.WAITING_DUPLICATED);
-        }
+        waitingRepository.validateRestaurantIdAndCustomerId(restaurant.getId(), customer.getId());
 
         Long LastOrderNumber = findLastOrderNumber(restaurant.getId());
 
@@ -83,15 +75,11 @@ public class WaitingService {
     }
 
     // 단일 조회용 메서드
-    public WaitingResponseDto getWaiting(
-        UserCredentials user,
-        Long waitingId) {
+    public WaitingResponseDto getWaiting(UserCredentials user, Long waitingId) {
 
         validateWaitingRequest(user, waitingId);
 
-        Waiting waiting = waitingRepository.findById(waitingId)
-            .orElseThrow(() -> new WaitingNotFoundException(
-                WaitingErrorCode.WAITING_NOT_FOUND));
+        Waiting waiting = waitingRepository.findByIdOrThrow(waitingId);
         return WaitingResponseDto.of(waiting, waiting.getRestaurant().getName());
     }
 
@@ -99,26 +87,19 @@ public class WaitingService {
     //해당 메서드 동작 시, 가게의 id가 들어간 orders가 하나씩 줄게 된다.
     // restaurant id에 맞는 Waiting들의 order를 하나씩 줄인다.
     @Transactional
-    public void reduceAllWaitingOrders(
-        UserCredentials user,
-        Long restaurantId) {
+    public void reduceAllWaitingOrders(UserCredentials user, Long restaurantId) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
 
-        Owner owner = ownerRepository.findById(restaurant.getOwner().getId())
-            .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED));
+        Owner owner = ownerRepository.findByIdOrThrow(restaurant.getOwner().getId());
 
         if (!user.getEmail().equals(owner.getEmail())) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
 
-        List<Waiting> waitingList = waitingRepository.findALLByRestaurantId(restaurantId);
-        if (waitingList.isEmpty()) {
-            throw new WaitingException(WaitingErrorCode.WAITING_NOT_FOUND);
-        }
+        List<Waiting> waitingList = waitingRepository.findALLByRestaurantIdOrThrow(restaurantId);
 
         List<Waiting> waitingArrayList = new ArrayList<>();
-
         for (Waiting waiting : waitingList) {
             waiting.reduceWaitingOrder();
             if (waiting.getWaitingOrder() == 0) {
@@ -138,9 +119,7 @@ public class WaitingService {
 
     // 웨이팅 하나만 삭제하고 뒤 웨이팅 숫자 하나씩 감소
     @Transactional
-    public void reduceOneWaitingOrders(
-        UserCredentials user,
-        Long waitingId) {
+    public void reduceOneWaitingOrders(UserCredentials user, Long waitingId) {
 
         validateWaitingRequest(user, waitingId);
 
@@ -149,14 +128,12 @@ public class WaitingService {
 
     // 가게용 api
     // 예약 인원수와 요청사항만 변경 가능함 ( 추후 합의를 통해 ?건 이하의 순서일 때는 수정하지 못하도록 로직 수정 필요)
-    public WaitingResponseDto updateWaiting(
-        UserCredentials user,
-        Long waitingId,
+    public WaitingResponseDto updateWaiting(UserCredentials user, Long waitingId,
         UpdateWaitingRequestDto updateWaitingRequestDto) {
 
         validateWaitingRequest(user, waitingId);
 
-        Waiting waiting = waitingRepository.findByIdOrElseThrowException(waitingId);
+        Waiting waiting = waitingRepository.findByIdOrThrow(waitingId);
 
         String restaurantName = waiting.getRestaurant().getName();
 
@@ -167,17 +144,14 @@ public class WaitingService {
     }
 
     // 취소 메서드
-    public void deleteWaiting(
-        UserCredentials user,
-        Long waitingId) {
+    public void deleteWaiting(UserCredentials user, Long waitingId) {
 
         validateWaitingRequest(user, waitingId);
 
         reduceWaitingOrders(waitingId, "delete");
     }
 
-    public Long findLastOrderNumber(
-        Long restaurantId) {
+    public Long findLastOrderNumber(Long restaurantId) {
         if (!waitingRepository.findALLByRestaurantId(restaurantId).isEmpty()) {
             // 해당하는 레스토랑에 예약이 하나라도 존재한다면
             return waitingRepository.findMaxWaitingOrderByRestaurantId(
@@ -190,13 +164,10 @@ public class WaitingService {
 
 
     // 페이지 네이션 말고 list로 하면 무슨 장점이 있을까요?
-    public Page<WaitingResponseDto> getWaitingsByRestaurantId(
-        UserCredentials user,
-        Long restaurantId,
-        Pageable pageable) {
+    public Page<WaitingResponseDto> getWaitingsByRestaurantId(UserCredentials user,
+        Long restaurantId, Pageable pageable) {
 
-        Restaurant restaurant = restaurantRepository.findByIdOrThrow(
-            restaurantId);
+        Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
 
         Owner owner = ownerRepository.findById(restaurant.getOwner().getId())
             .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED));
@@ -214,13 +185,12 @@ public class WaitingService {
         return new PageImpl<>(waitingResponseDtos, pageable, waitingPage.getTotalElements());
     }
 
-    private WaitingResponseDto convertToDto(
-        Waiting waiting) {
+    private WaitingResponseDto convertToDto(Waiting waiting) {
         return WaitingResponseDto.of(waiting, waiting.getRestaurant().getName());
     }
 
     private void reduceWaitingOrders(Long waitingId, String type) {
-        Waiting waitingOne = waitingRepository.findByIdOrElseThrowException(waitingId);
+        Waiting waitingOne = waitingRepository.findByIdOrThrow(waitingId);
 
         List<Waiting> waitingList = waitingRepository.findALLByRestaurantId(
             waitingOne.getRestaurant().getId());
@@ -260,7 +230,7 @@ public class WaitingService {
 
     private void validateWaitingRequest(UserCredentials user, Long waitingId) {
 
-        Waiting waiting = waitingRepository.findByIdOrElseThrowException(waitingId);
+        Waiting waiting = waitingRepository.findByIdOrThrow(waitingId);
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
             waiting.getRestaurant().getId());

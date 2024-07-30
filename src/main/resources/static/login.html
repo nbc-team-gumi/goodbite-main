@@ -65,7 +65,7 @@
           password: passwordInput.value,
         }),
       });
-
+      // console.log("response:", response);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || '로그인 실패');
@@ -73,10 +73,10 @@
 
       const responseData = await response.json();
 
-      console.log("responseData:", responseData);
+      // console.log("responseData:", responseData);
 
-      const accessToken = responseData.accessToken;
-      const refreshToken = responseData.refreshToken;
+      const accessToken = responseData["accessToken"];
+      const refreshToken = responseData["refreshToken"];
 
       // 토큰을 로컬 스토리지에 저장
       localStorage.setItem('accessToken', accessToken);
@@ -115,7 +115,7 @@
       }
 
       const responseData = await response.json();
-      const newAccessToken = responseData.accessToken;
+      const newAccessToken = responseData["accessToken"];
 
       // 새로운 액세스 토큰을 로컬 스토리지에 저장
       localStorage.setItem('accessToken', newAccessToken);

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>GoodBite - 로그인</title>
+  <link href="./styles/login.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <div class="logo">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" fill="#FF8C00" r="45"/>
+      <path d="M30 40 Q50 20 70 40 T90 60" fill="none" stroke="white" stroke-width="5"/>
+      <circle cx="35" cy="40" fill="white" r="5"/>
+      <circle cx="65" cy="40" fill="white" r="5"/>
+      <path d="M40 60 Q50 70 60 60" fill="none" stroke="white" stroke-width="3"/>
+    </svg>
+  </div>
+  <h1>GoodBite 로그인</h1>
+  <form id="loginForm">
+    <div class="form-group">
+      <label for="email">이메일</label>
+      <input id="email" name="email" required type="email">
+    </div>
+    <div class="form-group">
+      <label for="password">비밀번호</label>
+      <input id="password" name="password" required type="password">
+    </div>
+    <button class="login-btn" type="submit">로그인</button>
+  </form>
+  <div class="links">
+    <a href="/forgot-password">비밀번호를 잊으셨나요?</a> | <a href="/signup">회원가입</a>
+  </div>
+</div>
+
+<script>
+  const loginForm = document.getElementById('loginForm');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+
+  loginForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    // 기존 에러 메시지 제거
+    const existingError = document.querySelector('.error-message');
+    if (existingError) {
+      existingError.remove();
+    }
+
+    // 간단한 유효성 검사
+    if (!emailInput.value || !passwordInput.value) {
+      showError('이메일과 비밀번호를 모두 입력해주세요.');
+      return;
+    }
+
+    // 로그인 요청
+    try {
+      const response = await fetch('http://localhost:8080/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: emailInput.value,
+          password: passwordInput.value,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || '로그인 실패');
+      }
+
+      const responseData = await response.json();
+
+      console.log("responseData:", responseData);
+
+      const accessToken = responseData.accessToken;
+      const refreshToken = responseData.refreshToken;
+
+      // 토큰을 로컬 스토리지에 저장
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+
+      // 임시 로그인 성공 처리
+      alert('로그인에 성공했습니다!');
+      loginForm.reset();
+    } catch (error) {
+      console.error('로그인 에러:', error);
+      showError(`로그인 중 오류가 발생했습니다: ${error.message}`);
+    }
+  });
+
+  function showError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.textContent = message;
+    loginForm.insertAdjacentElement('afterend', errorDiv);
+  }
+
+  // 액세스 토큰 갱신 함수
+  async function refreshAccessToken() {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+      const response = await fetch('http://localhost:8080/users/refresh', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${refreshToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('토큰 갱신 실패');
+      }
+
+      const responseData = await response.json();
+      const newAccessToken = responseData.accessToken;
+
+      // 새로운 액세스 토큰을 로컬 스토리지에 저장
+      localStorage.setItem('accessToken', newAccessToken);
+      console.log('액세스 토큰 갱신 성공:', newAccessToken);
+    } catch (error) {
+      console.error('토큰 갱신 에러:', error);
+    }
+  }
+</script>
+</body>
+</html>

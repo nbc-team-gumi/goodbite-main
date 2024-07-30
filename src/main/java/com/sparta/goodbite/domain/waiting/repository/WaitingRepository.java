@@ -1,6 +1,8 @@
 package com.sparta.goodbite.domain.waiting.repository;
 
 import com.sparta.goodbite.domain.waiting.entity.Waiting;
+import com.sparta.goodbite.exception.waiting.WaitingErrorCode;
+import com.sparta.goodbite.exception.waiting.WaitingException;
 import java.util.ArrayList;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +11,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface WaitingRepository extends JpaRepository<Waiting, Long> {
+
+    default Waiting findByIdOrElseThrowException(Long waitingId) {
+        return findById(waitingId).orElseThrow(
+            () -> new WaitingException(WaitingErrorCode.WAITING_NOT_FOUND));
+    }
 
     Waiting findByRestaurantIdAndCustomerId(Long restaurantId, Long customerId);
 

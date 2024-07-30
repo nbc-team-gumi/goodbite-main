@@ -50,6 +50,11 @@ public class Customer extends ExtendedTimestamped implements UserCredentials {
     }
 
     @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
     public String getEmail() {
         return email;
     }

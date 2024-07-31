@@ -1,6 +1,5 @@
 package com.sparta.goodbite.domain.customer.service;
 
-import com.sparta.goodbite.common.UserCredentials;
 import com.sparta.goodbite.domain.customer.dto.CustomerResponseDto;
 import com.sparta.goodbite.domain.customer.dto.CustomerSignupRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdateNicknameRequestDto;
@@ -27,8 +26,8 @@ public class CustomerService {
 
     //조회
     @Transactional(readOnly = true)
-    public CustomerResponseDto getCustomer(UserCredentials user) {
-        return CustomerResponseDto.from(customerRepository.findByIdOrThrow(user.getId()));
+    public CustomerResponseDto getCustomer(Customer customer) {
+        return CustomerResponseDto.from(customerRepository.findByIdOrThrow(customer.getId()));
     }
 
     //회원가입
@@ -56,46 +55,23 @@ public class CustomerService {
 
     //수정-닉네임
     @Transactional
-    public void updateNickname(UpdateNicknameRequestDto requestDto,
-        UserCredentials user) {
+    public void updateNickname(UpdateNicknameRequestDto requestDto, Customer customer) {
         String newNickname = requestDto.getNewNickname();
-
-        customerRepository.validateDuplicateNickname(newNickname); //중복닉네임확인
-
-        //UserCredential타입의 객체를 Customer타입으로 캐스팅
-        Customer customer = (Customer) user;
-
-        // 닉네임 업데이트
-        customer.updateNickname(newNickname);
-
-        //명시적으로 저장
-        customerRepository.save(customer);
+        customerRepository.validateDuplicateNickname(newNickname); //중복 닉네임 확인
+        customer.updateNickname(newNickname);// 닉네임 업데이트
     }
 
     //수정-전화번호
     @Transactional
-    public void updatePhoneNumber(UpdatePhoneNumberRequestDto requestDto,
-        UserCredentials user) {
+    public void updatePhoneNumber(UpdatePhoneNumberRequestDto requestDto, Customer customer) {
         String newPhoneNumber = requestDto.getNewPhoneNumber();
-        customerRepository.validateDuplicatePhoneNumber(newPhoneNumber);
-
-        //UserCredential타입의 객체를 Customer타입으로 캐스팅
-        Customer customer = (Customer) user;
-
-        // 전화번호 업데이트
-        customer.updatePhoneNumber(newPhoneNumber);
-
-        //명시적으로 저장
-        customerRepository.save(customer);
+        customerRepository.validateDuplicatePhoneNumber(newPhoneNumber);//중복 전화번호 확인
+        customer.updatePhoneNumber(newPhoneNumber);// 전화번호 업데이트
     }
 
     //수정-비밀번호
     @Transactional
-    public void updatePassword(UpdatePasswordRequestDto requestDto
-        , UserCredentials user) {
-
-        //UserCredential타입의 객체를 Customer타입으로 캐스팅
-        Customer customer = (Customer) user;
+    public void updatePassword(UpdatePasswordRequestDto requestDto, Customer customer) {
 
         //입력한 비밀번호와 사용자의 비밀번호 일치유무 확인
         if (!passwordEncoder.matches(requestDto.getCurrentPassword(), customer.getPassword())) {
@@ -112,16 +88,10 @@ public class CustomerService {
 
         // 비밀번호 업데이트
         customer.updatePassword(newPassword);
-
-        //명시적으로 저장
-        customerRepository.save(customer);
-
     }
 
     @Transactional
-    public void deleteCustomer(UserCredentials user) {
-        //UserCredential타입의 객체를 Customer타입으로 캐스팅
-        Customer customer = (Customer) user;
+    public void deleteCustomer(Customer customer) {
 
         // 이미 탈퇴한 사용자인지 확인합니다.
         if (customer.getDeletedAt() != null) {
@@ -130,9 +100,6 @@ public class CustomerService {
 
         // 소프트 삭제를 위해 deletedAt 필드를 현재 시간으로 설정
         customer.deactivate();
-
-        //명시적으로 저장
-        customerRepository.save(customer);
     }
 
     // 중복 필드 검증 메서드

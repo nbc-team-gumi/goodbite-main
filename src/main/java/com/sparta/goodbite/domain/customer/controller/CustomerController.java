@@ -9,6 +9,7 @@ import com.sparta.goodbite.domain.customer.dto.CustomerSignupRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdateNicknameRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePasswordRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePhoneNumberRequestDto;
+import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +53,7 @@ public class CustomerController {
     public ResponseEntity<MessageResponseDto> updateNickname(
         @Valid @RequestBody UpdateNicknameRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
-        customerService.updateNickname(requestDto, userDetails.getUser());
+        customerService.updateNickname(requestDto, (Customer) userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -66,7 +67,7 @@ public class CustomerController {
     public ResponseEntity<MessageResponseDto> updatePhoneNumber(
         @Valid @RequestBody UpdatePhoneNumberRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
-        customerService.updatePhoneNumber(requestDto, userDetails.getUser());
+        customerService.updatePhoneNumber(requestDto, (Customer) userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -80,7 +81,7 @@ public class CustomerController {
     public ResponseEntity<MessageResponseDto> updatePassword(
         @Valid @RequestBody UpdatePasswordRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
-        customerService.updatePassword(requestDto, userDetails.getUser());
+        customerService.updatePassword(requestDto, (Customer) userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -92,7 +93,7 @@ public class CustomerController {
     @GetMapping
     public ResponseEntity<DataResponseDto<CustomerResponseDto>> getCustomer(
         @AuthenticationPrincipal EmailUserDetails userDetails) {
-        return ResponseUtil.findOk(customerService.getCustomer(userDetails.getUser()));
+        return ResponseUtil.findOk(customerService.getCustomer((Customer) userDetails.getUser()));
     }
 
     /**
@@ -103,7 +104,7 @@ public class CustomerController {
     @DeleteMapping
     public ResponseEntity<MessageResponseDto> deleteCustomer(
         @AuthenticationPrincipal EmailUserDetails userDetails) {
-        customerService.deleteCustomer(userDetails.getUser());
+        customerService.deleteCustomer((Customer) userDetails.getUser());
         return ResponseUtil.deleteOk();
     }
 

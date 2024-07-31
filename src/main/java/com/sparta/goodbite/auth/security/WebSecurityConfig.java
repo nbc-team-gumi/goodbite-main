@@ -20,6 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @RequiredArgsConstructor
@@ -32,6 +33,7 @@ public class WebSecurityConfig {
     private final EmailUserDetailsService userDetailsService;
     private final GlobalAccessDeniedHandler accessDeniedHandler;
     private final GlobalAuthenticationEntryPoint authenticationEntryPoint;
+    private final CorsFilter corsFilter;
 
     // Manager Bean 등록
     @Bean
@@ -108,6 +110,7 @@ public class WebSecurityConfig {
 
             // CORS 설정
 //            .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
+            .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
 
             // 세션을 사용하지 않도록 정책 STATELESS 로 변경
             .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(

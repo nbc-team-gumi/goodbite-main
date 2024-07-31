@@ -15,8 +15,6 @@ import com.sparta.goodbite.exception.owner.detail.OwnerAlreadyDeletedException;
 import com.sparta.goodbite.exception.user.UserErrorCode;
 import com.sparta.goodbite.exception.user.detail.PasswordMismatchException;
 import com.sparta.goodbite.exception.user.detail.SamePasswordException;
-import com.sparta.goodbite.exception.user.detail.UserMismatchException;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -53,17 +51,15 @@ public class OwnerService {
 
     //조회
     @Transactional(readOnly = true)
-    public OwnerResponseDto getOwner(Long ownerId, UserCredentials user) {
-        validateOwnerAccess(ownerId, user);//본인인지 확인
+    public OwnerResponseDto getOwner(UserCredentials user) {
         return OwnerResponseDto.from(ownerRepository.findByEmailOrThrow(user.getEmail()));
     }
 
     // 수정-닉네임
     @Transactional
-    public void updateNickname(Long ownerId, UpdateOwnerNicknameRequestDto requestDto,
+    public void updateNickname(UpdateOwnerNicknameRequestDto requestDto,
         UserCredentials user) {
         String newNickname = requestDto.getNewNickname();
-        validateOwnerAccess(ownerId, user); //본인확인
         ownerRepository.validateDuplicateNickname(newNickname); //중복닉네임확인
 
         //UserCredential타입의 객체를 Owner타입으로 캐스팅
@@ -75,11 +71,10 @@ public class OwnerService {
 
     //수정-전화번호
     @Transactional
-    public void updatePhoneNumber(Long ownerId, UpdateOwnerPhoneNumberRequestDto requestDto,
+    public void updatePhoneNumber(UpdateOwnerPhoneNumberRequestDto requestDto,
         UserCredentials user) {
         String newPhoneNumber = requestDto.getNewPhoneNumber();
 
-        validateOwnerAccess(ownerId, user);
         ownerRepository.validateDuplicatePhoneNumber(newPhoneNumber);
 
         //UserCredential타입의 객체를 Owner타입으로 캐스팅
@@ -95,7 +90,7 @@ public class OwnerService {
 
     // 수정-사업자번호
     @Transactional
-    public void updateBusinessNumber(Long ownerId, UpdateBusinessNumberRequestDto requestDto,
+    public void updateBusinessNumber(UpdateBusinessNumberRequestDto requestDto,
         UserCredentials user) {
         String newBusinessNumber = requestDto.getNewBusinessNumber();
 
@@ -104,7 +99,6 @@ public class OwnerService {
             throw new InvalidBusinessNumberException(OwnerErrorCode.INVALID_BUSINESS_NUMBER);
         }
 
-        validateOwnerAccess(ownerId, user);
         ownerRepository.validateDuplicateBusinessNumber(requestDto.getNewBusinessNumber());
 
         // UserCredential타입의 객체를 Owner타입으로 캐스팅
@@ -122,9 +116,8 @@ public class OwnerService {
 
     // 수정-비밀번호
     @Transactional
-    public void updatePassword(Long ownerId,
+    public void updatePassword(
         UpdateOwnerPasswordRequestDto requestDto, UserCredentials user) {
-        validateOwnerAccess(ownerId, user);
 
         //UserCredential타입의 객체를 Owner타입으로 캐스팅
         Owner owner = (Owner) user;
@@ -151,8 +144,7 @@ public class OwnerService {
 
     //삭제
     @Transactional
-    public void deleteOwner(Long ownerId, UserCredentials user) {
-        validateOwnerAccess(ownerId, user);
+    public void deleteOwner(UserCredentials user) {
 
         //UserCredential타입의 객체를 Owner타입으로 캐스팅
         Owner owner = (Owner) user;
@@ -176,13 +168,6 @@ public class OwnerService {
         ownerRepository.validateDuplicateEmail(email);
         ownerRepository.validateDuplicatePhoneNumber(phoneNumber);
         ownerRepository.validateDuplicateBusinessNumber(businessNumber);
-    }
-
-    //권한이 있는 유저인지 검증
-    private void validateOwnerAccess(Long ownerId, UserCredentials user) {
-        if (!Objects.equals(user.getId(), ownerId)) {
-            throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
-        }
     }
 
     //유효하지 않은 사업자 등록번호를 사전에 필터링

@@ -69,7 +69,7 @@ public class Waiting extends ExtendedTimestamped {
     }
 
     public void delete(LocalDateTime deletedAt, WaitingStatus status) {
-        this.waitingOrder = 0L;
+        this.waitingOrder = null;
         this.deletedAt = deletedAt;
         this.status = status;
     }

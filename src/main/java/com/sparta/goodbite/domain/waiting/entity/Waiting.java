@@ -1,6 +1,6 @@
 package com.sparta.goodbite.domain.waiting.entity;
 
-import com.sparta.goodbite.common.Timestamped;
+import com.sparta.goodbite.common.ExtendedTimestamped;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import jakarta.persistence.Column;
@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Entity
-public class Waiting extends Timestamped {
+public class Waiting extends ExtendedTimestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,6 +66,12 @@ public class Waiting extends Timestamped {
     public void update(Long partySize, String demand) {
         this.partySize = partySize;
         this.demand = demand;
+    }
+
+    public void setDeleted(LocalDateTime deletedAt, WaitingStatus status) {
+        this.waitingOrder = 0L;
+        this.deletedAt = deletedAt;
+        this.status = status;
     }
 
     public void reduceWaitingOrder() {

@@ -20,6 +20,7 @@ import com.sparta.goodbite.exception.customer.CustomerException;
 import com.sparta.goodbite.exception.waiting.WaitingErrorCode;
 import com.sparta.goodbite.exception.waiting.WaitingException;
 import com.sparta.goodbite.exception.waiting.detail.WaitingNotFoundException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +80,7 @@ public class WaitingService {
 
         validateWaitingRequest(user, waitingId);
 
-        Waiting waiting = waitingRepository.findByIdOrThrow(waitingId);
+        Waiting waiting = waitingRepository.findByIdAndDeletedAt(waitingId);
         return WaitingResponseDto.of(waiting, waiting.getRestaurant().getName());
     }
 
@@ -106,7 +107,8 @@ public class WaitingService {
                 // 그리고 여기서 알람이나 그런거 해야 함
                 sendNotificationToCustomer(waiting.getCustomer().getId(),
                     "가게로 들어와 주세요.");
-                waitingRepository.delete(waiting);
+//                waitingRepository.delete(waiting);
+                waiting.setDeleted(LocalDateTime.now(), WaitingStatus.SEATED);
             } else {
                 waitingArrayList.add(waiting);
             }
@@ -133,7 +135,7 @@ public class WaitingService {
 
         validateWaitingRequest(user, waitingId);
 
-        Waiting waiting = waitingRepository.findByIdOrThrow(waitingId);
+        Waiting waiting = waitingRepository.findByIdAndDeletedAt(waitingId);
 
         String restaurantName = waiting.getRestaurant().getName();
 
@@ -190,7 +192,7 @@ public class WaitingService {
     }
 
     private void reduceWaitingOrders(Long waitingId, String type) {
-        Waiting waitingOne = waitingRepository.findByIdOrThrow(waitingId);
+        Waiting waitingOne = waitingRepository.findByIdAndDeletedAt(waitingId);
 
         List<Waiting> waitingList = waitingRepository.findALLByRestaurantId(
             waitingOne.getRestaurant().getId());
@@ -200,16 +202,19 @@ public class WaitingService {
         List<Waiting> waitingArrayList = new ArrayList<>();
 
         for (Waiting waiting : waitingList) {
+
             if (Objects.equals(waiting.getId(), waitingId)) {
                 //여기서 알람 메서드
                 if (type.equals("delete")) {
                     message = "웨이팅이 취소되었습니다.";
+                    waiting.setDeleted(LocalDateTime.now(), WaitingStatus.CANCELLED);
                 } else if (type.equals("reduce")) {
                     message = "손님, 가게로 입장해 주세요.";
+                    waiting.setDeleted(LocalDateTime.now(), WaitingStatus.SEATED);
                 }
-                sendNotificationToCustomer(waiting.getCustomer().getId(),
-                    message);
-                waitingRepository.delete(waiting);
+                sendNotificationToCustomer(waiting.getCustomer().getId(), message);
+//                waitingRepository.delete(waiting);
+
                 flag = true;
             } else if (flag) {
                 waiting.reduceWaitingOrder();
@@ -230,7 +235,7 @@ public class WaitingService {
 
     private void validateWaitingRequest(UserCredentials user, Long waitingId) {
 
-        Waiting waiting = waitingRepository.findByIdOrThrow(waitingId);
+        Waiting waiting = waitingRepository.findByIdAndDeletedAt(waitingId);
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
             waiting.getRestaurant().getId());

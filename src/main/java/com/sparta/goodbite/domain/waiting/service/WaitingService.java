@@ -187,6 +187,17 @@ public class WaitingService {
         return new PageImpl<>(waitingResponseDtos, pageable, waitingPage.getTotalElements());
     }
 
+    public Page<WaitingResponseDto> getWaitings(UserCredentials user, Pageable pageable) {
+
+        Page<Waiting> waitingPage = waitingRepository.findByCustomerId(user.getId(), pageable);
+
+        List<WaitingResponseDto> waitingResponseDtos = waitingPage.stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
+        return new PageImpl<>(waitingResponseDtos, pageable, waitingPage.getTotalElements());
+
+    }
+
     private WaitingResponseDto convertToDto(Waiting waiting) {
         return WaitingResponseDto.of(waiting, waiting.getRestaurant().getName());
     }

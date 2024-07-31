@@ -21,7 +21,7 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
             () -> new WaitingException(WaitingErrorCode.WAITING_NOT_FOUND));
     }
 
-    default Waiting findByIdAndDeletedAt(Long waitingId) {
+    default Waiting findNotDeletedByIdOrThrow(Long waitingId) {
         return findByIdAndDeletedAtIsNull(waitingId)
             .orElseThrow(() -> new WaitingException(WaitingErrorCode.WAITING_NOT_FOUND));
     }

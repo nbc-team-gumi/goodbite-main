@@ -68,7 +68,7 @@ public class Waiting extends ExtendedTimestamped {
         this.demand = demand;
     }
 
-    public void setDeleted(LocalDateTime deletedAt, WaitingStatus status) {
+    public void delete(LocalDateTime deletedAt, WaitingStatus status) {
         this.waitingOrder = 0L;
         this.deletedAt = deletedAt;
         this.status = status;

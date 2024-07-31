@@ -80,7 +80,7 @@ public class WaitingService {
 
         validateWaitingRequest(user, waitingId);
 
-        Waiting waiting = waitingRepository.findByIdAndDeletedAt(waitingId);
+        Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
         return WaitingResponseDto.of(waiting, waiting.getRestaurant().getName());
     }
 
@@ -108,7 +108,7 @@ public class WaitingService {
                 sendNotificationToCustomer(waiting.getCustomer().getId(),
                     "가게로 들어와 주세요.");
 //                waitingRepository.delete(waiting);
-                waiting.setDeleted(LocalDateTime.now(), WaitingStatus.SEATED);
+                waiting.delete(LocalDateTime.now(), WaitingStatus.SEATED);
             } else {
                 waitingArrayList.add(waiting);
             }
@@ -135,7 +135,7 @@ public class WaitingService {
 
         validateWaitingRequest(user, waitingId);
 
-        Waiting waiting = waitingRepository.findByIdAndDeletedAt(waitingId);
+        Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
 
         String restaurantName = waiting.getRestaurant().getName();
 
@@ -192,7 +192,7 @@ public class WaitingService {
     }
 
     private void reduceWaitingOrders(Long waitingId, String type) {
-        Waiting waitingOne = waitingRepository.findByIdAndDeletedAt(waitingId);
+        Waiting waitingOne = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
 
         List<Waiting> waitingList = waitingRepository.findALLByRestaurantId(
             waitingOne.getRestaurant().getId());
@@ -207,10 +207,10 @@ public class WaitingService {
                 //여기서 알람 메서드
                 if (type.equals("delete")) {
                     message = "웨이팅이 취소되었습니다.";
-                    waiting.setDeleted(LocalDateTime.now(), WaitingStatus.CANCELLED);
+                    waiting.delete(LocalDateTime.now(), WaitingStatus.CANCELLED);
                 } else if (type.equals("reduce")) {
                     message = "손님, 가게로 입장해 주세요.";
-                    waiting.setDeleted(LocalDateTime.now(), WaitingStatus.SEATED);
+                    waiting.delete(LocalDateTime.now(), WaitingStatus.SEATED);
                 }
                 sendNotificationToCustomer(waiting.getCustomer().getId(), message);
 //                waitingRepository.delete(waiting);
@@ -235,7 +235,7 @@ public class WaitingService {
 
     private void validateWaitingRequest(UserCredentials user, Long waitingId) {
 
-        Waiting waiting = waitingRepository.findByIdAndDeletedAt(waitingId);
+        Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
             waiting.getRestaurant().getId());

@@ -1,22 +1,22 @@
 @baseUrl=http://localhost:8080/owners
-@ownerId=1
+
 ### 회원가입
 POST {{baseUrl}}/signup
 Content-Type: application/json
 
 {
-  "email": "testowner1@email.com",
-  "nickname": "가게1",
+  "email": "testowner2@email.com",
+  "nickname": "가게2",
   "password": "Passw0rd!",
-  "phoneNumber": "010-0001-0000",
-  "businessNumber": "dsf446s1242342"
+  "phoneNumber": "010-0001-2200",
+  "businessNumber": "3212653012"
 }
 
 ### 회원정보조회
-GET {{baseUrl}}/{{ownerId}}
+GET {{baseUrl}}
 
 ### 회원정보수정-닉네임
-PATCH {{baseUrl}}/{{ownerId}}/nickname
+PATCH {{baseUrl}}/nickname
 Content-Type: application/json
 
 {
@@ -24,7 +24,7 @@ Content-Type: application/json
 }
 
 ### 회원정보수정-전화번호
-PATCH {{baseUrl}}/{{ownerId}}/phone-number
+PATCH {{baseUrl}}/phone-number
 Content-Type: application/json
 
 {
@@ -32,7 +32,7 @@ Content-Type: application/json
 }
 
 ### 회원정보수정-비밀번호
-PATCH {{baseUrl}}/{{ownerId}}/password
+PATCH {{baseUrl}}/password
 Content-Type: application/json
 
 {
@@ -41,12 +41,12 @@ Content-Type: application/json
 }
 
 ### 회원정보수정-사업자번호
-PATCH {{baseUrl}}/{{ownerId}}/business-number
+PATCH {{baseUrl}}/business-number
 Content-Type: application/json
 
 {
-  "newBusinessNumber": "sdfgsdfgsdgg1234"
+  "newBusinessNumber": "7838601715"
 }
 
 ### 회원탈퇴
-DELETE {{baseUrl}}/{{ownerId}}
+DELETE {{baseUrl}}

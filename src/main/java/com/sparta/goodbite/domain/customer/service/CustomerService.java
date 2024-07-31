@@ -13,8 +13,6 @@ import com.sparta.goodbite.exception.customer.detail.CustomerAlreadyDeletedExcep
 import com.sparta.goodbite.exception.user.UserErrorCode;
 import com.sparta.goodbite.exception.user.detail.PasswordMismatchException;
 import com.sparta.goodbite.exception.user.detail.SamePasswordException;
-import com.sparta.goodbite.exception.user.detail.UserMismatchException;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,8 +27,7 @@ public class CustomerService {
 
     //조회
     @Transactional(readOnly = true)
-    public CustomerResponseDto getCustomer(Long customerId, UserCredentials user) {
-        validateCustomerAccess(customerId, user);//본인인지 확인
+    public CustomerResponseDto getCustomer(UserCredentials user) {
         return CustomerResponseDto.from(customerRepository.findByIdOrThrow(user.getId()));
     }
 
@@ -59,10 +56,10 @@ public class CustomerService {
 
     //수정-닉네임
     @Transactional
-    public void updateNickname(Long customerId, UpdateNicknameRequestDto requestDto,
+    public void updateNickname(UpdateNicknameRequestDto requestDto,
         UserCredentials user) {
         String newNickname = requestDto.getNewNickname();
-        validateCustomerAccess(customerId, user); //본인확인
+
         customerRepository.validateDuplicateNickname(newNickname); //중복닉네임확인
 
         //UserCredential타입의 객체를 Customer타입으로 캐스팅
@@ -77,11 +74,9 @@ public class CustomerService {
 
     //수정-전화번호
     @Transactional
-    public void updatePhoneNumber(Long customerId, UpdatePhoneNumberRequestDto requestDto,
+    public void updatePhoneNumber(UpdatePhoneNumberRequestDto requestDto,
         UserCredentials user) {
         String newPhoneNumber = requestDto.getNewPhoneNumber();
-
-        validateCustomerAccess(customerId, user);
         customerRepository.validateDuplicatePhoneNumber(newPhoneNumber);
 
         //UserCredential타입의 객체를 Customer타입으로 캐스팅
@@ -96,9 +91,8 @@ public class CustomerService {
 
     //수정-비밀번호
     @Transactional
-    public void updatePassword(Long customerId, UpdatePasswordRequestDto requestDto
+    public void updatePassword(UpdatePasswordRequestDto requestDto
         , UserCredentials user) {
-        validateCustomerAccess(customerId, user);
 
         //UserCredential타입의 객체를 Customer타입으로 캐스팅
         Customer customer = (Customer) user;
@@ -125,9 +119,7 @@ public class CustomerService {
     }
 
     @Transactional
-    public void deleteCustomer(Long customerId, UserCredentials user) {
-        validateCustomerAccess(customerId, user);
-
+    public void deleteCustomer(UserCredentials user) {
         //UserCredential타입의 객체를 Customer타입으로 캐스팅
         Customer customer = (Customer) user;
 
@@ -150,10 +142,4 @@ public class CustomerService {
         customerRepository.validateDuplicatePhoneNumber(phoneNumber);
     }
 
-    //권한이 있는 유저인지 검증
-    private void validateCustomerAccess(Long customerId, UserCredentials user) {
-        if (!Objects.equals(user.getId(), customerId)) {
-            throw new UserMismatchException(UserErrorCode.USER_MISMATCH);
-        }
-    }
 }

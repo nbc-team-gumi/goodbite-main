@@ -17,7 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,32 +45,28 @@ public class CustomerController {
     /**
      * 회원정보수정(닉네임) API
      *
-     * @param customerId 업데이트할 고객의 ID
      * @param requestDto 새로운 닉네임을 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
-    @PatchMapping("/{customerId}/nickname")
+    @PatchMapping("/nickname")
     public ResponseEntity<MessageResponseDto> updateNickname(
-        @PathVariable Long customerId,
         @Valid @RequestBody UpdateNicknameRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
-        customerService.updateNickname(customerId, requestDto, userDetails.getUser());
+        customerService.updateNickname(requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
     /**
      * 회원정보수정(전화번호) API
      *
-     * @param customerId 업데이트할 고객의 ID
      * @param requestDto 새로운 닉네임을 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
-    @PatchMapping("/{customerId}/phone-number")
+    @PatchMapping("/phone-number")
     public ResponseEntity<MessageResponseDto> updatePhoneNumber(
-        @PathVariable Long customerId,
         @Valid @RequestBody UpdatePhoneNumberRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
-        customerService.updatePhoneNumber(customerId, requestDto, userDetails.getUser());
+        customerService.updatePhoneNumber(requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -81,39 +76,34 @@ public class CustomerController {
      * @param requestDto 새로운 비밀번호를 담은 DTO
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
-    @PatchMapping("/{customerId}/password")
+    @PatchMapping("/password")
     public ResponseEntity<MessageResponseDto> updatePassword(
-        @PathVariable Long customerId,
         @Valid @RequestBody UpdatePasswordRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
-        customerService.updatePassword(customerId, requestDto, userDetails.getUser());
+        customerService.updatePassword(requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
     /**
      * 회원정보조회 API
      *
-     * @param customerId 조회할 고객의 ID
      * @return ResponseEntity
      */
-    @GetMapping("/{customerId}")
+    @GetMapping
     public ResponseEntity<DataResponseDto<CustomerResponseDto>> getCustomer(
-        @PathVariable Long customerId,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
-        return ResponseUtil.findOk(customerService.getCustomer(customerId, userDetails.getUser()));
+        return ResponseUtil.findOk(customerService.getCustomer(userDetails.getUser()));
     }
 
     /**
      * 회원탈퇴 API
      *
-     * @param customerId 탈퇴할 고객의 ID
      * @return 성공 메시지를 담은 ResponseEntity
      */
-    @DeleteMapping("/{customerId}")
+    @DeleteMapping
     public ResponseEntity<MessageResponseDto> deleteCustomer(
-        @PathVariable Long customerId,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
-        customerService.deleteCustomer(customerId, userDetails.getUser());
+        customerService.deleteCustomer(userDetails.getUser());
         return ResponseUtil.deleteOk();
     }
 

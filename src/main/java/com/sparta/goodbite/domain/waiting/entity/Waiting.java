@@ -34,8 +34,7 @@ public class Waiting extends ExtendedTimestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
-
-    @Column(nullable = false)
+    
     private Long waitingOrder;
 
     @Enumerated(EnumType.STRING)

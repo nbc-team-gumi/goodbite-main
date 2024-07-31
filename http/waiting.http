@@ -1,4 +1,4 @@
-@restaurantId = 2
+@restaurantId = 1
 @baseUrl = http://localhost:8080
 ### Passw120rd! / Passw0rd!
 
@@ -21,7 +21,7 @@ POST {{baseUrl}}/waitings
 Content-Type: application/json
 
 {
-  "restaurantId": 2,
+  "restaurantId": 1,
   "partySize": 123,
   "waitingType": "OFFLINE",
   "demand": "널널한 자리로 주세요~"
@@ -51,13 +51,12 @@ Content-Type: application/json
 ### Waiting 취소/삭제
 DELETE {{baseUrl}}/waitings/{{waitingId}}
 
-
 ### Waiting 사장이 수락하고 가게 전체 Waiting 순서 하나씩 줄어들게 하는거
 PUT {{baseUrl}}/restaurants/{{restaurantId}}/waitings
 
 
 ### Waiting 사장이 하나만 수락하고 그 뒤 가게 Waiting 순서 하나씩 줄어들게 하는거
-PUT {{baseUrl}}/restaurants/waitings/5
+PUT {{baseUrl}}/restaurants/waitings/{{waitingId}}
 
 ### 가게 웨이팅 리스트 페이지네이션 해서 보기
 GET {{baseUrl}}/restaurants/{{restaurantId}}/waitingList?page=0&size=5
@@ -67,7 +66,7 @@ GET {{baseUrl}}/restaurants/{{restaurantId}}/waitingList?page=0&size=5
 POST {{baseUrl}}/users/login
 
 {
-  "email": "testowner2@email.com",
+  "email": "testowner1@email.com",
   "password": "Passw0rd!"
 }
 

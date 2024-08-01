@@ -1,9 +1,11 @@
 package com.sparta.goodbite.domain.operatinghour.controller;
 
 import com.sparta.goodbite.auth.security.EmailUserDetails;
+import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
 import com.sparta.goodbite.domain.operatinghour.dto.CreateOperatingHourRequestDto;
+import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
 import com.sparta.goodbite.domain.operatinghour.dto.UpdateOperatingHourRequestDto;
 import com.sparta.goodbite.domain.operatinghour.service.OperatingHourService;
 import jakarta.validation.Valid;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -47,6 +50,13 @@ public class OperatingHourController {
         operatingHourService.updateOperatingHour(operatingHourId, updateOperatingHourRequestDto,
             userDetails.getUser());
         return ResponseUtil.updateOk();
+    }
+
+    @GetMapping("/{operatingHourId}")
+    public ResponseEntity<DataResponseDto<OperatingHourResponseDto>> getOperatingHour(
+        @PathVariable Long operatingHourId) {
+
+        return ResponseUtil.findOk(operatingHourService.getOperatingHour(operatingHourId));
     }
 
     @PreAuthorize("hasRole('OWNER')")

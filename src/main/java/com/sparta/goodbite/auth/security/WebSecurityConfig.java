@@ -20,12 +20,12 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @RequiredArgsConstructor
 @EnableMethodSecurity // @PreAuthorize 애너테이션 활성화
 @EnableWebSecurity // Spring Security 사용
-@EnableMethodSecurity
 public class WebSecurityConfig {
 
     // Bean 객체 authenticationConfiguration 으로부터 인증매니저를 get 가능 : getAuthenticationManager()
@@ -33,6 +33,7 @@ public class WebSecurityConfig {
     private final EmailUserDetailsService userDetailsService;
     private final GlobalAccessDeniedHandler accessDeniedHandler;
     private final GlobalAuthenticationEntryPoint authenticationEntryPoint;
+    private final CorsFilter corsFilter;
 
     // Manager Bean 등록
     @Bean
@@ -109,6 +110,7 @@ public class WebSecurityConfig {
 
             // CORS 설정
 //            .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
+            .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
 
             // 세션을 사용하지 않도록 정책 STATELESS 로 변경
             .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(
@@ -123,7 +125,7 @@ public class WebSecurityConfig {
                     .permitAll()
                     .requestMatchers("/admins/**").hasRole(UserRole.ADMIN.name())
                     .requestMatchers("/owners/**").hasRole(UserRole.OWNER.name())
-                    .requestMatchers("/customers/").hasRole(UserRole.CUSTOMER.name())
+                    .requestMatchers("/customers/**").hasRole(UserRole.CUSTOMER.name())
                     .requestMatchers(HttpMethod.GET, "/menus/**").permitAll() // 메뉴 조회는 모두 가능
                     .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll() // 리뷰 조회는 모두 가능
                     .requestMatchers(HttpMethod.GET, "/restaurants/**")

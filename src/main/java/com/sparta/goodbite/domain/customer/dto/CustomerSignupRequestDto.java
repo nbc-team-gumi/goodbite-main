@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
-public class CustomerSignUpRequestDto {
+public class CustomerSignupRequestDto {
 
     @Email(regexp = "^[a-zA-Z0-9+-\\_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$",
         message = "이메일 형식에 맞지 않습니다.")

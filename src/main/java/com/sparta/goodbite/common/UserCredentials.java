@@ -7,4 +7,5 @@ public interface UserCredentials {
     String getEmail();
 
     String getPassword();
+
 }

@@ -3,6 +3,7 @@ package com.sparta.goodbite.domain.restaurant.service;
 import com.sparta.goodbite.common.UserCredentials;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
+import com.sparta.goodbite.domain.restaurant.dto.RestaurantIdResponseDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
@@ -37,10 +38,16 @@ public class RestaurantService {
     }
 
     @Transactional(readOnly = true)
+    public RestaurantIdResponseDto getMyRestaurant(UserCredentials user) {
+        Restaurant restaurant = restaurantRepository.findByOwnerIdOrThrow(user.getId());
+        return new RestaurantIdResponseDto(restaurant.getId());
+    }
+
+    @Transactional(readOnly = true)
     public List<RestaurantResponseDto> getAllRestaurants() {
         return restaurantRepository.findAll().stream().map(RestaurantResponseDto::from).toList();
     }
-
+  
     @Transactional
     public void updateRestaurant(Long restaurantId, RestaurantRequestDto restaurantRequestDto,
         UserCredentials user) {

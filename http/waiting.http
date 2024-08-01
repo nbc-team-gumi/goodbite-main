@@ -39,11 +39,9 @@ GET {{baseUrl}}/waitings/{{waitingId}}
 GET {{baseUrl}}/waitings
 
 
-### Restaurant의 마지막 Waiting번호 가져오기
-GET {{baseUrl}}/restaurants/{{restaurantId}}/waitings
 
 
-### Waiting 가게에서 정보 수정
+### Waiting 정보 수정
 PATCH {{baseUrl}}/waitings/{{waitingId}}
 Content-Type: application/json
 
@@ -55,22 +53,24 @@ Content-Type: application/json
 ### Waiting 취소/삭제
 DELETE {{baseUrl}}/waitings/{{waitingId}}
 
-### Waiting 사장이 수락하고 가게 전체 Waiting 순서 하나씩 줄어들게 하는거
+### Restaurant의 마지막 Waiting번호 가져오기
+GET {{baseUrl}}/restaurants/{{restaurantId}}/last-waiting
+
+### Restaurant의 대시보드용 전체 Waiting 조회 : 페이지네이션
+GET {{baseUrl}}/restaurants/{{restaurantId}}/waitings?page=0&size=5
+
+### Waiting 사장이 수락하고 가게 전체 Waiting 순서 하나씩 줄어들게 하는거 (맨 앞 Waiting 번호 수락)
 PUT {{baseUrl}}/restaurants/{{restaurantId}}/waitings
 
-
 ### Waiting 사장이 하나만 수락하고 그 뒤 가게 Waiting 순서 하나씩 줄어들게 하는거
-PUT {{baseUrl}}/restaurants/waitings/{{waitingId}}
-
-### 가게 웨이팅 리스트 페이지네이션 해서 보기
-GET {{baseUrl}}/restaurants/{{restaurantId}}/waitingList?page=0&size=5
+PUT {{baseUrl}}/waitings/3
 
 
 ### 오너 로그인 요청
 POST {{baseUrl}}/users/login
 
 {
-  "email": "testowner1@email.com",
+  "email": "testowner2@email.com",
   "password": "Passw0rd!"
 }
 

@@ -64,14 +64,14 @@ public class WaitingService {
             restaurant,
             customer,
             LastOrderNumber + 1,
-            WaitingStatus.WAITING, //생성 시 무조껀 Waiting
+            WaitingStatus.WAITING, // 생성 시 무조건 Waiting
             postWaitingRequestDto.getPartySize(),
             postWaitingRequestDto.getWaitingType(),
             postWaitingRequestDto.getDemand());
 
         waitingRepository.save(waiting);
 
-        return WaitingResponseDto.of(waiting, restaurant.getName());
+        return WaitingResponseDto.of(waiting);
     }
 
     // 단일 조회용 메서드
@@ -80,11 +80,11 @@ public class WaitingService {
         validateWaitingRequest(user, waitingId);
 
         Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
-        return WaitingResponseDto.of(waiting, waiting.getRestaurant().getName());
+        return WaitingResponseDto.of(waiting);
     }
 
-    //    //가게 주인용 api
-    //해당 메서드 동작 시, 가게의 id가 들어간 orders가 하나씩 줄게 된다.
+    // 가게 주인용 api
+    // 해당 메서드 동작 시, 가게의 id가 들어간 orders가 하나씩 줄게 된다.
     // restaurant id에 맞는 Waiting들의 order를 하나씩 줄인다.
     @Transactional
     public void reduceAllWaitingOrders(UserCredentials user, Long restaurantId) {
@@ -103,7 +103,11 @@ public class WaitingService {
         for (Waiting waiting : waitingList) {
             waiting.reduceWaitingOrder();
             if (waiting.getWaitingOrder() == 0) {
-                // 그리고 여기서 알람이나 그런거 해야 함
+
+                //--------------
+                // 알람 메서드 위치
+                //--------------
+
                 sendNotificationToCustomer(waiting.getCustomer().getId(),
                     "가게로 들어와 주세요.");
 //                waitingRepository.delete(waiting);
@@ -136,12 +140,10 @@ public class WaitingService {
 
         Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
 
-        String restaurantName = waiting.getRestaurant().getName();
-
         waiting.update(updateWaitingRequestDto.getPartySize(), updateWaitingRequestDto.getDemand());
 
         waitingRepository.save(waiting);
-        return WaitingResponseDto.of(waiting, restaurantName);
+        return WaitingResponseDto.of(waiting);
     }
 
     // 취소 메서드
@@ -160,9 +162,7 @@ public class WaitingService {
         }
         // 해당하는 레스토랑에 예약이 하나도 없다
         return 0L;
-
     }
-
 
     // 페이지 네이션 말고 list로 하면 무슨 장점이 있을까요?
     public Page<WaitingResponseDto> getWaitingsByRestaurantId(UserCredentials user,
@@ -173,7 +173,7 @@ public class WaitingService {
         Owner owner = ownerRepository.findById(restaurant.getOwner().getId())
             .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED));
 
-        // api요청한 유저가 해당 레스토랑의 '오너'와 같지 않다면
+        // api 요청한 유저가 해당 레스토랑의 '오너'와 같지 않다면
         if (!user.getEmail().equals(owner.getEmail())) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
@@ -195,7 +195,7 @@ public class WaitingService {
     }
 
     private WaitingResponseDto convertToDto(Waiting waiting) {
-        return WaitingResponseDto.of(waiting, waiting.getRestaurant().getName());
+        return WaitingResponseDto.of(waiting);
     }
 
     private void reduceWaitingOrders(Long waitingId, String type) {
@@ -210,7 +210,11 @@ public class WaitingService {
 
         for (Waiting waiting : waitingList) {
             if (Objects.equals(waiting.getId(), waitingId)) {
-                //여기서 알람 메서드
+
+                //--------------
+                // 알람 메서드 위치
+                //--------------
+
                 if (type.equals("delete")) {
                     message = "웨이팅이 취소되었습니다.";
                     waiting.delete(LocalDateTime.now(), WaitingStatus.CANCELLED);
@@ -252,7 +256,7 @@ public class WaitingService {
         Owner owner = ownerRepository.findById(restaurant.getOwner().getId())
             .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED));
 
-        // api요청한 유저가 해당 레스토랑의 '오너'와 같던가 혹은 웨이팅 등록한 '손님'과 같던가
+        // api 요청한 유저가 해당 레스토랑의 '오너'와 같던가 혹은 웨이팅 등록한 '손님'과 같던가
         if (user.getClass().equals(Owner.class) && !user.getEmail()
             .equals(owner.getEmail())) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
@@ -267,5 +271,4 @@ public class WaitingService {
             throw new WaitingException(WaitingErrorCode.WAITING_NOT_FOUND);
         }
     }
-
 }

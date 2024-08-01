@@ -53,6 +53,13 @@ public class OperatingHourService {
     }
 
     @Transactional(readOnly = true)
+    public OperatingHourResponseDto getOperatingHour(Long operatingHourId) {
+
+        OperatingHour operatingHour = operatingHourRepository.findByIdOrThrow(operatingHourId);
+        return OperatingHourResponseDto.from(operatingHour);
+    }
+
+    @Transactional(readOnly = true)
     public List<OperatingHourResponseDto> getAllOperatingHoursByRestaurant(Long restaurantId) {
 
         restaurantRepository.findByIdOrThrow(restaurantId);

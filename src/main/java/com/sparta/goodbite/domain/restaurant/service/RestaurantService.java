@@ -1,8 +1,6 @@
 package com.sparta.goodbite.domain.restaurant.service;
 
 import com.sparta.goodbite.common.UserCredentials;
-import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
-import com.sparta.goodbite.domain.operatinghour.repository.OperatingHourRepository;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantIdResponseDto;
@@ -24,7 +22,6 @@ public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
     private final OwnerRepository ownerRepository;
-    private final OperatingHourRepository operatingHourRepository;
 
     @Transactional
     public void createRestaurant(RestaurantRequestDto restaurantRequestDto, UserCredentials user) {
@@ -50,14 +47,7 @@ public class RestaurantService {
     public List<RestaurantResponseDto> getAllRestaurants() {
         return restaurantRepository.findAll().stream().map(RestaurantResponseDto::from).toList();
     }
-
-    @Transactional(readOnly = true)
-    public List<OperatingHourResponseDto> getAllOperatingHoursByRestaurantId(Long restaurantId) {
-        restaurantRepository.findByIdOrThrow(restaurantId);
-        return operatingHourRepository.findAllByRestaurantId(restaurantId).stream()
-            .map(OperatingHourResponseDto::from).toList();
-    }
-    
+  
     @Transactional
     public void updateRestaurant(Long restaurantId, RestaurantRequestDto restaurantRequestDto,
         UserCredentials user) {

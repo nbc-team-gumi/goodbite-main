@@ -192,7 +192,6 @@ public class WaitingService {
         List<WaitingResponseDto> waitingResponseDtos = waitingPage.stream()
             .map(this::convertToDto).toList();
         return new PageImpl<>(waitingResponseDtos, pageable, waitingPage.getTotalElements());
-
     }
 
     private WaitingResponseDto convertToDto(Waiting waiting) {
@@ -210,7 +209,6 @@ public class WaitingService {
         List<Waiting> waitingArrayList = new ArrayList<>();
 
         for (Waiting waiting : waitingList) {
-
             if (Objects.equals(waiting.getId(), waitingId)) {
                 //여기서 알람 메서드
                 if (type.equals("delete")) {

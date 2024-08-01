@@ -8,6 +8,7 @@ public record WaitingResponseDto(
 
     Long waitingId,
     String restaurantName,
+    Long restaurantId,
     WaitingStatus waitingStatus,
     Long waitingOrder,
     String demand,
@@ -17,7 +18,8 @@ public record WaitingResponseDto(
 ) {
 
     public static WaitingResponseDto of(Waiting waiting, String restaurantName) {
-        return new WaitingResponseDto(waiting.getId(), restaurantName, waiting.getStatus(),
+        return new WaitingResponseDto(waiting.getId(), restaurantName,
+            waiting.getRestaurant().getId(), waiting.getStatus(),
             waiting.getWaitingOrder(), waiting.getDemand(), waiting.getCreatedAt(),
             waiting.getDeletedAt());
     }

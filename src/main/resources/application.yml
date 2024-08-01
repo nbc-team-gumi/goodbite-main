@@ -24,3 +24,9 @@ spring:
 # WebSocket 설정
 server:
   port: 8080
+
+#공공데이터
+publicdata:
+  api:
+    key: ${PUBLIC_DATA_KEY}
+    url: https://api.odcloud.kr/api/nts-businessman/v1/status

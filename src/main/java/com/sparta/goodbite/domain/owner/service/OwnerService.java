@@ -25,12 +25,18 @@ public class OwnerService {
 
     private final OwnerRepository ownerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final BusinessVerificationService businessVerificationService;
 
     //가입
     @Transactional
     public void signup(OwnerSignUpRequestDto requestDto) {
         validateDuplicateFields(requestDto.getNickname(), requestDto.getEmail(),
             requestDto.getPhoneNumber(), requestDto.getBusinessNumber());
+
+        // 사업자 등록번호 유효성 검사
+        if (!businessVerificationService.verifyBusinessNumber(requestDto.getBusinessNumber())) {
+            throw new InvalidBusinessNumberException(OwnerErrorCode.INVALID_BUSINESS_NUMBER);
+        }
 
         // 비밀번호 암호화 -> 인증인가연결시 config에서 PasswordEncoder Bean등록
         String password = passwordEncoder.encode(requestDto.getPassword());
@@ -41,7 +47,7 @@ public class OwnerService {
             .nickname(requestDto.getNickname())
             .password(password)
             .phoneNumber(requestDto.getPhoneNumber())
-            .businessNumber(requestDto.getBusinessNumber())
+            .businessNumber(requestDto.getBusinessNumber())//저장전까지는 결과를 받아야.->동기
             .build();
 
         ownerRepository.save(owner);
@@ -82,8 +88,12 @@ public class OwnerService {
     public void updateBusinessNumber(UpdateBusinessNumberRequestDto requestDto, Owner owner) {
         String newBusinessNumber = requestDto.getNewBusinessNumber();
 
-        // 사업자 등록번호 유효성 검사
+        /*// 사업자 등록번호 유효성 검사
         if (!isValidBusinessNumber(newBusinessNumber)) {
+            throw new InvalidBusinessNumberException(OwnerErrorCode.INVALID_BUSINESS_NUMBER);
+        }*/
+        // 사업자 등록번호 유효성 검사
+        if (!businessVerificationService.verifyBusinessNumber(newBusinessNumber)) {
             throw new InvalidBusinessNumberException(OwnerErrorCode.INVALID_BUSINESS_NUMBER);
         }
 

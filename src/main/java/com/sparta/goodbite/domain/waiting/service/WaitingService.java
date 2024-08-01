@@ -195,7 +195,6 @@ public class WaitingService {
         List<WaitingResponseDto> waitingResponseDtos = waitingPage.stream()
             .map(this::convertToDto).toList();
         return new PageImpl<>(waitingResponseDtos, pageable, waitingPage.getTotalElements());
-
     }
 
     private WaitingResponseDto convertToDto(Waiting waiting) {
@@ -214,7 +213,6 @@ public class WaitingService {
         List<Waiting> waitingArrayList = new ArrayList<>();
 
         for (Waiting waiting : waitingList) {
-
             if (Objects.equals(waiting.getId(), waitingId)) {
 
                 //--------------

@@ -1,6 +1,5 @@
 package com.sparta.goodbite.domain.waiting.dto;
 
-import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.waiting.entity.Waiting;
 import com.sparta.goodbite.domain.waiting.entity.Waiting.WaitingStatus;
 import java.time.LocalDateTime;
@@ -8,6 +7,7 @@ import java.time.LocalDateTime;
 public record WaitingResponseDto(
 
     Long waitingId,
+    Long restaurantId,
     String restaurantName,
     WaitingStatus waitingStatus,
     Long waitingOrder,
@@ -20,15 +20,16 @@ public record WaitingResponseDto(
 
 ) {
 
-    public static WaitingResponseDto of(Waiting waiting, String restaurantName, Customer customer) {
+    public static WaitingResponseDto of(Waiting waiting) {
         return new WaitingResponseDto(
             waiting.getId(),
-            restaurantName,
+            waiting.getRestaurant().getId(),
+            waiting.getRestaurant().getName(),
             waiting.getStatus(),
             waiting.getWaitingOrder(),
             waiting.getDemand(),
-            customer.getId(),
-            customer.getNickname(),
+            waiting.getCustomer().getId(),
+            waiting.getCustomer().getNickname(),
             waiting.getPartySize(),
             waiting.getCreatedAt(),
             waiting.getDeletedAt());

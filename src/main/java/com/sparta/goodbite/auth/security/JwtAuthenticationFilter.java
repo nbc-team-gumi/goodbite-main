@@ -2,6 +2,7 @@ package com.sparta.goodbite.auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.goodbite.auth.dto.LoginRequestDto;
+import com.sparta.goodbite.auth.dto.LoginSuccessResponseDto;
 import com.sparta.goodbite.auth.util.JwtUtil;
 import com.sparta.goodbite.common.response.ResponseUtil;
 import jakarta.servlet.FilterChain;
@@ -102,6 +103,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         String email = ((EmailUserDetails) authResult.getPrincipal()).getEmail();
         String role = ((EmailUserDetails) authResult.getPrincipal()).getRole();
+        //String nickname = ((EmailUserDetails) authResult.getPrincipal()).get
 
         String accessToken = JwtUtil.createAccessToken(email, role);
         String refreshToken = JwtUtil.createRefreshToken(email, role);
@@ -109,7 +111,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         JwtUtil.addJwtToCookie(accessToken, response);
         JwtUtil.addJwtToCookie(refreshToken, response);
 
-        ResponseUtil.servletApi(response, HttpStatus.OK.value(), "로그인 성공");
+        // 사용자 역할 정보를 포함한 응답 생성
+        LoginSuccessResponseDto responseDto = LoginSuccessResponseDto.from("로그인 성공", role);
+
+        ResponseUtil.servletApi(response, HttpStatus.OK.value(), responseDto);
     }
 
     @Override

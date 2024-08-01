@@ -2,7 +2,6 @@ package com.sparta.goodbite.domain.review.service;
 
 import com.sparta.goodbite.common.UserCredentials;
 import com.sparta.goodbite.domain.customer.entity.Customer;
-import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.domain.review.dto.CreateReviewRequestDto;
@@ -23,7 +22,6 @@ public class ReviewService {
 
     private final RestaurantRepository restaurantRepository;
     private final ReviewRepository reviewRepository;
-    private final CustomerRepository customerRepository;
 
     @Transactional
     public void createReview(CreateReviewRequestDto createReviewRequestDto, UserCredentials user) {

@@ -7,7 +7,7 @@ import com.sparta.goodbite.common.response.ResponseUtil;
 import com.sparta.goodbite.domain.menu.dto.MenuResponseDto;
 import com.sparta.goodbite.domain.menu.service.MenuService;
 import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
-import com.sparta.goodbite.domain.operatinghour.service.OperatingHourService;
+import com.sparta.goodbite.domain.restaurant.dto.RestaurantIdResponseDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
 import com.sparta.goodbite.domain.restaurant.service.RestaurantService;
@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class RestaurantController {
 
     private final RestaurantService restaurantService;
-    private final OperatingHourService operatingHourService;
     private final MenuService menuService;
 
     @PreAuthorize("hasRole('OWNER')")
@@ -50,6 +49,14 @@ public class RestaurantController {
         @PathVariable Long restaurantId) {
 
         return ResponseUtil.findOk(restaurantService.getRestaurant(restaurantId));
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<DataResponseDto<RestaurantIdResponseDto>> getMyRestaurant(
+        @AuthenticationPrincipal EmailUserDetails userDetails
+    ) {
+
+        return ResponseUtil.findOk(restaurantService.getMyRestaurant(userDetails.getUser()));
     }
 
     @GetMapping

@@ -42,6 +42,12 @@ public class ReviewService {
         return reviewRepository.findAll().stream().map(ReviewResponseDto::from).toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<ReviewResponseDto> getAllReviewsByRestaurantId(Long restaurantId) {
+        return reviewRepository.findAllByRestaurantId(restaurantId).stream()
+            .map(ReviewResponseDto::from).toList();
+    }
+
     @Transactional
     public void updateReview(Long reviewId, UpdateReviewRequestDto updateReviewRequestDto,
         UserCredentials user) {

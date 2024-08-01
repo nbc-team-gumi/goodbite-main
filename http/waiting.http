@@ -35,6 +35,10 @@ Content-Type: application/json
 ### Waiting 단일 정보 조회
 GET {{baseUrl}}/waitings/{{waitingId}}
 
+### Waiting 손님의 웨이팅 전체 정보 조회
+GET {{baseUrl}}/waitings
+
+
 ### Restaurant의 마지막 Waiting번호 가져오기
 GET {{baseUrl}}/restaurants/{{restaurantId}}/waitings
 

@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -182,9 +181,18 @@ public class WaitingService {
         Page<Waiting> waitingPage = waitingRepository.findByRestaurantId(restaurantId, pageable);
 
         List<WaitingResponseDto> waitingResponseDtos = waitingPage.stream()
-            .map(this::convertToDto)
-            .collect(Collectors.toList());
+            .map(this::convertToDto).toList();
         return new PageImpl<>(waitingResponseDtos, pageable, waitingPage.getTotalElements());
+    }
+
+    public Page<WaitingResponseDto> getWaitings(UserCredentials user, Pageable pageable) {
+
+        Page<Waiting> waitingPage = waitingRepository.findByCustomerId(user.getId(), pageable);
+
+        List<WaitingResponseDto> waitingResponseDtos = waitingPage.stream()
+            .map(this::convertToDto).toList();
+        return new PageImpl<>(waitingResponseDtos, pageable, waitingPage.getTotalElements());
+
     }
 
     private WaitingResponseDto convertToDto(Waiting waiting) {

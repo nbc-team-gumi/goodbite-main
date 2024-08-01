@@ -41,6 +41,17 @@ public class WaitingController {
         return ResponseUtil.createOk(
             waitingService.createWaiting(userDetails.getUser(), postWaitingRequestDto));
     }
+    
+    @PreAuthorize("hasRole('CUSTOMER')")
+    @GetMapping("/waitings")
+    public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getWaitingList(
+        @AuthenticationPrincipal EmailUserDetails userDetails,
+        @PageableDefault(size = 5) Pageable pageable
+    ) {
+        return ResponseUtil.createOk(
+            waitingService.getWaitings(userDetails.getUser(),
+                pageable));
+    }
 
     // 웨이팅 전체 조회용 api
     // 해당 가게 오너 + Admin

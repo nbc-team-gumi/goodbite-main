@@ -59,6 +59,7 @@ public class RestaurantController {
         return ResponseUtil.findOk(restaurantService.getRestaurant(restaurantId));
     }
 
+    @PreAuthorize("hasRole('OWNER')")
     @GetMapping("/my")
     public ResponseEntity<DataResponseDto<RestaurantIdResponseDto>> getMyRestaurant(
         @AuthenticationPrincipal EmailUserDetails userDetails
@@ -69,6 +70,7 @@ public class RestaurantController {
 
     @GetMapping
     public ResponseEntity<DataResponseDto<List<RestaurantResponseDto>>> getAllRestaurants() {
+
         return ResponseUtil.findOk(restaurantService.getAllRestaurants());
     }
 
@@ -87,8 +89,7 @@ public class RestaurantController {
         return ResponseUtil.findOk(menuService.getAllMenusByRestaurantId(restaurantId));
     }
 
-    // 웨이팅 전체 조회용 api
-    // 해당 가게 오너 + Admin
+    // 사업자 대시보드용 전체 웨이팅 조회
     @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
     @GetMapping("/{restaurantId}/waitings")
     public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getAllWaitingsByRestaurantId(
@@ -101,8 +102,7 @@ public class RestaurantController {
                 pageable));
     }
 
-    // 단순 가게의 현재 웨이팅 갯수 받아오는 api
-    // api 권한 제한 없음
+    // 가게의 마지막 웨이팅 번호 조회
     @GetMapping("/{restaurantId}/last-waiting")
     public ResponseEntity<DataResponseDto<Long>> getWaitingLastNumber(
         @PathVariable Long restaurantId) {
@@ -122,7 +122,6 @@ public class RestaurantController {
     }
 
     // 가게 주인용 가게 전체 하나씩 웨이팅 줄이기 메서드 호출
-    // 해당 가게 오너만 가능
     @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
     @PutMapping("/{restaurantId}/waitings")
     public ResponseEntity<MessageResponseDto> reduceAllWaitingOrders(

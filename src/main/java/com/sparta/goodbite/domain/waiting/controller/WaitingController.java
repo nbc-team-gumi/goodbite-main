@@ -44,6 +44,7 @@ public class WaitingController {
             waitingService.createWaiting(userDetails.getUser(), postWaitingRequestDto));
     }
 
+    // 손님이 보는 웨이팅 목록 조회
     @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping
     public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getWaitingList(
@@ -55,8 +56,7 @@ public class WaitingController {
                 pageable));
     }
 
-    // 웨이팅 단일 조회용 api
-    // 해당 가게 오너 또는 해당 웨이팅 등록 손님 + Admin
+    // 웨이팅 단일 조회
     @GetMapping("/{waitingId}")
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> getWaiting(
         @AuthenticationPrincipal EmailUserDetails userDetails,
@@ -65,9 +65,7 @@ public class WaitingController {
         return ResponseUtil.findOk(waitingService.getWaiting(userDetails.getUser(), waitingId));
     }
 
-
-    // 가게 주인용 하나 선택 후 웨이팅 줄이기 메서드 호출
-    // 해당 가게 오너 + Admin
+    // 가게 주인이 웨이팅 ID 하나 선택 후 웨이팅 줄이기
     @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
     @PutMapping("/{waitingId}")
     public ResponseEntity<MessageResponseDto> reduceOneWaitingOrders(
@@ -78,8 +76,7 @@ public class WaitingController {
         return ResponseUtil.updateOk();
     }
 
-    // 가게용 웨이팅 정보 업데이트
-    // 해당 가게 오너 또는 해당 웨이팅 등록 손님 + Admin
+    // 웨이팅 정보 수정
     @PatchMapping("/{waitingId}")
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> updateWaiting(
         @AuthenticationPrincipal EmailUserDetails userDetails,
@@ -90,8 +87,7 @@ public class WaitingController {
             updateWaitingRequestDto));
     }
 
-    // 가게/손님용 취소
-    // 해당 가게 오너 또는 해당 웨이팅 등록 손님 + Admin
+    // 웨이팅 취소
     @DeleteMapping("/{waitingId}")
     public ResponseEntity<MessageResponseDto> deleteWaiting(
         @AuthenticationPrincipal EmailUserDetails userDetails,

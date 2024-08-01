@@ -71,7 +71,7 @@ public class WaitingService {
 
         waitingRepository.save(waiting);
 
-        return WaitingResponseDto.of(waiting, restaurant.getName(), customer);
+        return WaitingResponseDto.of(waiting);
     }
 
     // 단일 조회용 메서드
@@ -80,8 +80,7 @@ public class WaitingService {
         validateWaitingRequest(user, waitingId);
 
         Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
-        return WaitingResponseDto.of(waiting, waiting.getRestaurant().getName(),
-            waiting.getCustomer());
+        return WaitingResponseDto.of(waiting);
     }
 
     // 가게 주인용 api
@@ -141,12 +140,10 @@ public class WaitingService {
 
         Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
 
-        String restaurantName = waiting.getRestaurant().getName();
-
         waiting.update(updateWaitingRequestDto.getPartySize(), updateWaitingRequestDto.getDemand());
 
         waitingRepository.save(waiting);
-        return WaitingResponseDto.of(waiting, restaurantName, waiting.getCustomer());
+        return WaitingResponseDto.of(waiting);
     }
 
     // 취소 메서드
@@ -198,8 +195,7 @@ public class WaitingService {
     }
 
     private WaitingResponseDto convertToDto(Waiting waiting) {
-        return WaitingResponseDto.of(waiting, waiting.getRestaurant().getName(),
-            waiting.getCustomer());
+        return WaitingResponseDto.of(waiting);
     }
 
     private void reduceWaitingOrders(Long waitingId, String type) {

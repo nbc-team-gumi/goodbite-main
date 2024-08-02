@@ -10,7 +10,6 @@ import com.sparta.goodbite.domain.owner.dto.UpdateBusinessNumberRequestDto;
 import com.sparta.goodbite.domain.owner.dto.UpdateOwnerNicknameRequestDto;
 import com.sparta.goodbite.domain.owner.dto.UpdateOwnerPasswordRequestDto;
 import com.sparta.goodbite.domain.owner.dto.UpdateOwnerPhoneNumberRequestDto;
-import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.owner.service.OwnerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +52,7 @@ public class OwnerController {
     public ResponseEntity<DataResponseDto<OwnerResponseDto>> getOwner(
         @AuthenticationPrincipal EmailUserDetails userDetails) {
         return ResponseUtil.findOk(
-            ownerService.getOwner((Owner) userDetails.getUser()));
+            ownerService.getOwner(userDetails.getUser()));
     }
 
     /**
@@ -66,7 +65,7 @@ public class OwnerController {
     public ResponseEntity<MessageResponseDto> updateNickname(
         @Valid @RequestBody UpdateOwnerNicknameRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
-        ownerService.updateNickname(requestDto, (Owner) userDetails.getUser());
+        ownerService.updateNickname(requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -80,7 +79,7 @@ public class OwnerController {
     public ResponseEntity<MessageResponseDto> updatePhoneNumber(
         @Valid @RequestBody UpdateOwnerPhoneNumberRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
-        ownerService.updatePhoneNumber(requestDto, (Owner) userDetails.getUser());
+        ownerService.updatePhoneNumber(requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -94,7 +93,7 @@ public class OwnerController {
     public ResponseEntity<MessageResponseDto> updateBusinessNumber(
         @Valid @RequestBody UpdateBusinessNumberRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
-        ownerService.updateBusinessNumber(requestDto, (Owner) userDetails.getUser());
+        ownerService.updateBusinessNumber(requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -108,7 +107,7 @@ public class OwnerController {
     public ResponseEntity<MessageResponseDto> updatePassword(
         @Valid @RequestBody UpdateOwnerPasswordRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
-        ownerService.updatePassword(requestDto, (Owner) userDetails.getUser());
+        ownerService.updatePassword(requestDto, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -120,7 +119,7 @@ public class OwnerController {
     @DeleteMapping
     public ResponseEntity<MessageResponseDto> deleteOwner(
         @AuthenticationPrincipal EmailUserDetails userDetails) {
-        ownerService.deleteOwner((Owner) userDetails.getUser());
+        ownerService.deleteOwner(userDetails.getUser());
         return ResponseUtil.deleteOk();
     }
 

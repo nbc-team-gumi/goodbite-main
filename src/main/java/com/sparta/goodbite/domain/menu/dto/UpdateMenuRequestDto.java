@@ -1,6 +1,6 @@
 package com.sparta.goodbite.domain.menu.dto;
 
-import com.sparta.goodbite.domain.menu.dto.validation.constraint.AtLeastOneFieldConstraint;
+import com.sparta.goodbite.common.validation.constraint.AtLeastOneFieldConstraint;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 

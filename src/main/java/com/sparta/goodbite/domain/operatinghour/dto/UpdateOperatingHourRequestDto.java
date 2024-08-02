@@ -1,8 +1,8 @@
 package com.sparta.goodbite.domain.operatinghour.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sparta.goodbite.domain.operatinghour.dto.validation.contraint.LocalTimeFormatConstraint;
-import com.sparta.goodbite.domain.operatinghour.dto.validation.contraint.OpenTimeBeforeCloseTimeConstraint;
+import com.sparta.goodbite.common.validation.constraint.LocalTimeFormatConstraint;
+import com.sparta.goodbite.common.validation.constraint.OpenTimeBeforeCloseTimeConstraint;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalTime;
 import lombok.Getter;

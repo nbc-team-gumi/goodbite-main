@@ -1,5 +1,7 @@
 package com.sparta.goodbite.domain.owner.service;
 
+import com.sparta.goodbite.common.UserCredentials;
+import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
 import com.sparta.goodbite.domain.owner.dto.OwnerResponseDto;
 import com.sparta.goodbite.domain.owner.dto.OwnerSignUpRequestDto;
 import com.sparta.goodbite.domain.owner.dto.UpdateBusinessNumberRequestDto;
@@ -25,6 +27,7 @@ public class OwnerService {
 
     private final OwnerRepository ownerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CustomerRepository customerRepository;
 
     //가입
     @Transactional
@@ -50,36 +53,38 @@ public class OwnerService {
 
     //조회
     @Transactional(readOnly = true)
-    public OwnerResponseDto getOwner(Owner owner) {
+    public OwnerResponseDto getOwner(UserCredentials user) {
+        Owner owner = (Owner) user;
         return OwnerResponseDto.from(ownerRepository.findByIdOrThrow(owner.getId()));
     }
 
     // 수정-닉네임
     @Transactional
     public void updateNickname(UpdateOwnerNicknameRequestDto requestDto,
-        Owner owner) {
+        UserCredentials user) {
         String newNickname = requestDto.getNewNickname();
         ownerRepository.validateDuplicateNickname(newNickname); //중복닉네임확인
-
+        Owner owner = (Owner) user;
         owner.updateNickname(newNickname);
         ownerRepository.save(owner);
     }
 
     //수정-전화번호
     @Transactional
-    public void updatePhoneNumber(UpdateOwnerPhoneNumberRequestDto requestDto, Owner owner) {
+    public void updatePhoneNumber(UpdateOwnerPhoneNumberRequestDto requestDto,
+        UserCredentials user) {
         String newPhoneNumber = requestDto.getNewPhoneNumber();
-
         ownerRepository.validateDuplicatePhoneNumber(newPhoneNumber);
-
-        // 전화번호 업데이트
-        owner.updatePhoneNumber(newPhoneNumber);
+        Owner owner = (Owner) user;
+        owner.updatePhoneNumber(newPhoneNumber);// 전화번호 업데이트
+        ownerRepository.save(owner);
     }
 
 
     // 수정-사업자번호
     @Transactional
-    public void updateBusinessNumber(UpdateBusinessNumberRequestDto requestDto, Owner owner) {
+    public void updateBusinessNumber(UpdateBusinessNumberRequestDto requestDto,
+        UserCredentials user) {
         String newBusinessNumber = requestDto.getNewBusinessNumber();
 
         // 사업자 등록번호 유효성 검사
@@ -89,9 +94,15 @@ public class OwnerService {
 
         ownerRepository.validateDuplicateBusinessNumber(requestDto.getNewBusinessNumber());
 
+        // UserCredential타입의 객체를 Owner타입으로 캐스팅
+        Owner owner = (Owner) user;
+
         // 사업자번호 업데이트
         owner.updateBusinessNumber(newBusinessNumber);
 
+        // 명시적으로 저장
+        ownerRepository.save(owner);
+        
         // 비즈니스 로직 추가 필요
         //사업자번호 인증상태 미인증으로 변환
     }
@@ -99,7 +110,8 @@ public class OwnerService {
     // 수정-비밀번호
     @Transactional
     public void updatePassword(
-        UpdateOwnerPasswordRequestDto requestDto, Owner owner) {
+        UpdateOwnerPasswordRequestDto requestDto, UserCredentials user) {
+        Owner owner = (Owner) user;
 
         //입력한 비밀번호와 사용자의 비밀번호 일치유무 확인
         if (!passwordEncoder.matches(requestDto.getCurrentPassword(), owner.getPassword())) {
@@ -116,11 +128,14 @@ public class OwnerService {
         // 비밀번호 업데이트
         owner.updatePassword(newPassword);
 
+        //명시적저장
+        ownerRepository.save(owner);
     }
 
     //삭제
     @Transactional
-    public void deleteOwner(Owner owner) {
+    public void deleteOwner(UserCredentials user) {
+        Owner owner = (Owner) user;
         // 이미 탈퇴한 사용자인지 확인
         if (owner.getDeletedAt() != null) {
             throw new OwnerAlreadyDeletedException(OwnerErrorCode.OWNER_ALREADY_DELETED);
@@ -128,6 +143,7 @@ public class OwnerService {
 
         // 소프트 삭제를 위해 deletedAt 필드를 현재 시간으로 설정
         owner.deactivate();
+        ownerRepository.save(owner);
     }
 
     // 중복 필드 검증 메서드

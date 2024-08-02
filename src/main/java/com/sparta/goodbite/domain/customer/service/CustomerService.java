@@ -1,5 +1,6 @@
 package com.sparta.goodbite.domain.customer.service;
 
+import com.sparta.goodbite.common.UserCredentials;
 import com.sparta.goodbite.domain.customer.dto.CustomerResponseDto;
 import com.sparta.goodbite.domain.customer.dto.CustomerSignupRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdateNicknameRequestDto;
@@ -26,7 +27,8 @@ public class CustomerService {
 
     //조회
     @Transactional(readOnly = true)
-    public CustomerResponseDto getCustomer(Customer customer) {
+    public CustomerResponseDto getCustomer(UserCredentials user) {
+        Customer customer = (Customer) user;
         return CustomerResponseDto.from(customerRepository.findByIdOrThrow(customer.getId()));
     }
 
@@ -55,23 +57,28 @@ public class CustomerService {
 
     //수정-닉네임
     @Transactional
-    public void updateNickname(UpdateNicknameRequestDto requestDto, Customer customer) {
+    public void updateNickname(UpdateNicknameRequestDto requestDto, UserCredentials user) {
         String newNickname = requestDto.getNewNickname();
         customerRepository.validateDuplicateNickname(newNickname); //중복 닉네임 확인
+        Customer customer = (Customer) user;
         customer.updateNickname(newNickname);// 닉네임 업데이트
+        customerRepository.save(customer);//명시적으로 저장
     }
 
     //수정-전화번호
     @Transactional
-    public void updatePhoneNumber(UpdatePhoneNumberRequestDto requestDto, Customer customer) {
+    public void updatePhoneNumber(UpdatePhoneNumberRequestDto requestDto, UserCredentials user) {
         String newPhoneNumber = requestDto.getNewPhoneNumber();
         customerRepository.validateDuplicatePhoneNumber(newPhoneNumber);//중복 전화번호 확인
+        Customer customer = (Customer) user;
         customer.updatePhoneNumber(newPhoneNumber);// 전화번호 업데이트
+        customerRepository.save(customer);//명시적으로 저장
     }
 
     //수정-비밀번호
     @Transactional
-    public void updatePassword(UpdatePasswordRequestDto requestDto, Customer customer) {
+    public void updatePassword(UpdatePasswordRequestDto requestDto, UserCredentials user) {
+        Customer customer = (Customer) user;
 
         //입력한 비밀번호와 사용자의 비밀번호 일치유무 확인
         if (!passwordEncoder.matches(requestDto.getCurrentPassword(), customer.getPassword())) {
@@ -88,10 +95,14 @@ public class CustomerService {
 
         // 비밀번호 업데이트
         customer.updatePassword(newPassword);
+
+        //명시적으로 저장
+        customerRepository.save(customer);
     }
 
     @Transactional
-    public void deleteCustomer(Customer customer) {
+    public void deleteCustomer(UserCredentials user) {
+        Customer customer = (Customer) user;
 
         // 이미 탈퇴한 사용자인지 확인합니다.
         if (customer.getDeletedAt() != null) {
@@ -100,6 +111,9 @@ public class CustomerService {
 
         // 소프트 삭제를 위해 deletedAt 필드를 현재 시간으로 설정
         customer.deactivate();
+
+        //명시적으로 저장
+        customerRepository.save(customer);
     }
 
     // 중복 필드 검증 메서드

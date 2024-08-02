@@ -2,8 +2,8 @@ package com.sparta.goodbite.domain.customer.service;
 
 import com.sparta.goodbite.domain.customer.dto.CustomerResponseDto;
 import com.sparta.goodbite.domain.customer.dto.CustomerSignupRequestDto;
+import com.sparta.goodbite.domain.customer.dto.UpdateCustomerPasswordRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdateNicknameRequestDto;
-import com.sparta.goodbite.domain.customer.dto.UpdatePasswordRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePhoneNumberRequestDto;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
@@ -71,7 +71,7 @@ public class CustomerService {
 
     //수정-비밀번호
     @Transactional
-    public void updatePassword(UpdatePasswordRequestDto requestDto, Customer customer) {
+    public void updatePassword(UpdateCustomerPasswordRequestDto requestDto, Customer customer) {
 
         //입력한 비밀번호와 사용자의 비밀번호 일치유무 확인
         if (!passwordEncoder.matches(requestDto.getCurrentPassword(), customer.getPassword())) {

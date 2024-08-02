@@ -6,8 +6,8 @@ import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
 import com.sparta.goodbite.domain.customer.dto.CustomerResponseDto;
 import com.sparta.goodbite.domain.customer.dto.CustomerSignupRequestDto;
+import com.sparta.goodbite.domain.customer.dto.UpdateCustomerPasswordRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdateNicknameRequestDto;
-import com.sparta.goodbite.domain.customer.dto.UpdatePasswordRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePhoneNumberRequestDto;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.service.CustomerService;
@@ -79,7 +79,7 @@ public class CustomerController {
      */
     @PatchMapping("/password")
     public ResponseEntity<MessageResponseDto> updatePassword(
-        @Valid @RequestBody UpdatePasswordRequestDto requestDto,
+        @Valid @RequestBody UpdateCustomerPasswordRequestDto requestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails) {
         customerService.updatePassword(requestDto, (Customer) userDetails.getUser());
         return ResponseUtil.updateOk();

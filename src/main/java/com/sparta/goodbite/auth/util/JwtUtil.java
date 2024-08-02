@@ -60,6 +60,7 @@ public final class JwtUtil {
                 cookie = new Cookie(REFRESH_HEADER, token); // Name-Value
             }
             log.debug("URL encoding: {}", token);
+            cookie.setDomain(JwtConfig.serverIp);
             cookie.setPath("/");
             cookie.setHttpOnly(true); // 클라이언트 JavaScript 에서 쿠키 접근 불가
             //cookie.setSecure(true); // HTTPS 사용 시 Secure 설정

@@ -1,9 +1,9 @@
 package com.sparta.goodbite.domain.menu.controller;
 
-import com.sparta.goodbite.auth.security.EmailUserDetails;
+import com.sparta.goodbite.security.EmailUserDetails;
 import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
-import com.sparta.goodbite.common.response.ResponseUtil;
+import com.sparta.goodbite.common.util.ResponseUtil;
 import com.sparta.goodbite.domain.menu.dto.CreateMenuRequestDto;
 import com.sparta.goodbite.domain.menu.dto.MenuResponseDto;
 import com.sparta.goodbite.domain.menu.dto.UpdateMenuRequestDto;

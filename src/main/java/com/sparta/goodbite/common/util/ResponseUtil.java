@@ -1,6 +1,8 @@
-package com.sparta.goodbite.common.response;
+package com.sparta.goodbite.common.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.goodbite.common.response.DataResponseDto;
+import com.sparta.goodbite.common.response.MessageResponseDto;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.springframework.http.HttpStatus;

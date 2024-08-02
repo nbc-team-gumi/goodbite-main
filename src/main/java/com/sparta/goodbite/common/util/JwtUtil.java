@@ -1,5 +1,6 @@
-package com.sparta.goodbite.auth.util;
+package com.sparta.goodbite.common.util;
 
+import com.sparta.goodbite.config.JwtConfig;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;

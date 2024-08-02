@@ -1,9 +1,9 @@
 package com.sparta.goodbite.domain.waiting.controller;
 
-import com.sparta.goodbite.auth.security.EmailUserDetails;
+import com.sparta.goodbite.security.EmailUserDetails;
 import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
-import com.sparta.goodbite.common.response.ResponseUtil;
+import com.sparta.goodbite.common.util.ResponseUtil;
 import com.sparta.goodbite.domain.waiting.dto.PostWaitingRequestDto;
 import com.sparta.goodbite.domain.waiting.dto.UpdateWaitingRequestDto;
 import com.sparta.goodbite.domain.waiting.dto.WaitingResponseDto;

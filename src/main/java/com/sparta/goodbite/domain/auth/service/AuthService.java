@@ -1,6 +1,6 @@
-package com.sparta.goodbite.auth.service;
+package com.sparta.goodbite.domain.auth.service;
 
-import com.sparta.goodbite.auth.util.JwtUtil;
+import com.sparta.goodbite.common.util.JwtUtil;
 import com.sparta.goodbite.exception.auth.AuthErrorCode;
 import com.sparta.goodbite.exception.auth.detail.InvalidRefreshTokenException;
 import jakarta.servlet.http.HttpServletRequest;

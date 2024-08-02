@@ -1,4 +1,4 @@
-package com.sparta.goodbite.auth.dto;
+package com.sparta.goodbite.domain.auth.dto;
 
 public record LoginSuccessResponseDto(String message, String role) {
 

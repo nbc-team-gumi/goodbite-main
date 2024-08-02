@@ -1,7 +1,13 @@
-package com.sparta.goodbite.auth.security;
+package com.sparta.goodbite.config;
 
-import com.sparta.goodbite.auth.UserRole;
-import com.sparta.goodbite.auth.util.JwtUtil;
+import com.sparta.goodbite.domain.auth.UserRole;
+import com.sparta.goodbite.security.EmailLogoutSuccessHandler;
+import com.sparta.goodbite.security.EmailUserDetailsService;
+import com.sparta.goodbite.security.GlobalAccessDeniedHandler;
+import com.sparta.goodbite.security.GlobalAuthenticationEntryPoint;
+import com.sparta.goodbite.security.JwtAuthenticationFilter;
+import com.sparta.goodbite.security.JwtAuthorizationFilter;
+import com.sparta.goodbite.common.util.JwtUtil;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;

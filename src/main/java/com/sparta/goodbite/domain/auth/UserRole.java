@@ -1,4 +1,4 @@
-package com.sparta.goodbite.auth;
+package com.sparta.goodbite.domain.auth;
 
 import lombok.Getter;
 

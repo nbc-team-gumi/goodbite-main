@@ -1,4 +1,4 @@
-package com.sparta.goodbite.auth.security;
+package com.sparta.goodbite.security;
 
 import com.sparta.goodbite.common.UserCredentials;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.sparta.goodbite.auth.util;
+package com.sparta.goodbite.config;
 
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;

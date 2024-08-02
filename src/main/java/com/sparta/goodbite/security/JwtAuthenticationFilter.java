@@ -1,10 +1,10 @@
-package com.sparta.goodbite.auth.security;
+package com.sparta.goodbite.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.goodbite.auth.dto.LoginRequestDto;
-import com.sparta.goodbite.auth.dto.LoginSuccessResponseDto;
-import com.sparta.goodbite.auth.util.JwtUtil;
-import com.sparta.goodbite.common.response.ResponseUtil;
+import com.sparta.goodbite.domain.auth.dto.LoginRequestDto;
+import com.sparta.goodbite.domain.auth.dto.LoginSuccessResponseDto;
+import com.sparta.goodbite.common.util.JwtUtil;
+import com.sparta.goodbite.common.util.ResponseUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

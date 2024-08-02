@@ -1,6 +1,6 @@
-package com.sparta.goodbite.auth.security;
+package com.sparta.goodbite.security;
 
-import com.sparta.goodbite.auth.UserRole;
+import com.sparta.goodbite.domain.auth.UserRole;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
 import com.sparta.goodbite.domain.owner.entity.Owner;

@@ -1,7 +1,7 @@
-package com.sparta.goodbite.auth.security;
+package com.sparta.goodbite.security;
 
-import com.sparta.goodbite.auth.util.JwtUtil;
-import com.sparta.goodbite.common.response.ResponseUtil;
+import com.sparta.goodbite.common.util.JwtUtil;
+import com.sparta.goodbite.common.util.ResponseUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

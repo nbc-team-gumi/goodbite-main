@@ -1,4 +1,4 @@
-package com.sparta.goodbite.auth.security;
+package com.sparta.goodbite.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

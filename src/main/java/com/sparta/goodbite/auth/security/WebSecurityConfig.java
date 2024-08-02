@@ -18,7 +18,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.filter.CorsFilter;
 
@@ -110,7 +109,7 @@ public class WebSecurityConfig {
 
             // CORS 설정
 //            .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
-            .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(corsFilter, JwtAuthorizationFilter.class)
 
             // 세션을 사용하지 않도록 정책 STATELESS 로 변경
             .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(
@@ -149,8 +148,8 @@ public class WebSecurityConfig {
                 .authenticationEntryPoint(authenticationEntryPoint)) // 인증 실패 시 처리
 
             // 커스텀 필터 끼우기
-            // JWT 인가필터 -> LogoutFilter -> JWT 인증필터 -> UsernamePasswordAuthenticationFilter 순으로 설정
-            .addFilterBefore(jwtAuthorizationFilter(), LogoutFilter.class)
+            // LogoutFilter -> corsFilter -> JWT 인가필터 -> JWT 인증필터 -> UsernamePasswordAuthenticationFilter 순으로 설정
+            .addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

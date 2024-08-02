@@ -2,7 +2,6 @@ package com.sparta.goodbite.domain.review.service;
 
 import com.sparta.goodbite.common.UserCredentials;
 import com.sparta.goodbite.domain.customer.entity.Customer;
-import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.domain.review.dto.CreateReviewRequestDto;
@@ -23,7 +22,6 @@ public class ReviewService {
 
     private final RestaurantRepository restaurantRepository;
     private final ReviewRepository reviewRepository;
-    private final CustomerRepository customerRepository;
 
     @Transactional
     public void createReview(CreateReviewRequestDto createReviewRequestDto, UserCredentials user) {
@@ -40,6 +38,12 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public List<ReviewResponseDto> getAllReviews() {
         return reviewRepository.findAll().stream().map(ReviewResponseDto::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewResponseDto> getAllReviewsByRestaurantId(Long restaurantId) {
+        return reviewRepository.findAllByRestaurantId(restaurantId).stream()
+            .map(ReviewResponseDto::from).toList();
     }
 
     @Transactional

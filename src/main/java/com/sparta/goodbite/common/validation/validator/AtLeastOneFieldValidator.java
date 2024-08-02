@@ -1,7 +1,7 @@
-package com.sparta.goodbite.domain.menu.dto.validation.validator;
+package com.sparta.goodbite.common.validation.validator;
 
+import com.sparta.goodbite.common.validation.constraint.AtLeastOneFieldConstraint;
 import com.sparta.goodbite.domain.menu.dto.UpdateMenuRequestDto;
-import com.sparta.goodbite.domain.menu.dto.validation.constraint.AtLeastOneFieldConstraint;
 import io.micrometer.common.util.StringUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

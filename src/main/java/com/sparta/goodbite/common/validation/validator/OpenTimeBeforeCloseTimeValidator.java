@@ -1,8 +1,8 @@
-package com.sparta.goodbite.domain.operatinghour.dto.validation.validator;
+package com.sparta.goodbite.common.validation.validator;
 
+import com.sparta.goodbite.common.validation.constraint.OpenTimeBeforeCloseTimeConstraint;
 import com.sparta.goodbite.domain.operatinghour.dto.CreateOperatingHourRequestDto;
 import com.sparta.goodbite.domain.operatinghour.dto.UpdateOperatingHourRequestDto;
-import com.sparta.goodbite.domain.operatinghour.dto.validation.contraint.OpenTimeBeforeCloseTimeConstraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.time.LocalTime;

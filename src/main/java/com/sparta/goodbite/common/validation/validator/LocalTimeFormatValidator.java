@@ -1,6 +1,6 @@
-package com.sparta.goodbite.domain.operatinghour.dto.validation.validator;
+package com.sparta.goodbite.common.validation.validator;
 
-import com.sparta.goodbite.domain.operatinghour.dto.validation.contraint.LocalTimeFormatConstraint;
+import com.sparta.goodbite.common.validation.constraint.LocalTimeFormatConstraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.time.LocalTime;

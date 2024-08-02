@@ -1,6 +1,6 @@
-package com.sparta.goodbite.domain.menu.dto.validation.constraint;
+package com.sparta.goodbite.common.validation.constraint;
 
-import com.sparta.goodbite.domain.menu.dto.validation.validator.AtLeastOneFieldValidator;
+import com.sparta.goodbite.common.validation.validator.OpenTimeBeforeCloseTimeValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.ElementType;
@@ -8,12 +8,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Constraint(validatedBy = AtLeastOneFieldValidator.class)
+@Constraint(validatedBy = OpenTimeBeforeCloseTimeValidator.class)
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AtLeastOneFieldConstraint {
+public @interface OpenTimeBeforeCloseTimeConstraint {
 
-    String message() default "필드 중 적어도 하나는 비어 있지 않아야 합니다.";
+    String message() default "오픈 시간은 마감 시간보다 빨라야 합니다.";
 
     Class<?>[] groups() default {};
 

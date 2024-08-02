@@ -103,13 +103,8 @@ public class WaitingService {
         for (Waiting waiting : waitingList) {
             waiting.reduceWaitingOrder();
             if (waiting.getWaitingOrder() == 0) {
-
-                //--------------
-                // 알람 메서드 위치
-                //--------------
-
-                sendNotificationToCustomer(waiting.getCustomer().getId(),
-                    "가게로 들어와 주세요.");
+                // 작업 수행 후
+                messagingTemplate.convertAndSend("/topic/alerts", "작업이 완료되었습니다.");
 //                waitingRepository.delete(waiting);
                 waiting.delete(LocalDateTime.now(), WaitingStatus.SEATED);
             } else {
@@ -222,8 +217,7 @@ public class WaitingService {
                     message = "손님, 가게로 입장해 주세요.";
                     waiting.delete(LocalDateTime.now(), WaitingStatus.SEATED);
                 }
-                sendNotificationToCustomer(waiting.getCustomer().getId(), message);
-//                waitingRepository.delete(waiting);
+                messagingTemplate.convertAndSend("/topic/alerts", message);
 
                 flag = true;
             } else if (flag) {
@@ -237,10 +231,6 @@ public class WaitingService {
         }
         // 쿼리 최적화
         waitingRepository.saveAll(waitingArrayList);
-    }
-
-    private void sendNotificationToCustomer(Long customerId, String message) {
-        messagingTemplate.convertAndSend("/topic/notifications/" + customerId, message);
     }
 
     private void validateWaitingRequest(UserCredentials user, Long waitingId) {

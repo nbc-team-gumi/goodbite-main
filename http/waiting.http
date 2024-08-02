@@ -1,4 +1,4 @@
-@restaurantId = 1
+@restaurantId = 12
 @baseUrl = http://localhost:8080
 ### Passw120rd! / Passw0rd!
 
@@ -70,7 +70,7 @@ PUT {{baseUrl}}/waitings/3
 POST {{baseUrl}}/users/login
 
 {
-  "email": "testowner2@email.com",
+  "email": "testowner2@example.com",
   "password": "Passw0rd!"
 }
 

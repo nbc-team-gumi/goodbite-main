@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 // JWT 인가 필터 사용자 정의
@@ -24,15 +27,23 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final EmailUserDetailsService userDetailsService;
+    private final List<String> excludedPaths = List.of(
+        "/users/login", "/customers/signup",
+        "/owners/signup", "/admins/signup");
+    private final PathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     protected void doFilterInternal(
         HttpServletRequest req, HttpServletResponse res, FilterChain filterChain)
         throws ServletException, IOException {
 
+        String requestPath = req.getRequestURI();
         String accessToken = JwtUtil.getAccessTokenFromRequest(req);
 
-        if (accessToken == null) {
+        // 로그인, 회원가입 페이지는 통과
+        boolean isExcludePath = excludedPaths.stream()
+            .anyMatch(path -> pathMatcher.match(path, requestPath));
+        if (accessToken == null || isExcludePath) {
             filterChain.doFilter(req, res);
             return;
         }

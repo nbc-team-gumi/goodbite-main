@@ -30,6 +30,7 @@ jobs:
           DB_NAME: ${{ vars.DB_NAME }}
           DB_PORT: ${{ vars.DB_PORT }}
           JWT_SECRET_KEY: ${{ vars.JWT_SECRET_KEY }}
+          EC2_HOST: ${{ vars.EC2_HOST }}
 
 
       #      직접 사용

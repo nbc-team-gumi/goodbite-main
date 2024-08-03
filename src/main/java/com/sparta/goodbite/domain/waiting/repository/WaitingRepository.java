@@ -54,4 +54,6 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
 
     @Query("SELECT w FROM Waiting w WHERE w.id = :waitingId AND w.deletedAt IS NULL")
     Optional<Waiting> findByIdAndDeletedAtIsNull(@Param("waitingId") Long waitingId);
+
+    Page<Waiting> findByCustomerId(Long customerId, Pageable pageable);
 }

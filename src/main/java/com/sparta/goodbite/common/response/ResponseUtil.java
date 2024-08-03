@@ -71,4 +71,26 @@ public abstract class ResponseUtil {
         // 응답 데이터 반환
         response.getWriter().write(result);
     }
+
+    /**
+     * 서블릿 컨테이너를 거치지 않고 사용자에게 응답 메시지와 데이터를 반환
+     *
+     * @param response   서블릿 응답 객체
+     * @param httpStatus 응답 http 상태
+     * @param data       응답 데이터
+     * @throws IOException JSON <-> 객체 매핑 예외처리
+     */
+    public static void servletApi(HttpServletResponse response, int httpStatus, Object data)
+        throws IOException {
+        // 응답 상태 설정
+        response.setStatus(httpStatus);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("utf-8");
+
+        // 응답 데이터 설정
+        String result = new ObjectMapper().writeValueAsString(data);
+
+        // 응답 데이터 반환
+        response.getWriter().write(result);
+    }
 }

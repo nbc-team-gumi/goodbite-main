@@ -24,6 +24,11 @@ spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
 
-# WebSocket 설정
 server:
-  port: 8080
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: /home/ubuntu/goodbite/.keystore
+    key-store-password: ${SSL_KEY}
+    key-store-type: PKCS12
+    key-alias: tomcat

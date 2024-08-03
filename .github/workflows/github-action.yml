@@ -31,25 +31,11 @@ jobs:
           DB_PORT: ${{ vars.DB_PORT }}
           JWT_SECRET_KEY: ${{ vars.JWT_SECRET_KEY }}
           EC2_HOST: ${{ vars.EC2_HOST }}
-
-
-      #      직접 사용
-      #      # Docker Image 빌드
-      #      - name: Build the Docker image
-      #        run: docker build . --file docker/Dockerfile --tag ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
-      #
-      #      # Docker 로큰
-      #      - name: Login to Docker Hub using Access Token
-      #        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-      #
-      #      # 이미지 푸시
-      #      - name: Push the Docker image
-      #        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
+          SSL_KEY: ${{ secrets.SSL_KEY }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      # Github Action Test 통과선 -----
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -67,10 +53,8 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
 
-
-
   deploy-to-ec2:
-    needs: build-and-docker-push # 위의 build-and-docker-push 이 끝나고 실행
+    needs: build-and-docker-push
     runs-on: ubuntu-latest
 
     steps:
@@ -81,14 +65,21 @@ jobs:
           username: ${{ vars.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
+            # Base64로 인코딩된 keystore 파일을 디코딩하여 /home/ubuntu/goodbite/.keystore에 저장
+            echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > /home/ubuntu/goodbite/.keystore
+
+            # 권한 설정
+            sudo chmod 600 /home/ubuntu/goodbite/.keystore
+            
             CONTAINER_ID=$(sudo docker ps -q --filter "publish=8080-8080")
             
             if [ ! -z "$CONTAINER_ID" ]; then
               sudo docker stop $CONTAINER_ID
               sudo docker rm $CONTAINER_ID
             fi
-            # 여기서의 환경 변수도 여러분 상황에 맞게 작성하시면 됩니다!!!
+            
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
+            
             sudo docker run -d -p 8080:8080 \
                 -e DB_USERNAME=${{vars.DB_USERNAME}} \
                 -e DB_PASSWORD=${{vars.DB_PASSWORD}} \
@@ -96,4 +87,6 @@ jobs:
                 -e DB_NAME=${{vars.DB_NAME}} \
                 -e DB_PORT=${{vars.DB_PORT}} \
                 -e JWT_SECRET_KEY=${{vars.JWT_SECRET_KEY}} \
+                -e SSL_KEY=${{secrets.SSL_KEY}} \
+                -v /home/ubuntu/goodbite/.keystore:/path/inside/container/.keystore \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest

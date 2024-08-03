@@ -12,6 +12,7 @@ ENV DB_HOST=${DB_HOST} \
     DB_USERNAME=${DB_USERNAME} \
     DB_PASSWORD=${DB_PASSWORD} \
     JWT_SECRET_KEY=${JWT_SECRET_KEY} \
-    EC2_HOST=${EC2_HOST}
+    EC2_HOST=${EC2_HOST} \
+    SSL_KEY=${SSL_KEY}
 
 ENTRYPOINT ["java", "-jar", "/app/goodbite.jar"]

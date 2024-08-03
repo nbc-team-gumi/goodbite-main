@@ -5,6 +5,9 @@ import com.sparta.goodbite.auth.util.JwtUtil;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.connector.Connector;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -77,11 +80,31 @@ public class WebSecurityConfig {
         return new EmailLogoutSuccessHandler();
     }
 
+    // HTTPS 사용, 리디렉션
+    @Bean
+    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> servletContainer() {
+        return server -> {
+            server.addAdditionalTomcatConnectors(createHttpConnector());
+        };
+    }
+
+    private Connector createHttpConnector() {
+        Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
+        connector.setScheme("http");
+        connector.setPort(8080);
+        connector.setSecure(false);
+        connector.setRedirectPort(443);
+        return connector;
+    }
+
     // 시큐리티 필터 체인 설정 Bean 등록
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+            // HTTP -> HTTPS 리다이렉트
+            .requiresChannel(channel -> channel.anyRequest().requiresSecure())
+
             // CSRF 설정: CSRF 보호 비활성 (보안 취약)
             .csrf((csrf) -> csrf.disable())
 
@@ -126,10 +149,11 @@ public class WebSecurityConfig {
                 .authenticationEntryPoint(authenticationEntryPoint)) // 인증 실패 시 처리
 
             // 커스텀 필터 끼우기
-            // LogoutFilter -> corsFilter -> JWT 인가필터 -> JWT 인증필터 -> UsernamePasswordAuthenticationFilter 순으로 설정
+            // LogoutFilter -> SameSiteCookieFilter -> corsFilter -> JWT 인가필터 -> JWT 인증필터 -> UsernamePasswordAuthenticationFilter 순으로 설정
             .addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(corsFilter, JwtAuthorizationFilter.class);
+            .addFilterBefore(corsFilter, JwtAuthorizationFilter.class)
+            .addFilterBefore(new SameSiteCookieFilter(), CorsFilter.class);
 
         return http.build();
     }

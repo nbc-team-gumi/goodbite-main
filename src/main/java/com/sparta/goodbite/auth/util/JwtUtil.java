@@ -63,10 +63,15 @@ public final class JwtUtil {
             cookie.setDomain(JwtConfig.serverIp);
             cookie.setPath("/");
             cookie.setHttpOnly(true); // 클라이언트 JavaScript 에서 쿠키 접근 불가
-            //cookie.setSecure(true); // HTTPS 사용 시 Secure 설정
+            cookie.setSecure(true); // HTTPS를 통해서만 전송
 
             // Response 객체에 Cookie 추가
             res.addCookie(cookie);
+
+//            // SameSite 설정 을 위한 Set-Cookie 설정
+//            res.addHeader("Set-Cookie",
+//                String.format("%s=%s; Path=/; HttpOnly; Secure; SameSite=None",
+//                    AUTHORIZATION_HEADER, URLEncoder.encode(token, "UTF-8")));
 
         } catch (UnsupportedEncodingException e) {
             log.error(e.getMessage());

@@ -28,7 +28,19 @@ server:
   port: 8443
   ssl:
     enabled: true
-    key-store: /home/ubuntu/goodbite/.keystore
+    key-store: classpath:.keystore
     key-store-password: ${SSL_KEY}
     key-store-type: PKCS12
     key-alias: tomcat
+
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    com.sparta.goodbite: DEBUG
+  file:
+    name: /var/log/goodbite/application.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

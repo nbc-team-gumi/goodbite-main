@@ -77,24 +77,6 @@ public class WebSecurityConfig {
         return new EmailLogoutSuccessHandler();
     }
 
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//
-//        // 출처 허용
-//        configuration.addAllowedOrigin("http://localhost:8080");
-//        // 모든 http 메서드 허용
-//        configuration.addAllowedMethod("*");
-//        // 모든 헤더 허용
-//        configuration.addAllowedHeader("*");
-//        // 자격 증명 허용
-//        configuration.setAllowCredentials(true);
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//        return source;
-//    }
-
     // 시큐리티 필터 체인 설정 Bean 등록
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -106,10 +88,6 @@ public class WebSecurityConfig {
             // CSRF 설정: 로그인 엔드포인트에 대해 CSRF 보호 비활성화
             //.csrf(csrf -> csrf
             //.ignoringRequestMatchers("/users/login"));
-
-            // CORS 설정
-//            .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
-            .addFilterBefore(corsFilter, JwtAuthorizationFilter.class)
 
             // 세션을 사용하지 않도록 정책 STATELESS 로 변경
             .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(
@@ -150,7 +128,8 @@ public class WebSecurityConfig {
             // 커스텀 필터 끼우기
             // LogoutFilter -> corsFilter -> JWT 인가필터 -> JWT 인증필터 -> UsernamePasswordAuthenticationFilter 순으로 설정
             .addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class)
-            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(corsFilter, JwtAuthorizationFilter.class);
 
         return http.build();
     }

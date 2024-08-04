@@ -5,13 +5,14 @@ import com.sparta.goodbite.exception.auth.AuthErrorCode;
 import com.sparta.goodbite.exception.auth.detail.InvalidRefreshTokenException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
 
     public void updateAccessToken(HttpServletRequest request,
-        HttpServletResponse response) {
+        HttpServletResponse response) throws UnsupportedEncodingException {
         String refreshToken = JwtUtil.getRefreshTokenFromRequest(request);
 
         // 리프레시 토큰이 만료되거나 존재하지 않습니다.
@@ -31,6 +32,6 @@ public class AuthService {
         String authority = JwtUtil.getAuthorityFromToken(refreshToken);
 
         String newAccessToken = JwtUtil.createAccessToken(email, authority);
-        JwtUtil.addJwtToCookie(newAccessToken, response);
+        JwtUtil.addJwtToHeader(newAccessToken, response);
     }
 }

@@ -5,6 +5,7 @@ import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,7 @@ public class AuthController {
 
     @PostMapping("/users/refresh")
     public ResponseEntity<MessageResponseDto> updateAccessToken(HttpServletRequest request,
-        HttpServletResponse response) {
+        HttpServletResponse response) throws UnsupportedEncodingException {
         authService.updateAccessToken(request, response);
         return ResponseUtil.createOk();
     }

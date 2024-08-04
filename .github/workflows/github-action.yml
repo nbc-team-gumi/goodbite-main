@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ dev ]
+    branches: [ 178-bug-쿠키-대신-헤더를-사용하도록-수정 ]
 
 env:
   DOCKER_IMAGE_TAG_NAME: good-bite

@@ -41,6 +41,29 @@ public final class JwtUtil {
         return createToken(email, authority, 1000L * 60 * 60 * 24 * 7); // 7일
     }
 
+    // JWT Header 에 저장
+    public static void addJwtToHeader(String token, HttpServletResponse res)
+        throws UnsupportedEncodingException {
+        try {
+            // 토큰 종류 확인
+            if (isAccessToken(token)) {
+                // 인코딩 사용 이유:
+                // Cookie Value 에는 공백 포함 불가
+                // URLEncoder.encode(): 공백 -> '+'으로 인코딩
+                // 퍼센트('%') 인코딩으로 변환
+                token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
+
+                // 응답 헤더에 JWT 추가
+                res.setHeader(AUTHORIZATION_HEADER, token);
+            } else {
+                res.setHeader(REFRESH_HEADER, token); // Name-Value
+            }
+
+        } catch (UnsupportedEncodingException e) {
+            log.error(e.getMessage());
+        }
+    }
+
     // JWT Cookie 에 저장
     public static void addJwtToCookie(String token, HttpServletResponse res) {
         try {
@@ -127,38 +150,64 @@ public final class JwtUtil {
 
     // HttpServletRequest 에서 Cookie Value : Access Token 가져오기
     public static String getAccessTokenFromRequest(HttpServletRequest req) {
-        Cookie[] cookies = req.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
-                    try {
-                        return URLDecoder.decode(cookie.getValue(),
-                            "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
-                    } catch (UnsupportedEncodingException e) {
-                        return null;
-                    }
-                }
-            }
+        // 헤더에서 REFRESH_HEADER 정보를 가져옴
+        String accessToken = req.getHeader(AUTHORIZATION_HEADER);
+
+        if (accessToken == null) {
+            return null;
         }
-        return null;
+
+        try {
+            return URLDecoder.decode(accessToken, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
+
+//        Cookie[] cookies = req.getCookies();
+//        if (cookies != null) {
+//            for (Cookie cookie : cookies) {
+//                if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
+//                    try {
+//                        return URLDecoder.decode(cookie.getValue(),
+//                            "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
+//                    } catch (UnsupportedEncodingException e) {
+//                        return null;
+//                    }
+//                }
+//            }
+//        }
+//        return null;
     }
 
     // HttpServletRequest 에서 Cookie Value : Refresh Token 가져오기
     public static String getRefreshTokenFromRequest(HttpServletRequest req) {
-        Cookie[] cookies = req.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(REFRESH_HEADER)) {
-                    try {
-                        return URLDecoder.decode(cookie.getValue(),
-                            "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
-                    } catch (UnsupportedEncodingException e) {
-                        return null;
-                    }
-                }
-            }
+        // 헤더에서 REFRESH_HEADER 정보를 가져옴
+        String refreshToken = req.getHeader(REFRESH_HEADER);
+
+        if (refreshToken == null) {
+            return null;
         }
-        return null;
+
+        try {
+            return URLDecoder.decode(refreshToken, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
+
+//        Cookie[] cookies = req.getCookies();
+//        if (cookies != null) {
+//            for (Cookie cookie : cookies) {
+//                if (cookie.getName().equals(REFRESH_HEADER)) {
+//                    try {
+//                        return URLDecoder.decode(cookie.getValue(),
+//                            "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
+//                    } catch (UnsupportedEncodingException e) {
+//                        return null;
+//                    }
+//                }
+//            }
+//        }
+//        return null;
     }
 
     // JWT 추출 (Bearer 제거)

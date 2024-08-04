@@ -13,11 +13,13 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
+
+        config.setAllowCredentials(true); // 자격 증명 허용
+        config.addAllowedOrigin("http://localhost:3000"); // 프론트엔드
+        config.addAllowedHeader("*"); // 모든 헤더 허용
+        config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
         source.registerCorsConfiguration("/**", config);
+
         return new CorsFilter(source);
     }
 }

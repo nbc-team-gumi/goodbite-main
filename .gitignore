@@ -39,3 +39,4 @@ out/
 ### AWS ###
 dev-goodbite-key.pem
 goodbite-server.pem
+.keystore

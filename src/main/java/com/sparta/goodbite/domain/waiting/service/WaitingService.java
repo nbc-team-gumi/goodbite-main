@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -44,9 +45,10 @@ public class WaitingService {
     private final CustomerRepository customerRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final OwnerRepository ownerRepository;
-
     private final Map<Long, SseEmitter> emitters = new HashMap<>();
     private final Map<Long, Integer> waitingList = new HashMap<>();
+    @Autowired
+    private NotificationService notificationService;
 
     public WaitingResponseDto createWaiting(UserCredentials user,
         PostWaitingRequestDto postWaitingRequestDto) {
@@ -71,6 +73,8 @@ public class WaitingService {
 
         waitingRepository.save(waiting);
 
+        String message = "웨이팅이 등록되었습니다.";
+        notificationService.sendCustomerNotification(waiting.getCustomer().getEmail(), message);
         return WaitingResponseDto.of(waiting);
     }
 
@@ -103,9 +107,17 @@ public class WaitingService {
         for (Waiting waiting : waitingList) {
             waiting.reduceWaitingOrder();
             if (waiting.getWaitingOrder() == 0) {
-                // 작업 수행 후
-                messagingTemplate.convertAndSend("/topic/alerts", "작업이 완료되었습니다.");
-//                waitingRepository.delete(waiting);
+                String message = "손님, 가게로 입장해 주세요.";
+                Long userId = waiting.getCustomer().getId();
+                notificationService.sendCustomerNotification(waiting.getCustomer().getEmail(),
+                    message);
+
+////                notificationService.sendNotification(userId.toString(), message);
+//                messagingTemplate.convertAndSendToUser(userId.toString(), "/queue/alerts", message);
+//
+//                // 작업 수행 후
+//                messagingTemplate.convertAndSend("/topic/alerts", "손님, 가게로 입장해 주세요.");
+
                 waiting.delete(LocalDateTime.now(), WaitingStatus.SEATED);
             } else {
                 waitingArrayList.add(waiting);
@@ -205,19 +217,18 @@ public class WaitingService {
 
         for (Waiting waiting : waitingList) {
             if (Objects.equals(waiting.getId(), waitingId)) {
-
-                //--------------
-                // 알람 메서드 위치
-                //--------------
-
+                Long userId = waiting.getCustomer().getId();
                 if (type.equals("delete")) {
                     message = "웨이팅이 취소되었습니다.";
                     waiting.delete(LocalDateTime.now(), WaitingStatus.CANCELLED);
+                    notificationService.sendCustomerNotification(waiting.getCustomer().getEmail(),
+                        message);
                 } else if (type.equals("reduce")) {
                     message = "손님, 가게로 입장해 주세요.";
                     waiting.delete(LocalDateTime.now(), WaitingStatus.SEATED);
+                    notificationService.sendCustomerNotification(waiting.getCustomer().getEmail(),
+                        message);
                 }
-                messagingTemplate.convertAndSend("/topic/alerts", message);
 
                 flag = true;
             } else if (flag) {

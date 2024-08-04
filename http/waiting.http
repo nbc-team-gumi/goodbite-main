@@ -6,7 +6,7 @@
 POST {{baseUrl}}/users/login
 
 {
-  "email": "testuser3@example.com",
+  "email": "testuser8@example.com",
   "password": "Passw0rd!"
 }
 
@@ -14,6 +14,16 @@ POST {{baseUrl}}/users/login
   client.global.set("accessToken", response.cookies["Authorization"].value);
   client.global.set("refreshToken", response.cookies["Refresh"].value);
 %}
+
+### err
+GET http://localhost:8080/ws/info?t=1722758619450
+
+### 손님 정보 요청
+GET {{baseUrl}}/ws
+
+### 손님 정보 요청
+GET {{baseUrl}}/customers
+
 
 
 ### Waiting 손님이 등록

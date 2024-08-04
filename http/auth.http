@@ -4,7 +4,7 @@
 POST {{baseUrl}}/users/login
 
 {
-  "email": "testuser1@example.com",
+  "email": "testuser7@example.com",
   "password": "Passw0rd!"
 }
 

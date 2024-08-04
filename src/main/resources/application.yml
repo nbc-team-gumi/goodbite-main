@@ -1,6 +1,15 @@
 spring:
+  web:
+    cors:
+      allowed-origins: "http://localhost:3000" # 명시적으로 허용할 도메인 설정
+      allowed-methods: "*"
+      allowed-headers: "*"
+      allow-credentials: true
+  websocket:
+    time-to-live: 60s # 웹소켓 연결의 타임아웃 설정 (기본적으로는 설정할 수 없으나, 사용자 정의 설정을 통해 조정할 수 있습니다.)
   application:
     name: goodbite
+
 
   profiles:
     active: test
@@ -21,9 +30,10 @@ spring:
         use_sql_comments: true
         dialect: org.hibernate.dialect.MySQLDialect
 
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
-
 # WebSocket 설정
 server:
+  servlet:
+    session:
+      timeout: 30m # 세션 타임아웃 설정
   port: 8080
+

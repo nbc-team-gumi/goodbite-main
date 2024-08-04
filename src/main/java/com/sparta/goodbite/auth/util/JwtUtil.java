@@ -54,9 +54,9 @@ public final class JwtUtil {
                 token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
 
                 // 응답 헤더에 JWT 추가
-                res.setHeader(AUTHORIZATION_HEADER, token);
+                res.addHeader(AUTHORIZATION_HEADER, token);
             } else {
-                res.setHeader(REFRESH_HEADER, token);
+                res.addHeader(REFRESH_HEADER, token);
             }
             System.out.println(token);
 

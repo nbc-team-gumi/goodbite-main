@@ -108,7 +108,9 @@ public class WebSecurityConfig {
             .cors(withDefaults())
 
             // HTTP -> HTTPS 리다이렉트
-            .requiresChannel(channel -> channel.anyRequest().requiresSecure())
+            .requiresChannel(channel -> channel
+                .anyRequest().requiresSecure()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").requiresInsecure())
 
             // CSRF 설정: CSRF 보호 비활성 (보안 취약)
             .csrf((csrf) -> csrf.disable())

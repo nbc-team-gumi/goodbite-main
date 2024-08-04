@@ -22,7 +22,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Decode keystore and save
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > src/main/resources/.keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > src/main/resources/goodbite.p12
 
       - name: Build with Gradle
         run: ./gradlew clean build
@@ -68,10 +68,10 @@ jobs:
           username: ${{ vars.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > /home/ubuntu/goodbite/.keystore
+            echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > /home/ubuntu/goodbite/goodbite.p12
 
             # 권한 설정
-            sudo chmod 600 /home/ubuntu/goodbite/.keystore
+            sudo chmod 600 /home/ubuntu/goodbite/goodbite.p12
             
             CONTAINER_ID=$(sudo docker ps -q --filter "publish=8080-8080")
             
@@ -90,5 +90,5 @@ jobs:
                 -e DB_PORT=${{vars.DB_PORT}} \
                 -e JWT_SECRET_KEY=${{vars.JWT_SECRET_KEY}} \
                 -e SSL_KEY=${{secrets.SSL_KEY}} \
-                -v /home/ubuntu/goodbite/.keystore:/path/inside/container/.keystore \
+                -v /home/ubuntu/goodbite/goodbite.p12:/path/inside/container/goodbite.p12 \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest

@@ -28,12 +28,10 @@ server:
   port: 8443
   ssl:
     enabled: true
-    key-store: classpath:.keystore
+    key-store: classpath:goodbite.p12
     key-store-password: ${SSL_KEY}
     key-store-type: PKCS12
-    key-alias: tomcat
-  http:
-    port: 8080
+    key-alias: goodbite
 
 logging:
   level:

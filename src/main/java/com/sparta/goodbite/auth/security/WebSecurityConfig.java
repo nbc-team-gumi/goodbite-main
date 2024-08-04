@@ -106,7 +106,7 @@ public class WebSecurityConfig {
         http
             // CORS 설정
             .cors(withDefaults())
-            
+
             // HTTP -> HTTPS 리다이렉트
             .requiresChannel(channel -> channel.anyRequest().requiresSecure())
 
@@ -124,6 +124,7 @@ public class WebSecurityConfig {
             // 인가 설정
             .authorizeHttpRequests(
                 (authorizeHttpRequests) -> authorizeHttpRequests
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 프리플라이트 요청 허용
                     .requestMatchers("/", "/owners/signup", "/customers/signup", "/users/login",
                         "/users/refresh",
                         "/error")

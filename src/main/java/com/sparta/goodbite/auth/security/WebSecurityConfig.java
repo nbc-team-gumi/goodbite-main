@@ -109,8 +109,8 @@ public class WebSecurityConfig {
 
             // HTTP -> HTTPS 리다이렉트
             .requiresChannel(channel -> channel
-                .anyRequest().requiresSecure()
-                .requestMatchers(HttpMethod.OPTIONS, "/**").requiresInsecure())
+                .requestMatchers(HttpMethod.OPTIONS, "/**").requiresInsecure()
+                .anyRequest().requiresSecure())
 
             // CSRF 설정: CSRF 보호 비활성 (보안 취약)
             .csrf((csrf) -> csrf.disable())
@@ -128,8 +128,7 @@ public class WebSecurityConfig {
                 (authorizeHttpRequests) -> authorizeHttpRequests
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 프리플라이트 요청 허용
                     .requestMatchers("/", "/owners/signup", "/customers/signup", "/users/login",
-                        "/users/refresh",
-                        "/error")
+                        "/users/refresh", "/error")
                     .permitAll()
                     .requestMatchers("/admins/**").hasRole(UserRole.ADMIN.name())
                     .requestMatchers("/owners/**").hasRole(UserRole.OWNER.name())

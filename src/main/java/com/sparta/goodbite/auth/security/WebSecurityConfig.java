@@ -1,5 +1,7 @@
 package com.sparta.goodbite.auth.security;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import com.sparta.goodbite.auth.UserRole;
 import com.sparta.goodbite.auth.util.JwtUtil;
 import jakarta.validation.Validation;
@@ -102,6 +104,9 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+            // CORS 설정
+            .cors(withDefaults())
+            
             // HTTP -> HTTPS 리다이렉트
             .requiresChannel(channel -> channel.anyRequest().requiresSecure())
 

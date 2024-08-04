@@ -30,8 +30,9 @@ jobs:
           DB_NAME: ${{ vars.DB_NAME }}
           DB_PORT: ${{ vars.DB_PORT }}
           JWT_SECRET_KEY: ${{ vars.JWT_SECRET_KEY }}
+          PUBLIC_DATA_KEY: ${{ secrets.PUBLIC_DATA_KEY }}
           EC2_HOST: ${{ vars.EC2_HOST }}
-
+          
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -65,7 +66,7 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             CONTAINER_ID=$(sudo docker ps -q --filter "publish=8080-8080")
-            
+
             if [ ! -z "$CONTAINER_ID" ]; then
             sudo docker stop $CONTAINER_ID
             sudo docker rm $CONTAINER_ID
@@ -80,4 +81,6 @@ jobs:
             -e DB_NAME=${{vars.DB_NAME}} \
             -e DB_PORT=${{vars.DB_PORT}} \
             -e JWT_SECRET_KEY=${{vars.JWT_SECRET_KEY}} \
+            -e PUBLIC_DATA_KEY=${{secrets.PUBLIC_DATA_KEY}} \
+
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest

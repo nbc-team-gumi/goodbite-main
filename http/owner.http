@@ -5,11 +5,11 @@ POST {{baseUrl}}/signup
 Content-Type: application/json
 
 {
-  "email": "testowner2@email.com",
-  "nickname": "가게2",
+  "email": "testowner4@email.com",
+  "nickname": "가게4",
   "password": "Passw0rd!",
-  "phoneNumber": "010-0001-2200",
-  "businessNumber": "3212653012"
+  "phoneNumber": "010-0004-4400",
+  "businessNumber": "7838601715"
 }
 
 ### 회원정보조회
@@ -20,7 +20,7 @@ PATCH {{baseUrl}}/nickname
 Content-Type: application/json
 
 {
-  "newNickname": "가게0001"
+  "newNickname": "가게0431"
 }
 
 ### 회원정보수정-전화번호
@@ -28,7 +28,7 @@ PATCH {{baseUrl}}/phone-number
 Content-Type: application/json
 
 {
-  "newPhoneNumber": "010-1012-0000"
+  "newPhoneNumber": "010-1034-0000"
 }
 
 ### 회원정보수정-비밀번호

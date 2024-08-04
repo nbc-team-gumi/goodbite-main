@@ -1,7 +1,6 @@
 package com.sparta.goodbite.domain.owner.service;
 
 import com.sparta.goodbite.common.UserCredentials;
-import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
 import com.sparta.goodbite.domain.owner.dto.OwnerResponseDto;
 import com.sparta.goodbite.domain.owner.dto.OwnerSignUpRequestDto;
 import com.sparta.goodbite.domain.owner.dto.UpdateBusinessNumberRequestDto;
@@ -9,6 +8,7 @@ import com.sparta.goodbite.domain.owner.dto.UpdateOwnerNicknameRequestDto;
 import com.sparta.goodbite.domain.owner.dto.UpdateOwnerPasswordRequestDto;
 import com.sparta.goodbite.domain.owner.dto.UpdateOwnerPhoneNumberRequestDto;
 import com.sparta.goodbite.domain.owner.entity.Owner;
+import com.sparta.goodbite.domain.owner.entity.OwnerStatus;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.exception.owner.OwnerErrorCode;
 import com.sparta.goodbite.exception.owner.detail.InvalidBusinessNumberException;
@@ -27,7 +27,7 @@ public class OwnerService {
 
     private final OwnerRepository ownerRepository;
     private final PasswordEncoder passwordEncoder;
-    private final CustomerRepository customerRepository;
+    private final BusinessVerificationService businessVerificationService;
 
     //가입
     @Transactional
@@ -35,8 +35,19 @@ public class OwnerService {
         validateDuplicateFields(requestDto.getNickname(), requestDto.getEmail(),
             requestDto.getPhoneNumber(), requestDto.getBusinessNumber());
 
+        // 사업자 등록번호 유효성 검사
+        boolean isValidBusinessNumber = businessVerificationService.verifyBusinessNumber(
+            requestDto.getBusinessNumber());
+        if (!isValidBusinessNumber) {
+            throw new InvalidBusinessNumberException(OwnerErrorCode.INVALID_BUSINESS_NUMBER);
+        }
+
         // 비밀번호 암호화 -> 인증인가연결시 config에서 PasswordEncoder Bean등록
         String password = passwordEncoder.encode(requestDto.getPassword());
+
+        // OwnerStatus 설정 -> isValidBusinessNumber값이 참이면 인증상태로 설정
+        OwnerStatus ownerStatus =
+            isValidBusinessNumber ? OwnerStatus.VERIFIED : OwnerStatus.UNVERIFIED;
 
         // User DB에 저장
         Owner owner = Owner.builder()
@@ -45,6 +56,7 @@ public class OwnerService {
             .password(password)
             .phoneNumber(requestDto.getPhoneNumber())
             .businessNumber(requestDto.getBusinessNumber())
+            .ownerStatus(ownerStatus)
             .build();
 
         ownerRepository.save(owner);
@@ -86,25 +98,28 @@ public class OwnerService {
     public void updateBusinessNumber(UpdateBusinessNumberRequestDto requestDto,
         UserCredentials user) {
         String newBusinessNumber = requestDto.getNewBusinessNumber();
+        // UserCredential타입의 객체를 Owner타입으로 캐스팅
+        Owner owner = (Owner) user;
 
         // 사업자 등록번호 유효성 검사
-        if (!isValidBusinessNumber(newBusinessNumber)) {
+        boolean isValidBusinessNumber = businessVerificationService.verifyBusinessNumber(
+            newBusinessNumber);
+        if (!isValidBusinessNumber) {
             throw new InvalidBusinessNumberException(OwnerErrorCode.INVALID_BUSINESS_NUMBER);
         }
 
         ownerRepository.validateDuplicateBusinessNumber(requestDto.getNewBusinessNumber());
 
-        // UserCredential타입의 객체를 Owner타입으로 캐스팅
-        Owner owner = (Owner) user;
-
         // 사업자번호 업데이트
         owner.updateBusinessNumber(newBusinessNumber);
 
+        // 사업자번호 인증상태 업데이트-> isValidBusinessNumber가 참이어야 인증상태로 설정
+        owner.updateOwnerStatus(
+            isValidBusinessNumber ? OwnerStatus.VERIFIED : OwnerStatus.UNVERIFIED);
+
         // 명시적으로 저장
         ownerRepository.save(owner);
-        
-        // 비즈니스 로직 추가 필요
-        //사업자번호 인증상태 미인증으로 변환
+
     }
 
     // 수정-비밀번호
@@ -155,26 +170,4 @@ public class OwnerService {
         ownerRepository.validateDuplicateBusinessNumber(businessNumber);
     }
 
-    //유효하지 않은 사업자 등록번호를 사전에 필터링
-    private boolean isValidBusinessNumber(String businessNumber) {
-        //dto에서 유효성검사를 하고 들어오긴하지만 일단은 체크
-        if (businessNumber == null || businessNumber.length() != 10) {
-            return false;
-        }
-
-        //인증키
-        int[] checkArr = {1, 3, 7, 1, 3, 7, 1, 3, 1};
-        int sum = 0;
-
-        for (int i = 0; i < 9; i++) {
-            sum += (businessNumber.charAt(i) - '0') * checkArr[i];
-        }
-
-        sum += ((businessNumber.charAt(8) - '0') * 5) / 10;
-        int remainder = sum % 10;
-        int checkDigit = (10 - remainder) % 10;
-
-        //계산된 체크 디지트와 사업자 등록번호의 마지막 자리 숫자가 일치하는지 비교
-        return checkDigit == (businessNumber.charAt(9) - '0');
-    }
 }

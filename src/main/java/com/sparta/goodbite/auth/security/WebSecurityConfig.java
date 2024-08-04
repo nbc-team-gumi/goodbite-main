@@ -100,7 +100,7 @@ public class WebSecurityConfig {
 
         http
             // HTTP -> HTTPS 리다이렉트
-            .requiresChannel(channel -> channel.anyRequest().requiresSecure())
+//            .requiresChannel(channel -> channel.anyRequest().requiresSecure())
 
             // CSRF 설정: CSRF 보호 비활성 (보안 취약)
             .csrf((csrf) -> csrf.disable())
@@ -149,8 +149,8 @@ public class WebSecurityConfig {
             // LogoutFilter -> SameSiteCookieFilter -> corsFilter -> JWT 인가필터 -> JWT 인증필터 -> UsernamePasswordAuthenticationFilter 순으로 설정
             .addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(corsFilter, JwtAuthorizationFilter.class)
-            .addFilterBefore(new SameSiteCookieFilter(), CorsFilter.class);
+            .addFilterBefore(corsFilter, JwtAuthorizationFilter.class);
+//            .addFilterBefore(new SameSiteCookieFilter(), CorsFilter.class);
 
         return http.build();
     }

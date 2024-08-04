@@ -60,10 +60,12 @@ public final class JwtUtil {
                 cookie = new Cookie(REFRESH_HEADER, token); // Name-Value
             }
             log.debug("URL encoding: {}", token);
-            cookie.setDomain(JwtConfig.serverIp);
+//            cookie.setDomain(JwtConfig.serverIp);
             cookie.setPath("/");
-            cookie.setHttpOnly(true); // 클라이언트 JavaScript 에서 쿠키 접근 불가
-            cookie.setSecure(true); // HTTPS를 통해서만 전송
+//            cookie.setHttpOnly(true); // 클라이언트 JavaScript 에서 쿠키 접근 불가
+//            cookie.setSecure(true); // HTTPS를 통해서만 전송
+            cookie.setSecure(false); // HTTP에서도 사용 가능
+            cookie.setAttribute("SameSite", "Lax"); // SameSite 속성 Lax
 
             // Response 객체에 Cookie 추가
             res.addCookie(cookie);

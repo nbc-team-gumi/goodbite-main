@@ -20,27 +20,3 @@ spring:
         format_sql: true
         use_sql_comments: true
         dialect: org.hibernate.dialect.MySQLDialect
-
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
-
-server:
-  port: 443
-  ssl:
-    enabled: true
-    key-store: classpath:goodbite.p12
-    key-store-password: ${SSL_KEY}
-    key-store-type: PKCS12
-    key-alias: goodbite
-
-
-logging:
-  level:
-    root: INFO
-    org.springframework: INFO
-    com.sparta.goodbite: DEBUG
-  file:
-    name: /var/log/goodbite/application.log
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

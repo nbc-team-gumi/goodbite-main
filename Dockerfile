@@ -4,7 +4,7 @@ LABEL authors="white"
 
 COPY build/libs/goodbite-0.0.1-SNAPSHOT.jar /app/goodbite.jar
 
-EXPOSE 443
+EXPOSE 8080
 
 ENV DB_HOST=${DB_HOST} \
     DB_PORT=${DB_PORT} \
@@ -12,7 +12,6 @@ ENV DB_HOST=${DB_HOST} \
     DB_USERNAME=${DB_USERNAME} \
     DB_PASSWORD=${DB_PASSWORD} \
     JWT_SECRET_KEY=${JWT_SECRET_KEY} \
-    EC2_HOST=${EC2_HOST} \
-    SSL_KEY=${SSL_KEY}
+    EC2_HOST=${EC2_HOST}
 
 ENTRYPOINT ["java", "-jar", "/app/goodbite.jar"]

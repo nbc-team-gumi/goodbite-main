@@ -56,8 +56,9 @@ public final class JwtUtil {
                 // 응답 헤더에 JWT 추가
                 res.setHeader(AUTHORIZATION_HEADER, token);
             } else {
-                res.setHeader(REFRESH_HEADER, token); // Name-Value
+                res.setHeader(REFRESH_HEADER, token);
             }
+            System.out.println(token);
 
         } catch (UnsupportedEncodingException e) {
             log.error(e.getMessage());

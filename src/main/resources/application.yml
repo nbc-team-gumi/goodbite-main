@@ -25,7 +25,7 @@ spring:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
 
 server:
-  port: 8443
+  port: 443
   ssl:
     enabled: true
     key-store: classpath:goodbite.p12

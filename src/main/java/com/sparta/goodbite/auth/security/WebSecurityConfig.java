@@ -5,9 +5,6 @@ import com.sparta.goodbite.auth.util.JwtUtil;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.connector.Connector;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -81,21 +78,21 @@ public class WebSecurityConfig {
     }
 
     // HTTPS 사용, 리디렉션
-    @Bean
-    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> servletContainer() {
-        return server -> {
-            server.addAdditionalTomcatConnectors(createHttpConnector());
-        };
-    }
-
-    private Connector createHttpConnector() {
-        Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
-        connector.setScheme("http");
-        connector.setPort(8080);
-        connector.setSecure(false);
-        connector.setRedirectPort(443);
-        return connector;
-    }
+//    @Bean
+//    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> servletContainer() {
+//        return server -> {
+//            server.addAdditionalTomcatConnectors(createHttpConnector());
+//        };
+//    }
+//
+//    private Connector createHttpConnector() {
+//        Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
+//        connector.setScheme("http");
+//        connector.setPort(8080);
+//        connector.setSecure(false);
+//        connector.setRedirectPort(443);
+//        return connector;
+//    }
 
     // 시큐리티 필터 체인 설정 Bean 등록
     @Bean

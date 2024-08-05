@@ -49,6 +49,8 @@ public class WaitingService {
     private final Map<Long, Integer> waitingList = new HashMap<>();
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private AlarmService alarmService;
 
     public WaitingResponseDto createWaiting(UserCredentials user,
         PostWaitingRequestDto postWaitingRequestDto) {
@@ -75,6 +77,8 @@ public class WaitingService {
 
         String message = "웨이팅이 등록되었습니다.";
         notificationService.sendCustomerNotification(waiting.getCustomer().getEmail(), message);
+        alarmService.alarmByMessage(waiting.getCustomer().getEmail(), message);
+        notificationService.handleSendNotification(waiting.getCustomer().getEmail(), message);
         return WaitingResponseDto.of(waiting);
     }
 
@@ -110,6 +114,9 @@ public class WaitingService {
                 String message = "손님, 가게로 입장해 주세요.";
                 Long userId = waiting.getCustomer().getId();
                 notificationService.sendCustomerNotification(waiting.getCustomer().getEmail(),
+                    message);
+                alarmService.alarmByMessage(waiting.getCustomer().getEmail(), message);
+                notificationService.handleSendNotification(waiting.getCustomer().getEmail(),
                     message);
 
 ////                notificationService.sendNotification(userId.toString(), message);
@@ -223,10 +230,16 @@ public class WaitingService {
                     waiting.delete(LocalDateTime.now(), WaitingStatus.CANCELLED);
                     notificationService.sendCustomerNotification(waiting.getCustomer().getEmail(),
                         message);
+                    alarmService.alarmByMessage(waiting.getCustomer().getEmail(), message);
+                    notificationService.handleSendNotification(waiting.getCustomer().getEmail(),
+                        message);
                 } else if (type.equals("reduce")) {
                     message = "손님, 가게로 입장해 주세요.";
                     waiting.delete(LocalDateTime.now(), WaitingStatus.SEATED);
                     notificationService.sendCustomerNotification(waiting.getCustomer().getEmail(),
+                        message);
+                    alarmService.alarmByMessage(waiting.getCustomer().getEmail(), message);
+                    notificationService.handleSendNotification(waiting.getCustomer().getEmail(),
                         message);
                 }
 

@@ -5,13 +5,11 @@ import com.sparta.goodbite.exception.waiting.WaitingErrorCode;
 import com.sparta.goodbite.exception.waiting.WaitingException;
 import com.sparta.goodbite.exception.waiting.detail.WaitingCanNotDuplicatedException;
 import com.sparta.goodbite.exception.waiting.detail.WaitingNotFoundException;
-import jakarta.persistence.LockModeType;
 import java.util.ArrayList;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -40,7 +38,6 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
     @Query("SELECT w FROM Waiting w WHERE w.restaurant.id = :restaurantId AND w.deletedAt IS NULL")
     Page<Waiting> findByRestaurantId(Long restaurantId, Pageable pageable);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     default void validateRestaurantIdAndCustomerId(Long restaurantId, Long customerId) {
         findByRestaurantIdAndCustomerId(restaurantId, customerId).ifPresent(_waiting -> {
             throw new WaitingCanNotDuplicatedException(WaitingErrorCode.WAITING_DUPLICATED);

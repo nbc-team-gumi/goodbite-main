@@ -30,6 +30,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -42,7 +43,7 @@ public class WaitingService {
     private final SimpMessagingTemplate messagingTemplate;
     private final OwnerRepository ownerRepository;
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public WaitingResponseDto createWaiting(UserCredentials user,
         PostWaitingRequestDto postWaitingRequestDto) {
 

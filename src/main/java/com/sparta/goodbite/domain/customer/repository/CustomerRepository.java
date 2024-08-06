@@ -6,8 +6,10 @@ import com.sparta.goodbite.exception.customer.detail.CustomerNotFoundException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateEmailException;
 import com.sparta.goodbite.exception.customer.detail.DuplicateNicknameException;
 import com.sparta.goodbite.exception.customer.detail.DuplicatePhoneNumberException;
+import jakarta.persistence.LockModeType;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
@@ -17,6 +19,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     Optional<Customer> findByPhoneNumber(String phoneNumber);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     default Customer findByIdOrThrow(Long customerId) {
         return findById(customerId).orElseThrow(
             () -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND));

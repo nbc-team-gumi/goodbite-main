@@ -47,9 +47,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             filterChain.doFilter(req, res);
             return;
         }
-
+        System.out.println("before substring: " + accessToken);
         // prefix 제거
         accessToken = JwtUtil.substringToken(accessToken);
+        System.out.println("after substring: " + accessToken);
 
         // 유효하지 않은 액세스 토큰
         try {

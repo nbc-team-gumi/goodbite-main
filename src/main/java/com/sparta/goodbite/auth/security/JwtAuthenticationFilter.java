@@ -108,8 +108,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String accessToken = JwtUtil.createAccessToken(email, role);
         String refreshToken = JwtUtil.createRefreshToken(email, role);
 
-        JwtUtil.addJwtToCookie(accessToken, response);
-        JwtUtil.addJwtToCookie(refreshToken, response);
+        JwtUtil.addJwtToHeader(accessToken, response);
+        JwtUtil.addJwtToHeader(refreshToken, response);
 
         // 사용자 역할 정보를 포함한 응답 생성
         LoginSuccessResponseDto responseDto = LoginSuccessResponseDto.from("로그인 성공", role);

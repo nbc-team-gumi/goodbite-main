@@ -66,6 +66,9 @@ dependencies {
     runtimeOnly 'mysql:mysql-connector-java'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
+    // Gradle
+    implementation 'org.redisson:redisson:3.16.4'
+
 }
 
 tasks.named('test') {

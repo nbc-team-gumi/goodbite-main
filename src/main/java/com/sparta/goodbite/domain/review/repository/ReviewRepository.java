@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    List<Review> findAllByRestaurantId(Long RestaurantId);
+    List<Review> findAllByRestaurantId(Long restaurantId);
+    
+    List<Review> findAllByCustomerId(Long customerId);
 
     default Review findByIdOrThrow(Long reviewId) {
         return findById(reviewId).orElseThrow(

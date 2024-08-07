@@ -18,6 +18,8 @@ public class CorsConfig {
         config.addAllowedOrigin("http://localhost:3000"); // 프론트엔드
         config.addAllowedHeader("*"); // 모든 헤더 허용
         config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
+        config.addExposedHeader("Authorization"); // 추가: Authorization 헤더 노출
+        config.addExposedHeader("Refresh"); // 추가: Refresh 헤더 노출
         source.registerCorsConfiguration("/**", config);
 
         return new CorsFilter(source);

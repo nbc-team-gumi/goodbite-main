@@ -22,9 +22,7 @@ import com.sparta.goodbite.exception.waiting.WaitingException;
 import com.sparta.goodbite.exception.waiting.detail.WaitingNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,8 +30,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Service
 @RequiredArgsConstructor
@@ -45,9 +43,7 @@ public class WaitingService {
     private final SimpMessagingTemplate messagingTemplate;
     private final OwnerRepository ownerRepository;
 
-    private final Map<Long, SseEmitter> emitters = new HashMap<>();
-    private final Map<Long, Integer> waitingList = new HashMap<>();
-
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public WaitingResponseDto createWaiting(UserCredentials user,
         PostWaitingRequestDto postWaitingRequestDto) {
 
@@ -75,6 +71,7 @@ public class WaitingService {
     }
 
     // 단일 조회용 메서드
+    @Transactional(readOnly = true)
     public WaitingResponseDto getWaiting(UserCredentials user, Long waitingId) {
 
         validateWaitingRequest(user, waitingId);
@@ -133,6 +130,7 @@ public class WaitingService {
 
     // 가게용 api
     // 예약 인원수와 요청사항만 변경 가능함 ( 추후 합의를 통해 ?건 이하의 순서일 때는 수정하지 못하도록 로직 수정 필요)
+    @Transactional
     public WaitingResponseDto updateWaiting(UserCredentials user, Long waitingId,
         UpdateWaitingRequestDto updateWaitingRequestDto) {
 
@@ -147,6 +145,7 @@ public class WaitingService {
     }
 
     // 취소 메서드
+    @Transactional
     public void deleteWaiting(UserCredentials user, Long waitingId) {
 
         validateWaitingRequest(user, waitingId);
@@ -154,6 +153,7 @@ public class WaitingService {
         reduceWaitingOrders(waitingId, "delete");
     }
 
+    @Transactional(readOnly = true)
     public Long findLastOrderNumber(Long restaurantId) {
         if (!waitingRepository.findALLByRestaurantId(restaurantId).isEmpty()) {
             // 해당하는 레스토랑에 예약이 하나라도 존재한다면
@@ -165,6 +165,7 @@ public class WaitingService {
     }
 
     // 페이지 네이션 말고 list로 하면 무슨 장점이 있을까요?
+    @Transactional(readOnly = true)
     public Page<WaitingResponseDto> getWaitingsByRestaurantId(UserCredentials user,
         Long restaurantId, Pageable pageable) {
 
@@ -185,6 +186,7 @@ public class WaitingService {
         return new PageImpl<>(waitingResponseDtos, pageable, waitingPage.getTotalElements());
     }
 
+    @Transactional(readOnly = true)
     public Page<WaitingResponseDto> getWaitings(UserCredentials user, Pageable pageable) {
 
         Page<Waiting> waitingPage = waitingRepository.findByCustomerId(user.getId(), pageable);

@@ -3,6 +3,7 @@ package com.sparta.goodbite.domain.restaurant.entity;
 import com.sparta.goodbite.common.Timestamped;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,7 +28,10 @@ public class Restaurant extends Timestamped {
     private Owner owner;
 
     private String name;
+
+    @Column(length = 2083)
     private String imageUrl;
+
     private String address;
     private String area;
     private String phoneNumber;

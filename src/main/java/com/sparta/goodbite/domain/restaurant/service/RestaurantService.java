@@ -1,6 +1,7 @@
 package com.sparta.goodbite.domain.restaurant.service;
 
 import com.sparta.goodbite.common.UserCredentials;
+import com.sparta.goodbite.common.s3.service.S3Service;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantIdResponseDto;
@@ -13,7 +14,6 @@ import com.sparta.goodbite.exception.auth.AuthException;
 import com.sparta.goodbite.exception.restaurant.RestaurantErrorCode;
 import com.sparta.goodbite.exception.restaurant.detail.RestaurantCreateFailedException;
 import com.sparta.goodbite.exception.restaurant.detail.RestaurantUpdateFailedException;
-import com.sparta.goodbite.s3.service.S3Service;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;

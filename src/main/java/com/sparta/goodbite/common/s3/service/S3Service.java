@@ -1,4 +1,4 @@
-package com.sparta.goodbite.s3;
+package com.sparta.goodbite.common.s3.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
@@ -7,7 +7,11 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.util.IOUtils;
 import com.sparta.goodbite.exception.s3.S3ErrorCode;
-import com.sparta.goodbite.exception.s3.S3Exception;
+import com.sparta.goodbite.exception.s3.detail.S3EmptyFileException;
+import com.sparta.goodbite.exception.s3.detail.S3FileDeleteFailedException;
+import com.sparta.goodbite.exception.s3.detail.S3FileUploadFailedException;
+import com.sparta.goodbite.exception.s3.detail.S3InvalidFileExtensionException;
+import com.sparta.goodbite.exception.s3.detail.S3InvalidS3UrlException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +44,7 @@ public class S3Service {
     // S3에 저장된 이미지 객체의 public url 반환
     public String upload(MultipartFile image) {
         if (image.isEmpty() || Objects.isNull(image.getOriginalFilename())) {
-            throw new S3Exception(S3ErrorCode.EMPTY_FILE);
+            throw new S3EmptyFileException(S3ErrorCode.EMPTY_FILE);
         }
         return this.uploadImage(image);
     }
@@ -51,7 +55,7 @@ public class S3Service {
         try {
             return this.uploadImageToS3(image);
         } catch (IOException e) {
-            throw new S3Exception(S3ErrorCode.FILE_UPLOAD_FAILED);
+            throw new S3FileUploadFailedException(S3ErrorCode.FILE_UPLOAD_FAILED);
         }
     }
 
@@ -63,7 +67,7 @@ public class S3Service {
         List<String> allowedExtentionList = Arrays.asList("jpg", "jpeg", "png", "gif");
 
         if (!allowedExtentionList.contains(extension)) {
-            throw new S3Exception(S3ErrorCode.INVALID_FILE_EXTENSION);
+            throw new S3InvalidFileExtensionException(S3ErrorCode.INVALID_FILE_EXTENSION);
         }
     }
 
@@ -93,7 +97,7 @@ public class S3Service {
             //실제로 S3에 이미지 데이터를 넣음
             amazonS3.putObject(putObjectRequest);
         } catch (Exception e) {
-            throw new S3Exception(S3ErrorCode.FILE_UPLOAD_FAILED);
+            throw new S3FileUploadFailedException(S3ErrorCode.FILE_UPLOAD_FAILED);
         } finally {
             byteArrayInputStream.close();
             is.close();
@@ -108,7 +112,7 @@ public class S3Service {
         try {
             amazonS3.deleteObject(new DeleteObjectRequest(bucketName, key));
         } catch (Exception e) {
-            throw new S3Exception(S3ErrorCode.FILE_DELETE_FAILED);
+            throw new S3FileDeleteFailedException(S3ErrorCode.FILE_DELETE_FAILED);
         }
     }
 
@@ -120,10 +124,10 @@ public class S3Service {
             if (decodingKey.startsWith(bucketPrefix)) {
                 return decodingKey.substring(bucketPrefix.length());
             } else {
-                throw new S3Exception(S3ErrorCode.INVALID_S3_URL);
+                throw new S3InvalidS3UrlException(S3ErrorCode.INVALID_S3_URL);
             }
         } catch (MalformedURLException | URISyntaxException e) {
-            throw new S3Exception(S3ErrorCode.FILE_DELETE_FAILED);
+            throw new S3FileDeleteFailedException(S3ErrorCode.FILE_DELETE_FAILED);
         }
     }
 }

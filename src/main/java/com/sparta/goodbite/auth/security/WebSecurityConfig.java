@@ -136,11 +136,13 @@ public class WebSecurityConfig {
             // 인가 설정
             .authorizeHttpRequests(
                 (authorizeHttpRequests) -> authorizeHttpRequests
-                    .requestMatchers("/", "/owners/signup", "/customers/signup", "/users/login",
+                    .requestMatchers(
+                        "/customers/signup",
+                        "/owners/signup",
+                        "/users/login",
                         "/users/refresh",
                         "/error")
                     .permitAll()
-                    .requestMatchers("/admins/**").hasRole(UserRole.ADMIN.name())
                     .requestMatchers("/owners/**").hasRole(UserRole.OWNER.name())
                     .requestMatchers("/customers/**").hasRole(UserRole.CUSTOMER.name())
                     .requestMatchers(HttpMethod.GET, "/menus/**").permitAll() // 메뉴 조회는 모두 가능

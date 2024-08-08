@@ -2,6 +2,7 @@ package com.sparta.goodbite.domain.restaurant.dto;
 
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
+import com.sparta.goodbite.domain.restaurant.enums.Category;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
@@ -26,7 +27,7 @@ public class RestaurantRequestDto {
     private String phoneNumber;
 
     @NotBlank(message = "카테고리를 입력해주세요.")
-    private String category;
+    private Category category;
 
     public Restaurant toEntity(Owner owner) {
         return Restaurant.builder()

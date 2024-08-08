@@ -38,15 +38,22 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         throws ServletException, IOException {
 
         String requestPath = req.getRequestURI();
+        String method = req.getMethod();
         String accessToken = JwtUtil.getAccessTokenFromRequest(req);
 
         // 로그인, 회원가입 페이지는 통과
         boolean isExcludePath = excludedPaths.stream()
             .anyMatch(path -> pathMatcher.match(path, requestPath));
-        if (accessToken == null || isExcludePath) {
+
+        // GET /restaurants 요청은 인증 없이 허용
+        boolean isGetRestaurantsRequest =
+            "GET".equalsIgnoreCase(method) && "/restaurants".equals(requestPath);
+
+        if (accessToken == null || isExcludePath || isGetRestaurantsRequest) {
             filterChain.doFilter(req, res);
             return;
         }
+
         System.out.println("before substring: " + accessToken);
         // prefix 제거
         accessToken = JwtUtil.substringToken(accessToken);

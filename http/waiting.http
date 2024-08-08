@@ -70,12 +70,19 @@ PUT {{baseUrl}}/waitings/3
 POST {{baseUrl}}/users/login
 
 {
-  "email": "testowner2@email.com",
+  "email": "testowner2@example.com",
   "password": "Passw0rd!"
 }
 
 > {%
-  client.global.set("accessToken", response.cookies["Authorization"].value);
-  client.global.set("refreshToken", response.cookies["Refresh"].value);
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.log("Authorization: " + response.headers.valueOf("Authorization"));
+
+  client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
 %}
+
+###
+GET http://localhost:8080/owners
+Content-Type: application/json
+Authorization:{{Authorization}}
 

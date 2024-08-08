@@ -125,7 +125,8 @@ public class WebSecurityConfig {
                     .requestMatchers("/customers/**").hasRole(UserRole.CUSTOMER.name())
                     .requestMatchers(HttpMethod.GET, "/menus/**").permitAll() // 메뉴 조회는 모두 가능
                     .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll() // 리뷰 조회는 모두 가능
-                    .requestMatchers(HttpMethod.GET, "/restaurants/**")
+                    .requestMatchers(HttpMethod.GET, "/restaurants/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/server-events/**")
                     .permitAll() // 레스토랑 조회는 모두 가능
                     .anyRequest().authenticated())
 

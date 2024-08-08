@@ -3,6 +3,7 @@ package com.sparta.goodbite.domain.waiting.service;
 import com.sparta.goodbite.common.UserCredentials;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
+import com.sparta.goodbite.domain.notification.controller.NotificationController;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
@@ -42,6 +43,7 @@ public class WaitingService {
     private final CustomerRepository customerRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final OwnerRepository ownerRepository;
+    private final NotificationController notificationController;
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public WaitingResponseDto createWaiting(UserCredentials user,
@@ -66,6 +68,7 @@ public class WaitingService {
             postWaitingRequestDto.getDemand());
 
         waitingRepository.save(waiting);
+        notificationController.notifyOwner(restaurant.getId().toString(), customer);
 
         return WaitingResponseDto.of(waiting);
     }

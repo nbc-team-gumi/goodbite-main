@@ -10,7 +10,10 @@ import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.exception.auth.AuthErrorCode;
 import com.sparta.goodbite.exception.auth.AuthException;
-import com.sparta.goodbite.s3.S3Service;
+import com.sparta.goodbite.exception.restaurant.RestaurantErrorCode;
+import com.sparta.goodbite.exception.restaurant.detail.RestaurantCreateFailedException;
+import com.sparta.goodbite.exception.restaurant.detail.RestaurantUpdateFailedException;
+import com.sparta.goodbite.s3.service.S3Service;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +34,15 @@ public class RestaurantService {
         MultipartFile image) {
 
         Owner owner = ownerRepository.findByIdOrThrow(user.getId());
+
         String restaurantImage = s3Service.upload(image);
-        restaurantRepository.save(restaurantRequestDto.toEntity(owner, restaurantImage));
+
+        try {
+            restaurantRepository.save(restaurantRequestDto.toEntity(owner, restaurantImage));
+        } catch (Exception e) {
+            s3Service.deleteImageFromS3(restaurantImage);
+            throw new RestaurantCreateFailedException(RestaurantErrorCode.RESTAURANT_CREATE_FAILED);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -61,10 +71,15 @@ public class RestaurantService {
 
         validateRestaurantOwnership(owner, restaurant);
 
-        s3Service.deleteImageFromS3(restaurant.getImageUrl());
+        String originalImage = restaurant.getImageUrl();
         String restaurantImage = s3Service.upload(image);
-
-        restaurant.update(restaurantRequestDto, restaurantImage);
+        try {
+            restaurant.update(restaurantRequestDto, restaurantImage);
+            s3Service.deleteImageFromS3(originalImage);
+        } catch (Exception e) {
+            s3Service.deleteImageFromS3(restaurantImage);
+            throw new RestaurantUpdateFailedException(RestaurantErrorCode.RESTAURANT_UPDATE_FAILED);
+        }
     }
 
     @Transactional

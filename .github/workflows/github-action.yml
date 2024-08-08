@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ dev ]
+    branches: [ 141-refactor-인증인가-리팩토링 ]
 
 env:
   DOCKER_IMAGE_TAG_NAME: good-bite

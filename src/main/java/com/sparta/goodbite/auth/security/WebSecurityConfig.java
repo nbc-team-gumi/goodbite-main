@@ -19,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 @Configuration
@@ -32,7 +34,6 @@ public class WebSecurityConfig {
     private final EmailUserDetailsService userDetailsService;
     private final GlobalAccessDeniedHandler accessDeniedHandler;
     private final GlobalAuthenticationEntryPoint authenticationEntryPoint;
-    private final CorsFilter corsFilter;
 
     // Manager Bean 등록
     @Bean
@@ -63,6 +64,22 @@ public class WebSecurityConfig {
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
         return new JwtAuthorizationFilter(userDetailsService);
+    }
+
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowCredentials(true); // 자격 증명 허용
+        config.addAllowedOrigin("http://localhost:3000"); // 프론트엔드
+        config.addAllowedHeader("*"); // 모든 헤더 허용
+        config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
+        config.addExposedHeader("Authorization"); // Authorization 헤더 노출
+        config.addExposedHeader("Refresh"); // Refresh 헤더 노출
+        source.registerCorsConfiguration("/**", config);
+
+        return new CorsFilter(source);
     }
 
     // 로그아웃 핸들러 Bean 등록
@@ -101,6 +118,9 @@ public class WebSecurityConfig {
         http
             // HTTP -> HTTPS 리다이렉트
 //            .requiresChannel(channel -> channel.anyRequest().requiresSecure())
+
+            // CORS 설정: 사용자 재정의 cors 필터
+            .addFilterBefore(corsFilter(), CorsFilter.class)
 
             // CSRF 설정: CSRF 보호 비활성 (보안 취약)
             .csrf((csrf) -> csrf.disable())
@@ -145,12 +165,32 @@ public class WebSecurityConfig {
                     accessDeniedHandler) // 접근 거부(인가 실패) 시 처리
                 .authenticationEntryPoint(authenticationEntryPoint)) // 인증 실패 시 처리
 
-            // 커스텀 필터 끼우기
-            // LogoutFilter -> SameSiteCookieFilter -> corsFilter -> JWT 인가필터 -> JWT 인증필터 -> UsernamePasswordAuthenticationFilter 순으로 설정
-            .addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class)
+            // 시큐리티 필터 순서
+            // ChannelProcessingFilter : 채널 HTTP -> HTTPS 리디렉션
+            // SecurityContextPersistenceFilter : SecurityContext 저장/로드
+            // ConcurrentSessionFilter : 동시 세션 처리
+            // HeaderWriterFilter : 응답 헤더 설정
+            // CorsFilter : CORS 처리
+            // + SameSiteCookieFilter : SameSite 쿠키 처리
+            // CsrfFilter : CSRF 방지
+            // LogoutFilter : 로그아웃 요청 처리
+            // + JWTAuthenticationFilter : JWT 인증
+            // UsernamePasswordAuthenticationFilter : 이름, 비밀번호 인증
+            // + JWTAuthorizationFilter : JWT 인가
+            // DefaultLoginPageGeneratingFilter (x) : 커스텀 설정
+            // DefaultLogoutPageGeneratingFilter (x) : 커스텀 설정
+            // BasicAuthenticationFilter : HTTP 기본 인증
+            // RequestCacheAwareFilter : 요청 캐시
+            // SecurityContextHolderAwareRequestFilter : SecurityContextHolder 에 인증 정보 전달
+            // AnonymousAuthenticationFilter : 익명 사용자 인증
+            // SessionManagementFilter : 세션 관리
+            // ExceptionTranslationFilter : 예외처리, 필요한 경우 로그인 페이지 리다이렉트
+            // FilterSecurityInterceptor (x) : authorizeHttpRequests 로 대체됨
+
+            // 커스텀 필터
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(corsFilter, JwtAuthorizationFilter.class);
-//            .addFilterBefore(new SameSiteCookieFilter(), CorsFilter.class);
+            .addFilterAfter(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+//            .addFilterAfter(new SameSiteCookieFilter(), CorsFilter.class);
 
         return http.build();
     }

@@ -1,5 +1,6 @@
 package com.sparta.goodbite.domain.waiting.service;
 
+import com.sparta.goodbite.auth.UserRole;
 import com.sparta.goodbite.common.UserCredentials;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
@@ -68,7 +69,9 @@ public class WaitingService {
             postWaitingRequestDto.getDemand());
 
         waitingRepository.save(waiting);
-        notificationController.notifyOwner(restaurant.getId().toString(), customer);
+
+        String message = "새로운 웨이팅이 등록되었습니다.";
+        notificationController.notifyOwner(restaurant.getId().toString(), message);
 
         return WaitingResponseDto.of(waiting);
     }
@@ -107,9 +110,8 @@ public class WaitingService {
                 //--------------
                 // 알람 메서드 위치
                 //--------------
-
-                sendNotificationToCustomer(waiting.getCustomer().getId(),
-                    "가게로 들어와 주세요.");
+                String message = "손님, 가게로 입장해 주세요.";
+                notificationController.notifyCustomer(waiting.getId().toString(), message);
 //                waitingRepository.delete(waiting);
                 waiting.delete(LocalDateTime.now(), WaitingStatus.SEATED);
             } else {
@@ -128,7 +130,7 @@ public class WaitingService {
 
         validateWaitingRequest(user, waitingId);
 
-        reduceWaitingOrders(waitingId, "reduce");
+        reduceWaitingOrders(user.getClass().toString(), waitingId, "reduce");
     }
 
     // 가게용 api
@@ -153,7 +155,7 @@ public class WaitingService {
 
         validateWaitingRequest(user, waitingId);
 
-        reduceWaitingOrders(waitingId, "delete");
+        reduceWaitingOrders(user.getClass().toString(), waitingId, "delete");
     }
 
     @Transactional(readOnly = true)
@@ -203,7 +205,7 @@ public class WaitingService {
         return WaitingResponseDto.of(waiting);
     }
 
-    private void reduceWaitingOrders(Long waitingId, String type) {
+    private void reduceWaitingOrders(String userClass, Long waitingId, String type) {
         Waiting waitingOne = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
 
         List<Waiting> waitingList = waitingRepository.findALLByRestaurantId(
@@ -211,6 +213,7 @@ public class WaitingService {
 
         String message = "";
         boolean flag = false;
+        WaitingStatus waitingStatus = WaitingStatus.WAITING;
         List<Waiting> waitingArrayList = new ArrayList<>();
 
         for (Waiting waiting : waitingList) {
@@ -222,13 +225,22 @@ public class WaitingService {
 
                 if (type.equals("delete")) {
                     message = "웨이팅이 취소되었습니다.";
-                    waiting.delete(LocalDateTime.now(), WaitingStatus.CANCELLED);
+                    waitingStatus = WaitingStatus.CANCELLED;
                 } else if (type.equals("reduce")) {
                     message = "손님, 가게로 입장해 주세요.";
-                    waiting.delete(LocalDateTime.now(), WaitingStatus.SEATED);
+                    waitingStatus = WaitingStatus.SEATED;
                 }
-                sendNotificationToCustomer(waiting.getCustomer().getId(), message);
-//                waitingRepository.delete(waiting);
+
+                if (userClass.equals(UserRole.OWNER.toString())) {
+                    notificationController.notifyCustomer(waitingId.toString(), message);
+                    System.out.println("손님에게 " + message + " 전송");
+                } else {
+                    notificationController.notifyOwner(waiting.getRestaurant().getId().toString(),
+                        message);
+                    System.out.println("사장에게 " + message + " 전송");
+                }
+
+                waiting.delete(LocalDateTime.now(), waitingStatus);
 
                 flag = true;
             } else if (flag) {
@@ -244,9 +256,6 @@ public class WaitingService {
         waitingRepository.saveAll(waitingArrayList);
     }
 
-    private void sendNotificationToCustomer(Long customerId, String message) {
-        messagingTemplate.convertAndSend("/topic/notifications/" + customerId, message);
-    }
 
     private void validateWaitingRequest(UserCredentials user, Long waitingId) {
 

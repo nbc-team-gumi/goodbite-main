@@ -45,9 +45,9 @@ public class Restaurant extends Timestamped {
         this.category = category;
     }
 
-    public void update(RestaurantRequestDto restaurantRequestDto) {
+    public void update(RestaurantRequestDto restaurantRequestDto, String restaurantImage) {
         this.name = restaurantRequestDto.getName();
-        this.imageUrl = restaurantRequestDto.getImageUrl();
+        this.imageUrl = restaurantImage;
         this.address = restaurantRequestDto.getAddress();
         this.area = restaurantRequestDto.getArea();
         this.phoneNumber = restaurantRequestDto.getPhoneNumber();

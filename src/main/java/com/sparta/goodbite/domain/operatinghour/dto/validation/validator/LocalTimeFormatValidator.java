@@ -13,12 +13,12 @@ public class LocalTimeFormatValidator implements
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     @Override
-    public boolean isValid(LocalTime value, ConstraintValidatorContext context) {
-        if (value == null) {
+    public boolean isValid(LocalTime time, ConstraintValidatorContext context) {
+        if (time == null) {
             return true; // null 값은 다른 유효성 검사에서 처리하도록 하고, 여기서는 의도된 유효성 검사만 통과
         }
         try {
-            TIME_FORMATTER.format(value);
+            TIME_FORMATTER.format(time);
             return true;
         } catch (DateTimeParseException e) {
             return false;

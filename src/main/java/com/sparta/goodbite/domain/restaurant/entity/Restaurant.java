@@ -32,10 +32,11 @@ public class Restaurant extends Timestamped {
     private String area;
     private String phoneNumber;
     private String category;
+    private int capacity;
 
     @Builder
     public Restaurant(Owner owner, String name, String imageUrl, String address, String area,
-        String phoneNumber, String category) {
+        String phoneNumber, String category, int capacity) {
         this.owner = owner;
         this.name = name;
         this.imageUrl = imageUrl;
@@ -43,6 +44,7 @@ public class Restaurant extends Timestamped {
         this.area = area;
         this.phoneNumber = phoneNumber;
         this.category = category;
+        this.capacity = capacity;
     }
 
     public void update(RestaurantRequestDto restaurantRequestDto) {
@@ -52,5 +54,6 @@ public class Restaurant extends Timestamped {
         this.area = restaurantRequestDto.getArea();
         this.phoneNumber = restaurantRequestDto.getPhoneNumber();
         this.category = restaurantRequestDto.getCategory();
+        this.capacity = restaurantRequestDto.getCapacity();
     }
 }

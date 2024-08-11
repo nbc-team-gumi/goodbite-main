@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ dev ]
+    branches: [ 191-feat-애플리케이션-포트를-8080-에서-80-으로-변경 ]
 
 env:
   DOCKER_IMAGE_TAG_NAME: good-bite

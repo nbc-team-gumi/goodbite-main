@@ -72,7 +72,7 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true); // 자격 증명 허용
-        config.addAllowedOrigin("http://localhost:3000"); // 프론트엔드
+        config.addAllowedOrigin("http://13.209.9.124"); // 프론트엔드
         config.addAllowedHeader("*"); // 모든 헤더 허용
         config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
         config.addExposedHeader("Authorization"); // Authorization 헤더 노출

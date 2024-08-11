@@ -1,6 +1,5 @@
 package com.sparta.goodbite.domain.waiting.service;
 
-import com.sparta.goodbite.auth.UserRole;
 import com.sparta.goodbite.common.UserCredentials;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
@@ -130,7 +129,7 @@ public class WaitingService {
 
         validateWaitingRequest(user, waitingId);
 
-        reduceWaitingOrders(user.getClass().toString(), waitingId, "reduce");
+        reduceWaitingOrders(waitingId, "reduce");
     }
 
     // 가게용 api
@@ -155,7 +154,7 @@ public class WaitingService {
 
         validateWaitingRequest(user, waitingId);
 
-        reduceWaitingOrders(user.getClass().toString(), waitingId, "delete");
+        reduceWaitingOrders(waitingId, "delete");
     }
 
     @Transactional(readOnly = true)
@@ -205,7 +204,7 @@ public class WaitingService {
         return WaitingResponseDto.of(waiting);
     }
 
-    private void reduceWaitingOrders(String userClass, Long waitingId, String type) {
+    private void reduceWaitingOrders(Long waitingId, String type) {
         Waiting waitingOne = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
 
         List<Waiting> waitingList = waitingRepository.findALLByRestaurantId(
@@ -221,25 +220,21 @@ public class WaitingService {
 
                 //--------------
                 // 알람 메서드 위치
+                // 현재 기능을 요청한 사람이 오너인지 손님인지 구분하는 메서드가 없음
+                // 이후 구현을 요함
                 //--------------
 
                 if (type.equals("delete")) {
                     message = "웨이팅이 취소되었습니다.";
                     waitingStatus = WaitingStatus.CANCELLED;
+                    notificationController.notifyOwner(waiting.getRestaurant().getId().toString(),
+                        message);
                 } else if (type.equals("reduce")) {
                     message = "손님, 가게로 입장해 주세요.";
                     waitingStatus = WaitingStatus.SEATED;
                 }
 
-                if (userClass.equals(UserRole.OWNER.toString())) {
-                    notificationController.notifyCustomer(waitingId.toString(), message);
-                    System.out.println("손님에게 " + message + " 전송");
-                } else {
-                    notificationController.notifyOwner(waiting.getRestaurant().getId().toString(),
-                        message);
-                    System.out.println("사장에게 " + message + " 전송");
-                }
-
+                notificationController.notifyCustomer(waitingId.toString(), message);
                 waiting.delete(LocalDateTime.now(), waitingStatus);
 
                 flag = true;

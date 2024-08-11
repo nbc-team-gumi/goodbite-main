@@ -5,6 +5,7 @@ import com.sparta.goodbite.auth.util.JwtUtil;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -34,6 +35,9 @@ public class WebSecurityConfig {
     private final EmailUserDetailsService userDetailsService;
     private final GlobalAccessDeniedHandler accessDeniedHandler;
     private final GlobalAuthenticationEntryPoint authenticationEntryPoint;
+
+    @Value("${FRONT_URL}")
+    private String FRONT_URL;
 
     // Manager Bean 등록
     @Bean
@@ -72,7 +76,7 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true); // 자격 증명 허용
-        config.addAllowedOrigin("http://13.209.9.124"); // 프론트엔드
+        config.addAllowedOrigin(FRONT_URL); // 프론트엔드
         config.addAllowedHeader("*"); // 모든 헤더 허용
         config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
         config.addExposedHeader("Authorization"); // Authorization 헤더 노출

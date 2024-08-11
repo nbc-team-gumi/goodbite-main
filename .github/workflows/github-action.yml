@@ -32,7 +32,8 @@ jobs:
           JWT_SECRET_KEY: ${{ vars.JWT_SECRET_KEY }}
           PUBLIC_DATA_KEY: ${{ secrets.PUBLIC_DATA_KEY }}
           EC2_HOST: ${{ vars.EC2_HOST }}
-          FRONT_URL: ${{ vars.FRONT_URL }}
+          DOMAIN_URL: ${{ vars.DOMAIN_URL }}
+          SUBDOMAIN_URL: ${{ vars.SUBDOMAIN_URL }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -88,6 +89,7 @@ jobs:
             -e DB_PORT=${{ vars.DB_PORT }} \
             -e JWT_SECRET_KEY=${{ vars.JWT_SECRET_KEY }} \
             -e PUBLIC_DATA_KEY=${{ secrets.PUBLIC_DATA_KEY }} \
-            -e FRONT_URL=${{ vars.FRONT_URL }} \
+            -e DOMAIN_URL=${{ vars.DOMAIN_URL }} \
+            -e SUBDOMAIN_URL=${{ vars.SUBDOMAIN_URL }} \
             -e EC2_HOST=${{ vars.EC2_HOST }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest

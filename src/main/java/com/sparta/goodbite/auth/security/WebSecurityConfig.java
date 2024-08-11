@@ -36,8 +36,11 @@ public class WebSecurityConfig {
     private final GlobalAccessDeniedHandler accessDeniedHandler;
     private final GlobalAuthenticationEntryPoint authenticationEntryPoint;
 
-    @Value("${FRONT_URL}")
-    private String FRONT_URL;
+    @Value("${SUBDOMAIN_URL}")
+    private String SUBDOMAIN_URL;
+
+    @Value("${DOMAIN_URL}")
+    private String DOMAIN_URL;
 
     // Manager Bean 등록
     @Bean
@@ -76,7 +79,8 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true); // 자격 증명 허용
-        config.addAllowedOrigin(FRONT_URL); // 프론트엔드
+        config.addAllowedOrigin(SUBDOMAIN_URL); // 프론트엔드 서브도메인
+        config.addAllowedOrigin(DOMAIN_URL); // 프론트엔드 도메인
         config.addAllowedHeader("*"); // 모든 헤더 허용
         config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
         config.addExposedHeader("Authorization"); // Authorization 헤더 노출

@@ -24,27 +24,23 @@ public class RedisLockAspect {
 
     @Around("@annotation(redisLock)")
     public Object around(ProceedingJoinPoint joinPoint, RedisLock redisLock) throws Throwable {
-        String key = redisLock.key();
         long waitTime = redisLock.waitTime();
         long leaseTime = redisLock.leaseTime();
 
         // 메서드 파라미터에서 필요한 값을 가져옴
         Object[] args = joinPoint.getArgs();
-        //String fieldValue = "";
         String restaurantId = "";
 
         for (Object arg : args) {
             if (arg instanceof PostWaitingRequestDto) {
-                //fieldValue = String.valueOf(((PostWaitingRequestDto) arg).getRestaurantId());
                 restaurantId = String.valueOf(((PostWaitingRequestDto) arg).getRestaurantId());
                 break;
             }
         }
 
-        //String lockName = key + ":" + fieldValue;
         // 락 이름을 레스토랑 ID로 설정
         String lockName = restaurantId;
-        log.info("Attempting to acquire lock: {}", lockName);
+        log.info("락 획득 시도: {}", lockName);
 
         RLock lock = redissonClient.getLock(lockName);
 
@@ -55,23 +51,24 @@ public class RedisLockAspect {
             isLockAcquired = lock.tryLock(waitTime, leaseTime, TimeUnit.SECONDS);
 
             if (!isLockAcquired) {
-                log.warn("Could not acquire lock: {} after waiting for {} seconds", lockName,
+                log.warn("락 획득 실패: 락 {}을 {}초 동안 대기했으나 획득하지 못했습니다. ", lockName,
                     waitTime);
                 throw new LockException(LockErrorCode.LOCK_ACQUISITION_FAILED);
             }
 
-            log.info("Lock acquired: {}", lockName);
+            log.info("락 획득: {}", lockName);
             return joinPoint.proceed(); // 타겟 메서드 실행
         } catch (InterruptedException e) {
-            log.error("Interrupted while trying to acquire lock: {}", lockName, e);
+            log.error("락을 획득하려는 도중에 인터럽트되었습니다: {}", lockName, e);
             throw new LockException(LockErrorCode.LOCK_INTERRUPTED);
         } finally {
             if (isLockAcquired && lock.isHeldByCurrentThread()) {
                 try {
                     lock.unlock();
-                    log.info("Lock released: {}", lockName);
+                    log.info("락 해제: {}", lockName);
                 } catch (IllegalMonitorStateException e) {
-                    log.error("Failed to release lock: {}", lockName, e);
+                    log.error("락 해제 실패: 락 {}이(가) 해제되지 않았습니다. 메서드: {}, 파라미터: {}, 예외: {}",
+                        lockName, joinPoint.getSignature().getName(), args, e);
                     throw new LockException(LockErrorCode.LOCK_RELEASE_FAILED);
                 }
             }

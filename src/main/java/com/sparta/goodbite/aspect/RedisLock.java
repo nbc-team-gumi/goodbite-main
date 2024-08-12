@@ -13,4 +13,10 @@ public @interface RedisLock { //커스텀 어노테이션을 정의
     //String value();//어노테이션에 설정할 값을 정의
     //String name();
     String key(); // 메서드마다 고유한 키를 지정하기 위한 속성
+
+    // 락을 얻기 위해 기다릴 수 있는 시간
+    long waitTime() default 5L;
+
+    // 락 획득 후 임대할 수 있는 시간
+    long leaseTime() default 3L;
 }

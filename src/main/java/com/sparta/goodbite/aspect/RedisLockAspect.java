@@ -2,6 +2,7 @@ package com.sparta.goodbite.aspect;
 
 
 import com.sparta.goodbite.domain.waiting.dto.PostWaitingRequestDto;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -17,42 +18,53 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RedisLockAspect {
 
-    private final RedissonClient redissonClient; // Redisson 클라이언트를 주입받음
+    private final RedissonClient redissonClient;
 
-    @Around("@annotation(redisLock)") // @RedisLock 어노테이션이 적용된 메서드 주변에 실행될 로직 정의
+    @Around("@annotation(redisLock)")
     public Object around(ProceedingJoinPoint joinPoint, RedisLock redisLock) throws Throwable {
-        // MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        // Method method = signature.getMethod();
-
-        // 어노테이션의 key 속성 값을 가져옴
         String key = redisLock.key();
+        long waitTime = redisLock.waitTime();
+        long leaseTime = redisLock.leaseTime();
 
         // 메서드 파라미터에서 필요한 값을 가져옴
         Object[] args = joinPoint.getArgs();
-        String restaurantId = "";
+        String fieldValue = "";
 
-        // 특정 파라미터 타입을 탐색하여 restaurantId 값을 가져옴
         for (Object arg : args) {
             if (arg instanceof PostWaitingRequestDto) {
-                restaurantId = String.valueOf(((PostWaitingRequestDto) arg).getRestaurantId());
+                fieldValue = String.valueOf(((PostWaitingRequestDto) arg).getRestaurantId());
                 break;
             }
         }
 
-        // 최종 락 이름 생성: key와 restaurantId를 조합
-        String lockName = key + ":" + restaurantId;
+        String lockName = key + ":" + fieldValue;
 
         log.info("Attempting to acquire lock: {}", lockName);
 
-        // 최종 락 이름으로 Redisson 락 생성
         RLock lock = redissonClient.getLock(lockName);
 
+        boolean isLockAcquired = false;
+
         try {
-            lock.lock(); // 락 획득
+            // tryLock을 사용하여 락을 획득 시도, 대기 시간과 임대 시간 적용
+            isLockAcquired = lock.tryLock(waitTime, leaseTime, TimeUnit.SECONDS);
+
+            if (!isLockAcquired) {
+                log.warn("Could not acquire lock: {} after waiting for {} seconds", lockName,
+                    waitTime);
+                throw new RuntimeException("Unable to acquire lock: " + lockName);
+            }
+
+            log.info("Lock acquired: {}", lockName);
             return joinPoint.proceed(); // 타겟 메서드 실행
+        } catch (InterruptedException e) {
+            log.error("Interrupted while trying to acquire lock: {}", lockName, e);
+            throw new RuntimeException("Interrupted while trying to acquire lock: " + lockName, e);
         } finally {
-            lock.unlock(); // 락 해제
-            log.info("Lock released: {}", lockName);
+            if (isLockAcquired && lock.isHeldByCurrentThread()) {
+                lock.unlock(); // 락 해제
+                log.info("Lock released: {}", lockName);
+            }
         }
     }
 }

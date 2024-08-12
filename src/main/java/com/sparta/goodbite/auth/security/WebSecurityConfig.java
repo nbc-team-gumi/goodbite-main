@@ -81,6 +81,7 @@ public class WebSecurityConfig {
         config.setAllowCredentials(true); // 자격 증명 허용
         config.addAllowedOrigin(SUBDOMAIN_URL); // 프론트엔드 서브도메인
         config.addAllowedOrigin(DOMAIN_URL); // 프론트엔드 도메인
+        config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedHeader("*"); // 모든 헤더 허용
         config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
         config.addExposedHeader("Authorization"); // Authorization 헤더 노출
@@ -157,6 +158,8 @@ public class WebSecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll() // 리뷰 조회는 모두 가능
                     .requestMatchers(HttpMethod.GET, "/restaurants/**")
                     .permitAll() // 레스토랑 조회는 모두 가능
+                    .requestMatchers(HttpMethod.GET, "/users/kakao/callback")
+                    .permitAll() // 카카오 콜백 허용
                     .anyRequest().authenticated())
 
             // 기본 폼 로그인을 비활성화, 중복 인증 방지

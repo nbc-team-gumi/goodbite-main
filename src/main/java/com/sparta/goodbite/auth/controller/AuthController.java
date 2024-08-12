@@ -35,6 +35,7 @@ public class AuthController {
     public ResponseEntity<DataResponseDto<KakaoUserResponseDto>> kakaoLogin(
         @RequestParam String code,
         HttpServletResponse response) throws JsonProcessingException {
+        log.info("API request OK: {}", code);
         // code: 카카오 서버로부터 받은 인가 코드 Service 전달 후 인증 처리 및 JWT 반환
         return ResponseUtil.findOk(authService.kakaoLogin(code));
     }

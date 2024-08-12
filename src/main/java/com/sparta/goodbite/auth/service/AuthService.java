@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
+    
 
     public void updateAccessToken(HttpServletRequest request,
         HttpServletResponse response) throws UnsupportedEncodingException {
@@ -33,5 +34,9 @@ public class AuthService {
 
         String newAccessToken = JwtUtil.createAccessToken(email, authority);
         JwtUtil.addJwtToHeader(newAccessToken, response);
+    }
+
+    public String kakaoLogin(String code) {
+
     }
 }

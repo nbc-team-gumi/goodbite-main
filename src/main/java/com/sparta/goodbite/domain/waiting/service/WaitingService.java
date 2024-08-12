@@ -43,7 +43,8 @@ public class WaitingService {
     private final SimpMessagingTemplate messagingTemplate;
     private final OwnerRepository ownerRepository;
 
-    @RedisLock("createWaitingLock:#postWaitingRequestDto.restaurantId")
+    //@RedisLock(name = "#{'createWaitingLock:' + #postWaitingRequestDto.restaurantId}")
+    @RedisLock(key = "createWaitingLock")
     @Transactional
     public WaitingResponseDto createWaiting(UserCredentials user,
         PostWaitingRequestDto postWaitingRequestDto) {

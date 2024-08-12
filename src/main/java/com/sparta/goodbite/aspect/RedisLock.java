@@ -10,5 +10,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME) //어노텐이션이 런타임까지 유지됨을 의미
 public @interface RedisLock { //커스텀 어노테이션을 정의
 
-    String value();//어노테이션에 설정할 값을 정의
+    //String value();//어노테이션에 설정할 값을 정의
+    //String name();
+    String key(); // 메서드마다 고유한 키를 지정하기 위한 속성
 }

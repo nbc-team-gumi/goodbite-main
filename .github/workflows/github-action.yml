@@ -87,4 +87,7 @@ jobs:
             -e DB_PORT=${{vars.DB_PORT}} \
             -e JWT_SECRET_KEY=${{vars.JWT_SECRET_KEY}} \
             -e PUBLIC_DATA_KEY=${{secrets.PUBLIC_DATA_KEY}} \
+            -e REDIS_SERVER=${{sercrets.REDIS_SERVER}} \
+            -e REDIS_PASSWORD=${{sercrets.REDIS_PASSWORD}} \
+            -e REDIS_PORT=${{sercrets.REDIS_PORT}} \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest

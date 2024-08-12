@@ -21,6 +21,9 @@ spring:
         use_sql_comments: true
         dialect: org.hibernate.dialect.MySQLDialect
 
+  jackson:
+    time-zone: Asia/Seoul
+
 # WebSocket 설정
 server:
   port: 8080

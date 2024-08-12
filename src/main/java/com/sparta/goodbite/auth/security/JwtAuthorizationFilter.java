@@ -28,8 +28,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final EmailUserDetailsService userDetailsService;
     private final List<String> excludedPaths = List.of(
-        "/users/login", "/customers/signup",
-        "/owners/signup", "/admins/signup");
+        "/customers/signup",
+        "/owners/signup",
+        "/users/login",
+        "/users/refresh"
+    );
     private final PathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
@@ -38,19 +41,27 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         throws ServletException, IOException {
 
         String requestPath = req.getRequestURI();
+        String method = req.getMethod();
         String accessToken = JwtUtil.getAccessTokenFromRequest(req);
 
-        // 로그인, 회원가입 페이지는 통과
+        // 로그인, 회원가입, 리프레시는 통과
         boolean isExcludePath = excludedPaths.stream()
             .anyMatch(path -> pathMatcher.match(path, requestPath));
-        if (accessToken == null || isExcludePath) {
+
+        // GET /menus/**, GET /reviews/**, GET /restaurants/** 요청은 인증 없이 허용
+        boolean isGetMethodExcludePath =
+            "GET".equalsIgnoreCase(method) && (
+                pathMatcher.match("/menus/**", requestPath) ||
+                    pathMatcher.match("/reviews/**", requestPath) ||
+                    pathMatcher.match("/restaurants/**", requestPath)
+            );
+        if (accessToken == null || isExcludePath || isGetMethodExcludePath) {
             filterChain.doFilter(req, res);
             return;
         }
-        System.out.println("before substring: " + accessToken);
+
         // prefix 제거
         accessToken = JwtUtil.substringToken(accessToken);
-        System.out.println("after substring: " + accessToken);
 
         // 유효하지 않은 액세스 토큰
         try {

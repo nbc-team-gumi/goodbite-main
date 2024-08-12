@@ -11,6 +11,7 @@ import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.owner.entity.OwnerStatus;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.exception.owner.OwnerErrorCode;
+import com.sparta.goodbite.exception.owner.detail.DuplicateKakaoIdException;
 import com.sparta.goodbite.exception.owner.detail.InvalidBusinessNumberException;
 import com.sparta.goodbite.exception.owner.detail.OwnerAlreadyDeletedException;
 import com.sparta.goodbite.exception.user.UserErrorCode;
@@ -29,11 +30,17 @@ public class OwnerService {
     private final PasswordEncoder passwordEncoder;
     private final BusinessVerificationService businessVerificationService;
 
-    //가입
+    //회원가입
     @Transactional
     public void signup(OwnerSignUpRequestDto requestDto) {
-        validateDuplicateFields(requestDto.getNickname(), requestDto.getEmail(),
-            requestDto.getPhoneNumber(), requestDto.getBusinessNumber());
+        String nickname = requestDto.getNickname();
+        String email = requestDto.getEmail();
+        String phoneNumber = requestDto.getPhoneNumber();
+        String businessNumber = requestDto.getBusinessNumber();
+        Long kakaoId = requestDto.getKakaoId();
+
+        Owner owner = validateDuplicateFields(nickname, email, phoneNumber, businessNumber,
+            kakaoId);
 
         // 사업자 등록번호 유효성 검사
         boolean isValidBusinessNumber = businessVerificationService.verifyBusinessNumber(
@@ -42,22 +49,30 @@ public class OwnerService {
             throw new InvalidBusinessNumberException(OwnerErrorCode.INVALID_BUSINESS_NUMBER);
         }
 
-        // 비밀번호 암호화 -> 인증인가연결시 config에서 PasswordEncoder Bean등록
-        String password = passwordEncoder.encode(requestDto.getPassword());
-
         // OwnerStatus 설정 -> isValidBusinessNumber값이 참이면 인증상태로 설정
         OwnerStatus ownerStatus =
             isValidBusinessNumber ? OwnerStatus.VERIFIED : OwnerStatus.UNVERIFIED;
 
-        // User DB에 저장
-        Owner owner = Owner.builder()
-            .email(requestDto.getEmail())
-            .nickname(requestDto.getNickname())
-            .password(password)
-            .phoneNumber(requestDto.getPhoneNumber())
-            .businessNumber(requestDto.getBusinessNumber())
-            .ownerStatus(ownerStatus)
-            .build();
+        // 비밀번호 암호화 -> 인증인가연결시 config에서 PasswordEncoder Bean등록
+        String password = passwordEncoder.encode(requestDto.getPassword());
+
+        if (owner == null) {
+            // User DB에 저장
+            owner = Owner.builder()
+                .email(email)
+                .nickname(nickname)
+                .password(password)
+                .phoneNumber(phoneNumber)
+                .businessNumber(businessNumber)
+                .ownerStatus(ownerStatus)
+                .build();
+        } else {
+            owner.updateKakaoId(kakaoId);
+            owner.updateBusinessNumber(businessNumber);
+            owner.updateNickname(nickname);
+            owner.updatePassword(password);
+            owner.updatePhoneNumber(phoneNumber);
+        }
 
         ownerRepository.save(owner);
     }
@@ -70,7 +85,7 @@ public class OwnerService {
         return OwnerResponseDto.from(ownerRepository.findByIdOrThrow(owner.getId()));
     }
 
-    // 수정-닉네임
+    //수정-닉네임
     @Transactional
     public void updateNickname(UpdateOwnerNicknameRequestDto requestDto,
         UserCredentials user) {
@@ -93,7 +108,7 @@ public class OwnerService {
     }
 
 
-    // 수정-사업자번호
+    //수정-사업자번호
     @Transactional
     public void updateBusinessNumber(UpdateBusinessNumberRequestDto requestDto,
         UserCredentials user) {
@@ -122,7 +137,7 @@ public class OwnerService {
 
     }
 
-    // 수정-비밀번호
+    //수정-비밀번호
     @Transactional
     public void updatePassword(
         UpdateOwnerPasswordRequestDto requestDto, UserCredentials user) {
@@ -162,12 +177,18 @@ public class OwnerService {
     }
 
     // 중복 필드 검증 메서드
-    private void validateDuplicateFields(String nickname, String email, String phoneNumber,
-        String businessNumber) {
+    private Owner validateDuplicateFields(String nickname, String email, String phoneNumber,
+        String businessNumber, Long kakaoId) {
         ownerRepository.validateDuplicateNickname(nickname);
-        ownerRepository.validateDuplicateEmail(email);
         ownerRepository.validateDuplicatePhoneNumber(phoneNumber);
         ownerRepository.validateDuplicateBusinessNumber(businessNumber);
+
+        Owner kakaoUser = ownerRepository.findByKakaoId(kakaoId).orElse(null);
+        if (kakaoUser == null) {
+            return ownerRepository.findByEmail(email).orElse(null);
+        } else {
+            throw new DuplicateKakaoIdException(OwnerErrorCode.DUPLICATE_KAKAO_ID);
+        }
     }
 
 }

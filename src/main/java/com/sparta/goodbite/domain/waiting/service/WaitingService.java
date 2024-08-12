@@ -28,7 +28,9 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -193,11 +195,19 @@ public class WaitingService {
     @Transactional(readOnly = true)
     public Page<WaitingResponseDto> getWaitings(UserCredentials user, Pageable pageable) {
 
-        Page<Waiting> waitingPage = waitingRepository.findByCustomerId(user.getId(), pageable);
+        // 기존 pageable에 최신순 정렬을 추가
+        Pageable sortedPageable = PageRequest.of(
+            pageable.getPageNumber(),
+            pageable.getPageSize(),
+            Sort.by(Sort.Direction.DESC, "createdAt")  // 최신순으로 정렬
+        );
+
+        Page<Waiting> waitingPage = waitingRepository.findByCustomerId(user.getId(),
+            sortedPageable);
 
         List<WaitingResponseDto> waitingResponseDtos = waitingPage.stream()
             .map(this::convertToDto).toList();
-        return new PageImpl<>(waitingResponseDtos, pageable, waitingPage.getTotalElements());
+        return new PageImpl<>(waitingResponseDtos, sortedPageable, waitingPage.getTotalElements());
     }
 
     private WaitingResponseDto convertToDto(Waiting waiting) {

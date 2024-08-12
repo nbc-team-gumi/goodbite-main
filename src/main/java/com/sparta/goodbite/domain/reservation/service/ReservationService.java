@@ -10,6 +10,7 @@ import com.sparta.goodbite.domain.menu.repository.MenuRepository;
 import com.sparta.goodbite.domain.operatinghour.entity.OperatingHour;
 import com.sparta.goodbite.domain.operatinghour.repository.OperatingHourRepository;
 import com.sparta.goodbite.domain.reservation.dto.CreateReservationRequestDto;
+import com.sparta.goodbite.domain.reservation.dto.MenuItemDto;
 import com.sparta.goodbite.domain.reservation.dto.ReservationResponseDto;
 import com.sparta.goodbite.domain.reservation.entity.Reservation;
 import com.sparta.goodbite.domain.reservation.entity.ReservationMenu;
@@ -20,6 +21,7 @@ import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.exception.auth.AuthErrorCode;
 import com.sparta.goodbite.exception.auth.AuthException;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,7 @@ public class ReservationService {
     private final OperatingHourRepository operatingHourRepository;
 
     @Transactional
+//    @RedisLock("reservationLock:#createReservationRequestDto.restaurantId + ':' + #createReservationRequestDto.date")
     public void createReservation(CreateReservationRequestDto createReservationRequestDto,
         UserCredentials user) {
         Customer customer = customerRepository.findByIdOrThrow(user.getId());
@@ -51,7 +54,7 @@ public class ReservationService {
             throw new IllegalArgumentException("예약 시간이 영업 시간 내에 있지 않습니다.");
         }
 
-        // 예약 시간대의 현재 예약 수 확인 (식당 이용 시간 고려)
+        // 예약 시간대의 현재 예약 목록 확인 (식당 이용 시간 고려)
         List<Reservation> existingReservations = reservationRepository.findAllByRestaurantIdAndDate(
             restaurant.getId(), createReservationRequestDto.getDate());
 
@@ -68,25 +71,27 @@ public class ReservationService {
         if (totalReservedPartySize > restaurant.getCapacity()) {
             // 예약 거절: REJECTED 상태로 저장
             Reservation rejectedReservation = createReservationRequestDto.toEntity(customer,
-                restaurant, null);
+                restaurant);
             rejectedReservation.reject();
             reservationRepository.save(rejectedReservation);
             return; // 예약 절차 종료
         }
 
+        List<MenuItemDto> menuItems = createReservationRequestDto.getMenuItems();
+        if (menuItems == null) {
+            menuItems = new ArrayList<>(); // null이면 빈 리스트로 초기화
+        }
+
         // ReservationMenu 엔티티 생성
-        List<ReservationMenu> reservationMenus = createReservationRequestDto.getMenuQuantities()
-            .entrySet().stream()
-            .map(entry -> {
-                Long menuId = entry.getKey();
-                Integer quantity = entry.getValue();
-                Menu menu = menuRepository.findByIdOrThrow(menuId);
-                return ReservationMenu.builder()
-                    .menu(menu)
-                    .quantity(quantity)
-                    .reservation(null) // 나중에 Reservation에 추가할 때 설정
-                    .build();
-            }).toList();
+        List<ReservationMenu> reservationMenus = menuItems.stream().map(menuItemDto -> {
+            Long menuId = menuItemDto.getMenuId();
+            int quantity = menuItemDto.getQuantity();
+            Menu menu = menuRepository.findByIdOrThrow(menuId);
+            return ReservationMenu.builder()
+                .menu(menu)
+                .quantity(quantity)
+                .build();
+        }).toList();
 
         // Reservation 엔티티 생성
         Reservation reservation = createReservationRequestDto.toEntity(customer, restaurant,

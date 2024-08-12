@@ -2,8 +2,9 @@ package com.sparta.goodbite.exception;
 
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
-import com.sparta.goodbite.exception.customer.CustomerException;
 import com.sparta.goodbite.exception.auth.AuthException;
+import com.sparta.goodbite.exception.customer.CustomerException;
+import com.sparta.goodbite.exception.lock.LockException;
 import com.sparta.goodbite.exception.menu.MenuException;
 import com.sparta.goodbite.exception.operatinghour.OperatingHourException;
 import com.sparta.goodbite.exception.owner.OwnerException;
@@ -67,11 +68,17 @@ public class GlobalExceptionHandler {
         log.error("에러 발생: ", e);
         return ResponseUtil.of(e.getOperatingHourErrorCode().getHttpStatus(), e.getMessage());
     }
-  
+
     @ExceptionHandler(WaitingException.class)
     public ResponseEntity<MessageResponseDto> handleWaitingException(WaitingException e) {
         log.error("에러 발생: ", e);
         return ResponseUtil.of(e.getWaitingErrorCode().getHttpStatus(), e.getMessage());
+    }
+
+    @ExceptionHandler(LockException.class)
+    public ResponseEntity<MessageResponseDto> handleWaitingException(LockException e) {
+        log.error("에러 발생: ", e);
+        return ResponseUtil.of(e.getLockErrorCode().getHttpStatus(), e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

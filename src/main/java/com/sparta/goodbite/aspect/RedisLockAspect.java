@@ -2,6 +2,8 @@ package com.sparta.goodbite.aspect;
 
 
 import com.sparta.goodbite.domain.waiting.dto.PostWaitingRequestDto;
+import com.sparta.goodbite.exception.lock.LockErrorCode;
+import com.sparta.goodbite.exception.lock.LockException;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,17 +30,20 @@ public class RedisLockAspect {
 
         // 메서드 파라미터에서 필요한 값을 가져옴
         Object[] args = joinPoint.getArgs();
-        String fieldValue = "";
+        //String fieldValue = "";
+        String restaurantId = "";
 
         for (Object arg : args) {
             if (arg instanceof PostWaitingRequestDto) {
-                fieldValue = String.valueOf(((PostWaitingRequestDto) arg).getRestaurantId());
+                //fieldValue = String.valueOf(((PostWaitingRequestDto) arg).getRestaurantId());
+                restaurantId = String.valueOf(((PostWaitingRequestDto) arg).getRestaurantId());
                 break;
             }
         }
 
-        String lockName = key + ":" + fieldValue;
-
+        //String lockName = key + ":" + fieldValue;
+        // 락 이름을 레스토랑 ID로 설정
+        String lockName = restaurantId;
         log.info("Attempting to acquire lock: {}", lockName);
 
         RLock lock = redissonClient.getLock(lockName);
@@ -52,18 +57,23 @@ public class RedisLockAspect {
             if (!isLockAcquired) {
                 log.warn("Could not acquire lock: {} after waiting for {} seconds", lockName,
                     waitTime);
-                throw new RuntimeException("Unable to acquire lock: " + lockName);
+                throw new LockException(LockErrorCode.LOCK_ACQUISITION_FAILED);
             }
 
             log.info("Lock acquired: {}", lockName);
             return joinPoint.proceed(); // 타겟 메서드 실행
         } catch (InterruptedException e) {
             log.error("Interrupted while trying to acquire lock: {}", lockName, e);
-            throw new RuntimeException("Interrupted while trying to acquire lock: " + lockName, e);
+            throw new LockException(LockErrorCode.LOCK_INTERRUPTED);
         } finally {
             if (isLockAcquired && lock.isHeldByCurrentThread()) {
-                lock.unlock(); // 락 해제
-                log.info("Lock released: {}", lockName);
+                try {
+                    lock.unlock();
+                    log.info("Lock released: {}", lockName);
+                } catch (IllegalMonitorStateException e) {
+                    log.error("Failed to release lock: {}", lockName, e);
+                    throw new LockException(LockErrorCode.LOCK_RELEASE_FAILED);
+                }
             }
         }
     }

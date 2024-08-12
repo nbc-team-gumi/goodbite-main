@@ -41,6 +41,9 @@ public class OwnerService {
 
         Owner owner = validateDuplicateFields(nickname, email, phoneNumber, businessNumber,
             kakaoId);
+        if (kakaoId == null) {
+            kakaoId = -1L;
+        }
 
         // 사업자 등록번호 유효성 검사
         boolean isValidBusinessNumber = businessVerificationService.verifyBusinessNumber(
@@ -65,6 +68,7 @@ public class OwnerService {
                 .phoneNumber(phoneNumber)
                 .businessNumber(businessNumber)
                 .ownerStatus(ownerStatus)
+                .kakaoId(kakaoId)
                 .build();
         } else {
             owner.updateKakaoId(kakaoId);

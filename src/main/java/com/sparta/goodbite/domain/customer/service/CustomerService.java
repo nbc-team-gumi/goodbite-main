@@ -35,6 +35,10 @@ public class CustomerService {
         Long kakaoId = requestDto.getKakaoId();
 
         Customer customer = validateDuplicateFields(nickname, email, phoneNumber, kakaoId);
+        if (kakaoId == null) {
+            kakaoId = -1L;
+        }
+
         // 비밀번호 암호화 -> 인증인가연결시 config에서 PasswordEncoder Bean등록
         String password = passwordEncoder.encode(requestDto.getPassword());
 

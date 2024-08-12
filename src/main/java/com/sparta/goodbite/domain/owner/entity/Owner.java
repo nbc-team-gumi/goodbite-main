@@ -44,7 +44,7 @@ public class Owner extends ExtendedTimestamped implements UserCredentials {
     @Column(nullable = false, unique = true)
     private String businessNumber;
 
-    @Column(nullable = true, unique = true)
+    @Column(nullable = false, unique = true)
     private Long kakaoId;
 
     /*@OneToMany(mappedBy = "owner",cascade = CascadeType.ALL, orphanRemoval = true)

@@ -38,7 +38,7 @@ public class Customer extends ExtendedTimestamped implements UserCredentials {
     @Column(nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(nullable = true, unique = true)
+    @Column(nullable = false, unique = true)
     private Long kakaoId;
 
     /*@OneToMany(mappedBy = "customer",cascade = CascadeType.ALL, orphanRemoval = true)

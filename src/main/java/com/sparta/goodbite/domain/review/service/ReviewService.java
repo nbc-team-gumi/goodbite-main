@@ -46,24 +46,30 @@ public class ReviewService {
             .map(ReviewResponseDto::from).toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<ReviewResponseDto> getMyReviews(UserCredentials user) {
+        return reviewRepository.findAllByCustomerId(user.getId()).stream()
+            .map(ReviewResponseDto::from).toList();
+    }
+
     @Transactional
     public void updateReview(Long reviewId, UpdateReviewRequestDto updateReviewRequestDto,
         UserCredentials user) {
 
-        Review review = getReviewByIdAndValidateCustomer(reviewId, user);
+        Review review = getReviewByIdAndValidateCustomer(reviewId, user.getId());
         review.update(updateReviewRequestDto);
     }
 
     @Transactional
     public void deleteReview(Long reviewId, UserCredentials user) {
-        Review review = getReviewByIdAndValidateCustomer(reviewId, user);
+        Review review = getReviewByIdAndValidateCustomer(reviewId, user.getId());
         reviewRepository.delete(review);
     }
 
-    private Review getReviewByIdAndValidateCustomer(Long reviewId, UserCredentials user) {
+    private Review getReviewByIdAndValidateCustomer(Long reviewId, Long customerId) {
         Review review = reviewRepository.findByIdOrThrow(reviewId);
 
-        if (!review.getCustomer().getId().equals(user.getId())) {
+        if (!review.getCustomer().getId().equals(customerId)) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
 

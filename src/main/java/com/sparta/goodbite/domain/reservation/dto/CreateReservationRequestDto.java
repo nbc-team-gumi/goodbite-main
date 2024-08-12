@@ -15,7 +15,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
 import lombok.Getter;
 
 @Getter
@@ -42,7 +41,19 @@ public class CreateReservationRequestDto {
     @NotNull(message = "인원 수를 입력해 주세요.")
     private int partySize;
 
-    private Map<Long, Integer> menuQuantities;
+    private List<MenuItemDto> menuItems;
+
+    public Reservation toEntity(Customer customer, Restaurant restaurant) {
+        return Reservation.builder()
+            .customer(customer)
+            .restaurant(restaurant)
+            .date(date)
+            .time(time)
+            .requirement(requirement)
+            .partySize(partySize)
+            .status(ReservationStatus.PENDING)
+            .build();
+    }
 
     public Reservation toEntity(Customer customer, Restaurant restaurant,
         List<ReservationMenu> reservationMenus) {

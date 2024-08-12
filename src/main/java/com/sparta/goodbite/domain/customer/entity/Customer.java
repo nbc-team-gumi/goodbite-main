@@ -38,15 +38,20 @@ public class Customer extends ExtendedTimestamped implements UserCredentials {
     @Column(nullable = false, unique = true)
     private String phoneNumber;
 
+    @Column(nullable = true, unique = true)
+    private Long kakaoId;
+
     /*@OneToMany(mappedBy = "customer",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Waiting> waitingList;*/
 
     @Builder
-    public Customer(String password, String email, String nickname, String phoneNumber) {
+    public Customer(String password, String email, String nickname, String phoneNumber,
+        Long kakaoId) {
         this.password = password;
         this.email = email;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
+        this.kakaoId = kakaoId;
     }
 
     @Override
@@ -74,6 +79,10 @@ public class Customer extends ExtendedTimestamped implements UserCredentials {
 
     public void updatePassword(String newPassword) {
         this.password = newPassword;
+    }
+
+    public void updateKakaoId(Long kakaoId) {
+        this.kakaoId = kakaoId;
     }
 
     // 소프트 삭제를 위한 메서드 추가

@@ -31,7 +31,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         "/customers/signup",
         "/owners/signup",
         "/users/login",
-        "/users/refresh"
+        "/users/refresh",
+        "/users/kakao/callback"
     );
     private final PathMatcher pathMatcher = new AntPathMatcher();
 

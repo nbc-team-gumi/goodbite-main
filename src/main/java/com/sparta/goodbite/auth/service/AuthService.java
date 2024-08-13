@@ -3,8 +3,10 @@ package com.sparta.goodbite.auth.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.goodbite.auth.UserRole;
 import com.sparta.goodbite.auth.dto.KakaoUserResponseDto;
 import com.sparta.goodbite.auth.util.JwtUtil;
+import com.sparta.goodbite.common.UserCredentials;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.exception.auth.AuthErrorCode;
@@ -61,17 +63,34 @@ public class AuthService {
         JwtUtil.addJwtToHeader(newAccessToken, response);
     }
 
-    public KakaoUserResponseDto kakaoLogin(String code, Boolean isOwner)
-        throws JsonProcessingException {
+    public KakaoUserResponseDto kakaoLogin(String code, Boolean isOwner,
+        HttpServletResponse response)
+        throws JsonProcessingException, UnsupportedEncodingException {
         // 카카오 액세스 토큰 요청
-        String accessToken = getToken(code);
+        String kakaoAccessToken = getToken(code);
 
         // 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
-        KakaoUserResponseDto userResponseDto = getKakaoUserInfo(accessToken);
+        KakaoUserResponseDto userResponseDto = getKakaoUserInfo(kakaoAccessToken);
+        UserCredentials user;
+        String role;
 
         if (isOwner) {
-            ownerRepository.findByEmail(userResponseDto.getEmail());
+            user = ownerRepository.findByEmail(userResponseDto.email()).orElse(null);
+            role = UserRole.OWNER.getAuthority();
+        } else {
+            user = customerRepository.findByEmail(userResponseDto.email()).orElse(null);
+            role = UserRole.CUSTOMER.getAuthority();
         }
+
+        if (user != null) {
+            String accessToken = JwtUtil.createAccessToken(user.getEmail(), role);
+            String refreshToken = JwtUtil.createRefreshToken(user.getEmail(), role);
+
+            JwtUtil.addJwtToHeader(accessToken, response);
+            JwtUtil.addJwtToHeader(refreshToken, response);
+        }
+
+        return userResponseDto;
     }
 
     private String getToken(String code) throws JsonProcessingException {
@@ -142,14 +161,13 @@ public class AuthService {
         );
 
         JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
-        Long id = jsonNode.get("id").asLong();
         String nickname = jsonNode.get("properties")
             .get("nickname").asText();
         String email = jsonNode.get("kakao_account")
             .get("email").asText();
 
-        log.info("카카오 사용자 정보: {}, {}, {}", id, nickname, email);
-        return KakaoUserResponseDto.from(id, nickname, email);
+        log.info("카카오 사용자 정보: {}, {}", nickname, email);
+        return KakaoUserResponseDto.from(nickname, email);
     }
 
 }

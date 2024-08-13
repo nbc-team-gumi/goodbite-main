@@ -35,12 +35,12 @@ public class AuthController {
         return ResponseUtil.createOk();
     }
 
+    // 카카오 서버로부터 받은 인가 코드 전달 후 인증 처리 및 JWT 반환
     @GetMapping("/users/kakao/callback")
     public ResponseEntity<DataResponseDto<KakaoUserResponseDto>> kakaoLogin(
         @RequestParam String code, @RequestParam Boolean owner,
-        HttpServletResponse response) throws JsonProcessingException {
+        HttpServletResponse response) throws JsonProcessingException, UnsupportedEncodingException {
         log.info("API request OK: {}, {}", code, owner);
-        // code: 카카오 서버로부터 받은 인가 코드 Service 전달 후 인증 처리 및 JWT 반환
-        return ResponseUtil.findOk(authService.kakaoLogin(code, owner));
+        return ResponseUtil.findOk(authService.kakaoLogin(code, owner, response));
     }
 }

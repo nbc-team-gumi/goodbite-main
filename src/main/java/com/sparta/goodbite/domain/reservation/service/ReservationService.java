@@ -155,12 +155,20 @@ public class ReservationService {
         // 예약 ID로 예약 정보 가져오기
         Reservation reservation = reservationRepository.findByIdOrThrow(reservationId);
 
-        // 예약이 현재 사용자와 연관된 예약인지 확인
-        if (!reservation.getCustomer().getId().equals(user.getId())) {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+        if (user.isCustomer()) {
+            // 예약이 현재 사용자와 연관된 예약인지 확인
+            if (!reservation.getCustomer().getId().equals(user.getId())) {
+                throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+            }
+            // 예약 삭제
+            reservation.cancel();
+        } else if (user.isOwner()) {
+            // 예약이 현재 사용자와 연관된 예약인지 확인
+            if (!reservation.getRestaurant().getOwner().getId().equals(user.getId())) {
+                throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+            }
+            // 오너가 예약을 취소하면 예약 거절로 처리
+            reservation.reject();
         }
-
-        // 예약 삭제
-        reservation.cancel();
     }
 }

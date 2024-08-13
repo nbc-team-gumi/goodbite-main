@@ -30,9 +30,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/restaurants")
@@ -48,10 +49,11 @@ public class RestaurantController {
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping
     public ResponseEntity<MessageResponseDto> createRestaurant(
-        @Valid @RequestBody RestaurantRequestDto restaurantRequestDto,
-        @AuthenticationPrincipal EmailUserDetails userDetails) {
+        @Valid @RequestPart RestaurantRequestDto restaurantRequestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails,
+        @RequestPart MultipartFile image) {
 
-        restaurantService.createRestaurant(restaurantRequestDto, userDetails.getUser());
+        restaurantService.createRestaurant(restaurantRequestDto, userDetails.getUser(), image);
         return ResponseUtil.createOk();
     }
 
@@ -63,7 +65,7 @@ public class RestaurantController {
     }
 
     @PreAuthorize("hasRole('OWNER')")
-    @GetMapping("/my")
+    @PostMapping("/my")
     public ResponseEntity<DataResponseDto<RestaurantIdResponseDto>> getMyRestaurant(
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
@@ -94,7 +96,7 @@ public class RestaurantController {
 
     // 사업자 대시보드용 전체 웨이팅 조회
     @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
-    @GetMapping("/{restaurantId}/waitings")
+    @PostMapping("/{restaurantId}/waitings")
     public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getAllWaitingsByRestaurantId(
         @AuthenticationPrincipal EmailUserDetails userDetails,
         @PathVariable Long restaurantId,
@@ -122,11 +124,12 @@ public class RestaurantController {
     @PreAuthorize("hasRole('OWNER')")
     @PutMapping("/{restaurantId}")
     public ResponseEntity<MessageResponseDto> updateRestaurant(@PathVariable Long restaurantId,
-        @RequestBody RestaurantRequestDto restaurantRequestDto,
-        @AuthenticationPrincipal EmailUserDetails userDetails) {
+        @RequestPart RestaurantRequestDto restaurantRequestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails,
+        @RequestPart MultipartFile image) {
 
         restaurantService.updateRestaurant(restaurantId, restaurantRequestDto,
-            userDetails.getUser());
+            userDetails.getUser(), image);
         return ResponseUtil.updateOk();
     }
 

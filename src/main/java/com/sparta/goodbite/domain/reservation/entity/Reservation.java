@@ -90,6 +90,7 @@ public class Reservation extends ExtendedTimestamped {
     }
 
     public void reject() {
+        this.deletedAt = LocalDateTime.now();
         this.status = ReservationStatus.REJECTED;
     }
 }

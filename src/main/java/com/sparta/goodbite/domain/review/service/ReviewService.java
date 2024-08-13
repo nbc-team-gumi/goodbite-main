@@ -9,6 +9,7 @@ import com.sparta.goodbite.domain.review.dto.ReviewResponseDto;
 import com.sparta.goodbite.domain.review.dto.UpdateReviewRequestDto;
 import com.sparta.goodbite.domain.review.entity.Review;
 import com.sparta.goodbite.domain.review.repository.ReviewRepository;
+import com.sparta.goodbite.domain.waiting.repository.WaitingRepository;
 import com.sparta.goodbite.exception.auth.AuthErrorCode;
 import com.sparta.goodbite.exception.auth.AuthException;
 import java.util.List;
@@ -22,11 +23,16 @@ public class ReviewService {
 
     private final RestaurantRepository restaurantRepository;
     private final ReviewRepository reviewRepository;
+    private final WaitingRepository waitingRepository;
 
     @Transactional
     public void createReview(CreateReviewRequestDto createReviewRequestDto, UserCredentials user) {
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
             createReviewRequestDto.getRestaurantId());
+
+        waitingRepository.findStatusByRestaurantIdAndCustomerIdOrTrow(restaurant.getId(),
+            user.getId());
+
         reviewRepository.save(createReviewRequestDto.toEntity(restaurant, (Customer) user));
     }
 

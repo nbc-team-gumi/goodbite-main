@@ -1,5 +1,6 @@
 package com.sparta.goodbite.domain.waiting.service;
 
+import com.sparta.goodbite.aspect.RedisLock;
 import com.sparta.goodbite.common.UserCredentials;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
@@ -33,7 +34,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -47,7 +47,8 @@ public class WaitingService {
     private final OwnerRepository ownerRepository;
     private final NotificationController notificationController;
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @RedisLock(key = "createWaitingLock")
+    @Transactional
     public WaitingResponseDto createWaiting(UserCredentials user,
         PostWaitingRequestDto postWaitingRequestDto) {
 
@@ -56,7 +57,8 @@ public class WaitingService {
 
         Customer customer = customerRepository.findByIdOrThrow(user.getId());
 
-        waitingRepository.validateRestaurantIdAndCustomerId(restaurant.getId(), customer.getId());
+        waitingRepository.validateRestaurantIdAndCustomerId(restaurant.getId(),
+            customer.getId());
 
         Long LastOrderNumber = findLastOrderNumber(restaurant.getId());
 

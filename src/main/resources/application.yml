@@ -5,6 +5,12 @@ spring:
   profiles:
     active: test
 
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
   datasource:
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USERNAME}
@@ -53,3 +59,10 @@ publicdata:
     key: ${PUBLIC_DATA_KEY}
     url: https://api.odcloud.kr/api/nts-businessman/v1/status
 
+logging:
+  level:
+    root: INFO
+    com:
+      sparta:
+        goodbite:
+          aspect: DEBUG

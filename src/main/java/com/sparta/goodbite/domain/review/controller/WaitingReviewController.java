@@ -52,13 +52,6 @@ public class WaitingReviewController {
     }
 
     @PreAuthorize("hasRole('CUSTOMER')")
-    @GetMapping("/my")
-    public ResponseEntity<DataResponseDto<List<ReviewResponseDto>>> getMyWaitingReviews(
-        @AuthenticationPrincipal EmailUserDetails userDetails) {
-        return ResponseUtil.findOk(waitingReviewService.getMyReviews(userDetails.getUser()));
-    }
-
-    @PreAuthorize("hasRole('CUSTOMER')")
     @PutMapping("/{waitingReviewId}")
     public ResponseEntity<MessageResponseDto> updateWaitingReview(
         @PathVariable Long waitingReviewId,

@@ -54,14 +54,6 @@ public class ReservationReviewController {
     }
 
     @PreAuthorize("hasRole('CUSTOMER')")
-    @GetMapping("/my")
-    public ResponseEntity<DataResponseDto<List<ReviewResponseDto>>> getMyReviews(
-        @AuthenticationPrincipal EmailUserDetails userDetails) {
-        return ResponseUtil.findOk(reservationReviewService.getMyReviews(userDetails.getUser()));
-    }
-
-
-    @PreAuthorize("hasRole('CUSTOMER')")
     @PutMapping("/{reservationReviewId}")
     public ResponseEntity<MessageResponseDto> updateReview(@PathVariable Long reservationReviewId,
         @Valid @RequestBody UpdateReviewRequestDto updateReviewRequestDto,

@@ -40,7 +40,7 @@ public class RedisLockAspect {
 
         // 락 이름을 레스토랑 ID로 설정
         String lockName = restaurantId;
-        log.info("락 획득 시도: {}", lockName);
+        log.debug("락 획득 시도: {}", lockName);
 
         RLock lock = redissonClient.getLock(lockName);
 
@@ -56,7 +56,7 @@ public class RedisLockAspect {
                 throw new LockException(LockErrorCode.LOCK_ACQUISITION_FAILED);
             }
 
-            log.info("락 획득: {}", lockName);
+            log.debug("락 획득: {}", lockName);
             return joinPoint.proceed(); // 타겟 메서드 실행
         } catch (InterruptedException e) {
             log.error("락을 획득하려는 도중에 인터럽트되었습니다: {}", lockName, e);
@@ -65,10 +65,10 @@ public class RedisLockAspect {
             if (isLockAcquired && lock.isHeldByCurrentThread()) {
                 try {
                     lock.unlock();
-                    log.info("락 해제: {}", lockName);
+                    log.debug("락 해제: {}", lockName);
                 } catch (IllegalMonitorStateException e) {
-                    log.error("락 해제 실패: 락 {}이(가) 해제되지 않았습니다. 메서드: {}, 파라미터: {}, 예외: {}",
-                        lockName, joinPoint.getSignature().getName(), args, e);
+                    log.error("락 해제 실패: 락 {}이(가) 해제되지 않았습니다. 메서드: {}, 파라미터: {}, 예외: {}", lockName,
+                        joinPoint.getSignature().getName(), args, e);
                     throw new LockException(LockErrorCode.LOCK_RELEASE_FAILED);
                 }
             }

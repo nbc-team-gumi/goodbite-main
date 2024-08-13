@@ -16,6 +16,7 @@ public class AtLeastOneFieldValidator implements
     @Override
     public boolean isValid(UpdateMenuRequestDto dto, ConstraintValidatorContext context) {
         return dto.getPrice() != null || StringUtils.isNotBlank(dto.getName())
-            || StringUtils.isNotBlank(dto.getDescription());
+            || StringUtils.isNotBlank(dto.getDescription()) || StringUtils.isNotBlank(
+            dto.getImageUrl());
     }
 }

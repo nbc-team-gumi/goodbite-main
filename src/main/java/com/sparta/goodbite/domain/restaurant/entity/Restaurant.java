@@ -38,6 +38,7 @@ public class Restaurant extends Timestamped {
     private String address;
     private String area;
     private String phoneNumber;
+    private int capacity;
 
     @Enumerated(EnumType.STRING)
     private Category category;
@@ -52,6 +53,7 @@ public class Restaurant extends Timestamped {
         this.area = area;
         this.phoneNumber = phoneNumber;
         this.category = category;
+        this.capacity = capacity;
     }
 
     public void update(RestaurantRequestDto restaurantRequestDto, String restaurantImage) {
@@ -61,5 +63,6 @@ public class Restaurant extends Timestamped {
         this.area = restaurantRequestDto.getArea();
         this.phoneNumber = restaurantRequestDto.getPhoneNumber();
         this.category = restaurantRequestDto.getCategory();
+        this.capacity = restaurantRequestDto.getCapacity();
     }
 }

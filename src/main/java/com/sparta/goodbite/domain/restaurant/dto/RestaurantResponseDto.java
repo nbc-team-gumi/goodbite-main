@@ -4,7 +4,8 @@ import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.enums.Category;
 
 public record RestaurantResponseDto(Long restaurantId, String name, String imageUrl, String address,
-                                    String area, String phoneNumber, Category category) {
+                                    String area, String phoneNumber, String category,
+                                    int capacity) {
 
     public static RestaurantResponseDto from(Restaurant restaurant) {
         return new RestaurantResponseDto(
@@ -14,6 +15,7 @@ public record RestaurantResponseDto(Long restaurantId, String name, String image
             restaurant.getAddress(),
             restaurant.getArea(),
             restaurant.getPhoneNumber(),
-            restaurant.getCategory());
+            restaurant.getCategory(),
+            restaurant.getCapacity());
     }
 }

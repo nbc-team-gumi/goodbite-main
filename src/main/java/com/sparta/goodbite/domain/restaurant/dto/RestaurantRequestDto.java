@@ -4,6 +4,7 @@ import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.enums.Category;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
@@ -29,6 +30,9 @@ public class RestaurantRequestDto {
     @NotBlank(message = "카테고리를 입력해주세요.")
     private Category category;
 
+    @NotNull(message = "최대 수용 인원을 입력해주세요.")
+    private Integer capacity;
+
     public Restaurant toEntity(Owner owner, String image) {
         return Restaurant.builder()
             .owner(owner)
@@ -38,6 +42,7 @@ public class RestaurantRequestDto {
             .area(area)
             .phoneNumber(phoneNumber)
             .category(category)
+            .capacity(capacity)
             .build();
     }
 }

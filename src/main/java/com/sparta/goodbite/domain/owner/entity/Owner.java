@@ -76,6 +76,16 @@ public class Owner extends ExtendedTimestamped implements UserCredentials {
         return password;
     }
 
+    @Override
+    public boolean isCustomer() {
+        return false;
+    }
+
+    @Override
+    public boolean isOwner() {
+        return true;
+    }
+
     public void updateNickname(String newNickname) {
         this.nickname = newNickname;
     }

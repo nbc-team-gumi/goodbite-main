@@ -8,6 +8,8 @@ import com.sparta.goodbite.domain.menu.dto.MenuResponseDto;
 import com.sparta.goodbite.domain.menu.service.MenuService;
 import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
 import com.sparta.goodbite.domain.operatinghour.service.OperatingHourService;
+import com.sparta.goodbite.domain.reservation.dto.ReservationResponseDto;
+import com.sparta.goodbite.domain.reservation.service.ReservationService;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantIdResponseDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
@@ -45,6 +47,7 @@ public class RestaurantController {
     private final WaitingService waitingService;
     private final MenuService menuService;
     private final ReviewService reviewService;
+    private final ReservationService reservationService;
 
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping
@@ -119,6 +122,15 @@ public class RestaurantController {
     public ResponseEntity<DataResponseDto<List<ReviewResponseDto>>> getAllReviewsByRestaurantId(
         @PathVariable Long restaurantId) {
         return ResponseUtil.findOk(reviewService.getAllReviewsByRestaurantId(restaurantId));
+    }
+
+    @PreAuthorize("hasRole('OWNER')")
+    @GetMapping("/{restaurantId}/reservations")
+    public ResponseEntity<DataResponseDto<List<ReservationResponseDto>>> getAllReservationsByRestaurantId(
+        @PathVariable Long restaurantId, @AuthenticationPrincipal EmailUserDetails userDetails) {
+
+        return ResponseUtil.findOk(reservationService.getAllReservationsByRestaurantId(restaurantId,
+            userDetails.getUser()));
     }
 
     @PreAuthorize("hasRole('OWNER')")

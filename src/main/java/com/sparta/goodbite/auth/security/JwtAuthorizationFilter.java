@@ -27,12 +27,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final EmailUserDetailsService userDetailsService;
-    private final List<String> excludedPaths = List.of(
-        "/customers/signup",
-        "/owners/signup",
-        "/users/login",
-        "/users/refresh"
-    );
     private final PathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
@@ -44,18 +38,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String method = req.getMethod();
         String accessToken = JwtUtil.getAccessTokenFromRequest(req);
 
-        // 로그인, 회원가입, 리프레시는 통과
-        boolean isExcludePath = excludedPaths.stream()
-            .anyMatch(path -> pathMatcher.match(path, requestPath));
-
-        // GET /menus/**, GET /reviews/**, GET /restaurants/** 요청은 인증 없이 허용
-        boolean isGetMethodExcludePath =
-            "GET".equalsIgnoreCase(method) && (
-                pathMatcher.match("/menus/**", requestPath) ||
-                    pathMatcher.match("/reviews/**", requestPath) ||
-                    pathMatcher.match("/restaurants/**", requestPath)
-            );
-        if (accessToken == null || isExcludePath || isGetMethodExcludePath) {
+        if (isExcludedPath(requestPath) || isGetMethodExcludedPath(requestPath, method)
+            || accessToken == null) {
             filterChain.doFilter(req, res);
             return;
         }
@@ -79,6 +63,35 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(req, res);
+    }
+
+    // 특정 경로가 제외 경로에 해당하는지 검사
+    private boolean isExcludedPath(String requestPath) {
+        List<String> excludedPaths = List.of(
+            "/customers/signup",
+            "/owners/signup",
+            "/users/login",
+            "/users/refresh"
+        );
+        return excludedPaths.stream()
+            .anyMatch(path -> pathMatcher.match(path, requestPath));
+    }
+
+    // 특정 메서드(GET) 요청 경로가 제외 경로에 해당하는지 검사
+    private boolean isGetMethodExcludedPath(String requestPath, String method) {
+        return "GET".equalsIgnoreCase(method) && (
+            pathMatcher.match("/menus", requestPath) ||
+                pathMatcher.match("/menus/{menuId}", requestPath) ||
+                pathMatcher.match("/operating-hours/{operatingHourId}", requestPath) ||
+                pathMatcher.match("/restaurants", requestPath) ||
+                pathMatcher.match("/restaurants/{restaurantId}", requestPath) ||
+                pathMatcher.match("/restaurants/{restaurantId}/operating-hours", requestPath) ||
+                pathMatcher.match("/restaurants/{restaurantId}/menus", requestPath) ||
+                pathMatcher.match("/restaurants/{restaurantId}/last-waiting", requestPath) ||
+                pathMatcher.match("/restaurants/{restaurantId}/reviews", requestPath) ||
+                pathMatcher.match("/reviews", requestPath) ||
+                pathMatcher.match("/reviews/{reviewId}", requestPath)
+        );
     }
 
     // 인증 처리

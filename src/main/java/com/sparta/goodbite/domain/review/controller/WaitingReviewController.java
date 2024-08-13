@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping("/waiting-reviews")
 @RequiredArgsConstructor
+@RequestMapping("/waiting-reviews")
+@RestController
 public class WaitingReviewController {
 
     private final WaitingReviewServiceImpl waitingReviewService;

@@ -45,7 +45,7 @@ public class Restaurant extends Timestamped {
 
     @Builder
     public Restaurant(Owner owner, String name, String imageUrl, String address, String area,
-        String phoneNumber, Category category) {
+        String phoneNumber, Category category, int capacity) {
         this.owner = owner;
         this.name = name;
         this.imageUrl = imageUrl;

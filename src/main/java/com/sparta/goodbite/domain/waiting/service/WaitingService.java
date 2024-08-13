@@ -3,6 +3,7 @@ package com.sparta.goodbite.domain.waiting.service;
 import com.sparta.goodbite.common.UserCredentials;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
+import com.sparta.goodbite.domain.notification.controller.NotificationController;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
@@ -27,7 +28,9 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -42,6 +45,7 @@ public class WaitingService {
     private final CustomerRepository customerRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final OwnerRepository ownerRepository;
+    private final NotificationController notificationController;
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public WaitingResponseDto createWaiting(UserCredentials user,
@@ -66,6 +70,9 @@ public class WaitingService {
             postWaitingRequestDto.getDemand());
 
         waitingRepository.save(waiting);
+
+        String message = "새로운 웨이팅이 등록되었습니다.";
+        notificationController.notifyOwner(restaurant.getId().toString(), message);
 
         return WaitingResponseDto.of(waiting);
     }
@@ -104,9 +111,8 @@ public class WaitingService {
                 //--------------
                 // 알람 메서드 위치
                 //--------------
-
-                sendNotificationToCustomer(waiting.getCustomer().getId(),
-                    "가게로 들어와 주세요.");
+                String message = "손님, 가게로 입장해 주세요.";
+                notificationController.notifyCustomer(waiting.getId().toString(), message);
 //                waitingRepository.delete(waiting);
                 waiting.delete(LocalDateTime.now(), WaitingStatus.SEATED);
             } else {
@@ -189,11 +195,19 @@ public class WaitingService {
     @Transactional(readOnly = true)
     public Page<WaitingResponseDto> getWaitings(UserCredentials user, Pageable pageable) {
 
-        Page<Waiting> waitingPage = waitingRepository.findByCustomerId(user.getId(), pageable);
+        // 기존 pageable에 최신순 정렬을 추가
+        Pageable sortedPageable = PageRequest.of(
+            pageable.getPageNumber(),
+            pageable.getPageSize(),
+            Sort.by(Sort.Direction.DESC, "createdAt")  // 최신순으로 정렬
+        );
+
+        Page<Waiting> waitingPage = waitingRepository.findByCustomerId(user.getId(),
+            sortedPageable);
 
         List<WaitingResponseDto> waitingResponseDtos = waitingPage.stream()
             .map(this::convertToDto).toList();
-        return new PageImpl<>(waitingResponseDtos, pageable, waitingPage.getTotalElements());
+        return new PageImpl<>(waitingResponseDtos, sortedPageable, waitingPage.getTotalElements());
     }
 
     private WaitingResponseDto convertToDto(Waiting waiting) {
@@ -208,6 +222,7 @@ public class WaitingService {
 
         String message = "";
         boolean flag = false;
+        WaitingStatus waitingStatus = WaitingStatus.WAITING;
         List<Waiting> waitingArrayList = new ArrayList<>();
 
         for (Waiting waiting : waitingList) {
@@ -215,17 +230,22 @@ public class WaitingService {
 
                 //--------------
                 // 알람 메서드 위치
+                // 현재 기능을 요청한 사람이 오너인지 손님인지 구분하는 메서드가 없음
+                // 이후 구현을 요함
                 //--------------
 
                 if (type.equals("delete")) {
                     message = "웨이팅이 취소되었습니다.";
-                    waiting.delete(LocalDateTime.now(), WaitingStatus.CANCELLED);
+                    waitingStatus = WaitingStatus.CANCELLED;
+                    notificationController.notifyOwner(waiting.getRestaurant().getId().toString(),
+                        message);
                 } else if (type.equals("reduce")) {
                     message = "손님, 가게로 입장해 주세요.";
-                    waiting.delete(LocalDateTime.now(), WaitingStatus.SEATED);
+                    waitingStatus = WaitingStatus.SEATED;
                 }
-                sendNotificationToCustomer(waiting.getCustomer().getId(), message);
-//                waitingRepository.delete(waiting);
+
+                notificationController.notifyCustomer(waitingId.toString(), message);
+                waiting.delete(LocalDateTime.now(), waitingStatus);
 
                 flag = true;
             } else if (flag) {
@@ -241,9 +261,6 @@ public class WaitingService {
         waitingRepository.saveAll(waitingArrayList);
     }
 
-    private void sendNotificationToCustomer(Long customerId, String message) {
-        messagingTemplate.convertAndSend("/topic/notifications/" + customerId, message);
-    }
 
     private void validateWaitingRequest(UserCredentials user, Long waitingId) {
 

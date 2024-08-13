@@ -22,7 +22,6 @@ public class EmailUserDetailsService implements UserDetailsService {
 
     private final CustomerRepository customerRepository;
     private final OwnerRepository ownerRepository;
-//    private final AdminRepository adminRepository;
 
 //    public EmailUserDetails loadUserByEmail(String email, String role)
 //        throws UsernameNotFoundException {
@@ -58,11 +57,6 @@ public class EmailUserDetailsService implements UserDetailsService {
             OwnerStatus.VERIFIED)) {
             return new EmailUserDetails(owner.get(), UserRole.OWNER.getAuthority());
         }
-
-//        Optional<Admin> admin = adminRepository.findByEmail(username);
-//        if (admin.isPresent()) {
-//            return new EmailUserDetails(admin.get(), UserRole.ADMIN.getAuthority());
-//        }
 
         return null;
     }

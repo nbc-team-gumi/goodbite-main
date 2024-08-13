@@ -68,7 +68,7 @@ public class RestaurantController {
     }
 
     @PreAuthorize("hasRole('OWNER')")
-    @PostMapping("/my")
+    @GetMapping("/my")
     public ResponseEntity<DataResponseDto<RestaurantIdResponseDto>> getMyRestaurant(
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
@@ -99,7 +99,7 @@ public class RestaurantController {
 
     // 사업자 대시보드용 전체 웨이팅 조회
     @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
-    @PostMapping("/{restaurantId}/waitings")
+    @GetMapping("/{restaurantId}/waitings")
     public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getAllWaitingsByRestaurantId(
         @AuthenticationPrincipal EmailUserDetails userDetails,
         @PathVariable Long restaurantId,

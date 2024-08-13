@@ -94,12 +94,6 @@ public class WebSecurityConfig {
     // 로그아웃 핸들러 Bean 등록
     @Bean
     public LogoutSuccessHandler logoutSuccessHandler() {
-
-//        // 로그아웃 페이지로 리디렉션 (프론트 개발시 고려)
-//        SimpleUrlLogoutSuccessHandler handler = new SimpleUrlLogoutSuccessHandler();
-//        handler.setDefaultTargetUrl("/users/login?logout");
-//        return handler;
-
         return new EmailLogoutSuccessHandler();
     }
 

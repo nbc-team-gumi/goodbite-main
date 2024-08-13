@@ -12,8 +12,8 @@ public class RestaurantRequestDto {
     @NotBlank(message = "가게 이름을 입력해주세요.")
     private String name;
 
-    @NotBlank(message = "가게 사진을 넣어주세요.")
-    private String imageUrl;
+//    @NotBlank(message = "가게 사진을 넣어주세요.")
+//    private String imageUrl;
 
     @NotBlank(message = "가게 주소를 입력해주세요.")
     private String address;
@@ -28,11 +28,11 @@ public class RestaurantRequestDto {
     @NotBlank(message = "카테고리를 입력해주세요.")
     private String category;
 
-    public Restaurant toEntity(Owner owner) {
+    public Restaurant toEntity(Owner owner, String image) {
         return Restaurant.builder()
             .owner(owner)
             .name(name)
-            .imageUrl(imageUrl)
+            .imageUrl(image)
             .address(address)
             .area(area)
             .phoneNumber(phoneNumber)

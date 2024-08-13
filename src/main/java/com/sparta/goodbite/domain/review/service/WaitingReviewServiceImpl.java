@@ -14,6 +14,8 @@ import com.sparta.goodbite.domain.waiting.entity.Waiting;
 import com.sparta.goodbite.domain.waiting.repository.WaitingRepository;
 import com.sparta.goodbite.exception.auth.AuthErrorCode;
 import com.sparta.goodbite.exception.auth.AuthException;
+import com.sparta.goodbite.exception.review.ReviewErrorCode;
+import com.sparta.goodbite.exception.review.detail.CanNotSubmitReviewException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,10 +34,16 @@ public class WaitingReviewServiceImpl implements
     @Transactional
     public void createReview(CreateWaitingReviewRequestDto createWaitingReviewRequestDto,
         UserCredentials user) {
-        Restaurant restaurant = restaurantRepository.findByIdOrThrow(
-            createWaitingReviewRequestDto.getRestaurantId());
+
         Waiting waiting = waitingRepository.findByIdOrThrow(
             createWaitingReviewRequestDto.getWaitingId());
+
+        if (!waiting.canSubmitReview()) {
+            throw new CanNotSubmitReviewException(ReviewErrorCode.CANNOT_SUBMIT_REVIEW);
+        }
+
+        Restaurant restaurant = restaurantRepository.findByIdOrThrow(
+            createWaitingReviewRequestDto.getRestaurantId());
         waitingReviewRepository.save(
             createWaitingReviewRequestDto.toEntity(restaurant, (Customer) user, waiting));
     }

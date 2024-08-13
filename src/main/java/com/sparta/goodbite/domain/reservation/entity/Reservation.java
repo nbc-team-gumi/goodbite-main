@@ -18,6 +18,7 @@ import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -74,6 +75,14 @@ public class Reservation extends ExtendedTimestamped {
         this.requirement = requirement;
         this.partySize = partySize;
         this.status = status;
+    }
+
+    public boolean canSubmitReview() {
+        return this.status == ReservationStatus.COMPLETED &&
+            ChronoUnit.MINUTES.between(
+                LocalDateTime.of(this.date, this.time).plusHours(RESERVATION_DURATION_HOUR),
+                LocalDateTime.now())
+                <= 60 * 24 * 3;
     }
 
     public void delete() {

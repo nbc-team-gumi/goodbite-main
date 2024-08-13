@@ -5,7 +5,7 @@ import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.operatinghour.dto.validation.contraint.LocalTimeFormatConstraint;
 import com.sparta.goodbite.domain.reservation.dto.validation.constraint.LocalDateFormatConstraint;
 import com.sparta.goodbite.domain.reservation.dto.validation.constraint.ReservationDateConstraint;
-import com.sparta.goodbite.domain.reservation.dto.validation.constraint.ReservationTimeConstraint;
+import com.sparta.goodbite.domain.reservation.dto.validation.constraint.ReservationDateTimeConstraint;
 import com.sparta.goodbite.domain.reservation.dto.validation.constraint.TimeIntervalConstraint;
 import com.sparta.goodbite.domain.reservation.entity.Reservation;
 import com.sparta.goodbite.domain.reservation.entity.ReservationMenu;
@@ -18,6 +18,7 @@ import java.util.List;
 import lombok.Getter;
 
 @Getter
+@ReservationDateTimeConstraint
 public class CreateReservationRequestDto {
 
     @NotNull(message = "식당 ID를 입력해 주세요.")
@@ -33,7 +34,6 @@ public class CreateReservationRequestDto {
     @JsonFormat(pattern = "HH:mm")
     @LocalTimeFormatConstraint
     @TimeIntervalConstraint
-    @ReservationTimeConstraint
     private LocalTime time;
 
     private String requirement;

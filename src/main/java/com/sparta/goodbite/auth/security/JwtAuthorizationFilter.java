@@ -77,21 +77,28 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             .anyMatch(path -> pathMatcher.match(path, requestPath));
     }
 
-    // 특정 메서드(GET) 요청 경로가 제외 경로에 해당하는지 검사
+    // GET 요청 중 인가가 필요한 경로 확인
     private boolean isGetMethodExcludedPath(String requestPath, String method) {
-        return "GET".equalsIgnoreCase(method) && (
-            pathMatcher.match("/menus", requestPath) ||
-                pathMatcher.match("/menus/{menuId}", requestPath) ||
-                pathMatcher.match("/operating-hours/{operatingHourId}", requestPath) ||
-                pathMatcher.match("/restaurants", requestPath) ||
-                pathMatcher.match("/restaurants/{restaurantId}", requestPath) ||
-                pathMatcher.match("/restaurants/{restaurantId}/operating-hours", requestPath) ||
-                pathMatcher.match("/restaurants/{restaurantId}/menus", requestPath) ||
-                pathMatcher.match("/restaurants/{restaurantId}/last-waiting", requestPath) ||
-                pathMatcher.match("/restaurants/{restaurantId}/reviews", requestPath) ||
-                pathMatcher.match("/reviews", requestPath) ||
-                pathMatcher.match("/reviews/{reviewId}", requestPath)
+        if (!"GET".equalsIgnoreCase(method)) {
+            return false; // GET 메서드가 아닌 경우 인가 필요
+        }
+
+        // 인가가 필요한 경로
+        List<String> authorizedPaths = List.of(
+            "/restaurants/my",
+            "/restaurants/{restaurantId}/waitings",
+            "/reviews/my",
+            "/waitings",
+            "/waitings/{waitingId}",
+            "/reservations/{reservationId}",
+            "/reservations/my",
+            "/owners",
+            "/customers"
         );
+
+        // 인가가 필요한 경로에 해당하지 않는 GET 메서드는 인가 패스
+        return authorizedPaths.stream()
+            .noneMatch(path -> pathMatcher.match(path, requestPath));
     }
 
     // 인증 처리

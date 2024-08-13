@@ -3,7 +3,11 @@ package com.sparta.goodbite.domain.restaurant.entity;
 import com.sparta.goodbite.common.Timestamped;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
+import com.sparta.goodbite.domain.restaurant.enums.Category;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,16 +31,21 @@ public class Restaurant extends Timestamped {
     private Owner owner;
 
     private String name;
+
+    @Column(length = 2083)
     private String imageUrl;
+
     private String address;
     private String area;
     private String phoneNumber;
-    private String category;
     private int capacity;
+
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
     @Builder
     public Restaurant(Owner owner, String name, String imageUrl, String address, String area,
-        String phoneNumber, String category, int capacity) {
+        String phoneNumber, Category category) {
         this.owner = owner;
         this.name = name;
         this.imageUrl = imageUrl;
@@ -47,9 +56,9 @@ public class Restaurant extends Timestamped {
         this.capacity = capacity;
     }
 
-    public void update(RestaurantRequestDto restaurantRequestDto) {
+    public void update(RestaurantRequestDto restaurantRequestDto, String restaurantImage) {
         this.name = restaurantRequestDto.getName();
-        this.imageUrl = restaurantRequestDto.getImageUrl();
+        this.imageUrl = restaurantImage;
         this.address = restaurantRequestDto.getAddress();
         this.area = restaurantRequestDto.getArea();
         this.phoneNumber = restaurantRequestDto.getPhoneNumber();

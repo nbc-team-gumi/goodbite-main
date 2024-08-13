@@ -32,6 +32,12 @@ jobs:
           JWT_SECRET_KEY: ${{ vars.JWT_SECRET_KEY }}
           PUBLIC_DATA_KEY: ${{ secrets.PUBLIC_DATA_KEY }}
           EC2_HOST: ${{ vars.EC2_HOST }}
+          DOMAIN_URL: ${{ vars.DOMAIN_URL }}
+          SUBDOMAIN_URL: ${{ vars.SUBDOMAIN_URL }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          S3_REGION: ${{ secrets.S3_REGION }}
+          S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+          S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -70,7 +76,7 @@ jobs:
             sudo usermod -aG docker $USER
             newgrp docker
             
-            CONTAINER_ID=$(sudo docker ps -q --filter "publish=8080-8080")
+            CONTAINER_ID=$(sudo docker ps -q --filter "publish=80-8080")
 
             if [ ! -z "$CONTAINER_ID" ]; then
             sudo docker stop $CONTAINER_ID
@@ -79,12 +85,19 @@ jobs:
             
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
             
-            sudo docker run -d -p 8080:8080 \
-            -e DB_USERNAME=${{vars.DB_USERNAME}} \
-            -e DB_PASSWORD=${{vars.DB_PASSWORD}} \
-            -e DB_HOST=${{vars.DB_HOST}} \
-            -e DB_NAME=${{vars.DB_NAME}} \
-            -e DB_PORT=${{vars.DB_PORT}} \
-            -e JWT_SECRET_KEY=${{vars.JWT_SECRET_KEY}} \
-            -e PUBLIC_DATA_KEY=${{secrets.PUBLIC_DATA_KEY}} \
+            sudo docker run -d -p 80:8080 \
+            -e DB_USERNAME=${{ vars.DB_USERNAME }} \
+            -e DB_PASSWORD=${{ vars.DB_PASSWORD }} \
+            -e DB_HOST=${{ vars.DB_HOST }} \
+            -e DB_NAME=${{ vars.DB_NAME }} \
+            -e DB_PORT=${{ vars.DB_PORT }} \
+            -e JWT_SECRET_KEY=${{ vars.JWT_SECRET_KEY }} \
+            -e PUBLIC_DATA_KEY=${{ secrets.PUBLIC_DATA_KEY }} \
+            -e DOMAIN_URL=${{ vars.DOMAIN_URL }} \
+            -e SUBDOMAIN_URL=${{ vars.SUBDOMAIN_URL }} \
+            -e EC2_HOST=${{ vars.EC2_HOST }} \
+            -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
+            -e S3_REGION=${{ secrets.S3_REGION }} \
+            -e S3_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY }} \
+            -e S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest

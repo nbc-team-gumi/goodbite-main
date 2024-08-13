@@ -14,6 +14,8 @@ import com.sparta.goodbite.domain.review.entity.Review;
 import com.sparta.goodbite.domain.review.repository.ReservationReviewRepository;
 import com.sparta.goodbite.exception.auth.AuthErrorCode;
 import com.sparta.goodbite.exception.auth.AuthException;
+import com.sparta.goodbite.exception.review.ReviewErrorCode;
+import com.sparta.goodbite.exception.review.detail.CanNotSubmitReviewException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,10 +34,16 @@ public class ReservationReviewServiceImpl implements
     @Transactional
     public void createReview(CreateReservationReviewRequestDto createReservationReviewRequestDto,
         UserCredentials user) {
-        Restaurant restaurant = restaurantRepository.findByIdOrThrow(
-            createReservationReviewRequestDto.getRestaurantId());
+
         Reservation reservation = reservationRepository.findByIdOrThrow(
             createReservationReviewRequestDto.getReservationId());
+
+        if (!reservation.canSubmitReview()) {
+            throw new CanNotSubmitReviewException(ReviewErrorCode.CANNOT_SUBMIT_REVIEW);
+        }
+        
+        Restaurant restaurant = restaurantRepository.findByIdOrThrow(
+            createReservationReviewRequestDto.getRestaurantId());
         reservationReviewRepository.save(
             createReservationReviewRequestDto.toEntity(restaurant, (Customer) user, reservation));
     }

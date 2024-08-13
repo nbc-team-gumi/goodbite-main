@@ -15,7 +15,7 @@ import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
 import com.sparta.goodbite.domain.restaurant.service.RestaurantService;
 import com.sparta.goodbite.domain.review.dto.ReviewResponseDto;
-import com.sparta.goodbite.domain.review.service.ReviewService;
+import com.sparta.goodbite.domain.review.service.WaitingReviewServiceImpl;
 import com.sparta.goodbite.domain.waiting.dto.WaitingResponseDto;
 import com.sparta.goodbite.domain.waiting.service.WaitingService;
 import jakarta.validation.Valid;
@@ -46,7 +46,7 @@ public class RestaurantController {
     private final OperatingHourService operatingHourService;
     private final WaitingService waitingService;
     private final MenuService menuService;
-    private final ReviewService reviewService;
+    private final WaitingReviewServiceImpl reviewService;
     private final ReservationService reservationService;
 
     @PreAuthorize("hasRole('OWNER')")

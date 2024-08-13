@@ -79,7 +79,7 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true); // 자격 증명 허용
-        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedOrigin("http://localhost:3000"); // 로컬 개발용
         config.addAllowedOrigin(SUBDOMAIN_URL); // 프론트엔드 서브도메인
         config.addAllowedOrigin(DOMAIN_URL); // 프론트엔드 도메인
         config.addAllowedHeader("*"); // 모든 헤더 허용
@@ -150,11 +150,10 @@ public class WebSecurityConfig {
                     .requestMatchers("/customers/**").hasRole(UserRole.CUSTOMER.name())
                     .requestMatchers(HttpMethod.GET, "/menus/**").permitAll() // 메뉴 조회는 모두 가능
                     .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll() // 리뷰 조회는 모두 가능
-                    .requestMatchers(HttpMethod.GET, "/restaurants/**").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/server-events/**")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/server-events/**")
+                    .requestMatchers(HttpMethod.GET, "/restaurants/**")
                     .permitAll() // 레스토랑 조회는 모두 가능
+                    .requestMatchers(HttpMethod.GET, "/server-events/**").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/server-events/**").permitAll()
                     .anyRequest().authenticated())
 
             // 기본 폼 로그인을 비활성화, 중복 인증 방지

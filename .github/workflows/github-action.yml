@@ -38,6 +38,9 @@ jobs:
           S3_REGION: ${{ secrets.S3_REGION }}
           S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
           S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+          REDIS_SERVER: ${{ secrets.REDIS_SERVER }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          REDIS_PORT: $${{ secrets.REDIS_PORT }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -100,7 +103,7 @@ jobs:
             -e S3_REGION=${{ secrets.S3_REGION }} \
             -e S3_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY }} \
             -e S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }} \
-            -e REDIS_SERVER=${{sercrets.REDIS_SERVER}} \
-            -e REDIS_PASSWORD=${{sercrets.REDIS_PASSWORD}} \
-            -e REDIS_PORT=${{sercrets.REDIS_PORT}} \
+            -e REDIS_SERVER=${{ secrets.REDIS_SERVER }} \
+            -e REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
+            -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest

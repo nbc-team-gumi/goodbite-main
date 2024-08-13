@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.goodbite.auth.dto.KakaoUserResponseDto;
 import com.sparta.goodbite.auth.util.JwtUtil;
+import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
+import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.exception.auth.AuthErrorCode;
 import com.sparta.goodbite.exception.auth.detail.InvalidRefreshTokenException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +31,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class AuthService {
 
     private final RestTemplate restTemplate;
+    private final CustomerRepository customerRepository;
+    private final OwnerRepository ownerRepository;
 
     @Value("${KAKAO_API_KEY}")
     private String kakaoApiKey;
@@ -57,12 +61,17 @@ public class AuthService {
         JwtUtil.addJwtToHeader(newAccessToken, response);
     }
 
-    public KakaoUserResponseDto kakaoLogin(String code) throws JsonProcessingException {
+    public KakaoUserResponseDto kakaoLogin(String code, Boolean isOwner)
+        throws JsonProcessingException {
         // 카카오 액세스 토큰 요청
         String accessToken = getToken(code);
 
         // 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
-        return getKakaoUserInfo(accessToken);
+        KakaoUserResponseDto userResponseDto = getKakaoUserInfo(accessToken);
+
+        if (isOwner) {
+            ownerRepository.findByEmail(userResponseDto.getEmail());
+        }
     }
 
     private String getToken(String code) throws JsonProcessingException {

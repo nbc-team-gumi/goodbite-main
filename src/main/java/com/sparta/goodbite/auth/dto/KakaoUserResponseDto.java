@@ -1,8 +1,12 @@
 package com.sparta.goodbite.auth.dto;
 
-public record KakaoUserResponseDto(Long id, String nickname, String email) {
+public record KakaoUserResponseDto(String nickname, String email) {
 
-    public static KakaoUserResponseDto from(Long id, String nickname, String email) {
-        return new KakaoUserResponseDto(id, nickname, email);
+    public static KakaoUserResponseDto from(String nickname, String email) {
+        return new KakaoUserResponseDto(nickname, email);
+    }
+
+    public String getEmail() {
+        return this.email;
     }
 }

@@ -54,7 +54,7 @@ public class ReservationController {
         return ResponseUtil.findOk(reservationService.getMyReservations(userDetails.getUser()));
     }
 
-    @PreAuthorize("hasAnyRole('CUSTOMER, OWNER')")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'OWNER')")
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<MessageResponseDto> deleteReservation(@PathVariable Long reservationId,
         @AuthenticationPrincipal EmailUserDetails userDetails) {

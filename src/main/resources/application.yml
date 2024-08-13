@@ -2,9 +2,6 @@ spring:
   application:
     name: goodbite
 
-  profiles:
-    active: test
-
   data:
     redis:
       host: ${REDIS_SERVER}

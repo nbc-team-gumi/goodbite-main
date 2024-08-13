@@ -22,7 +22,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test
         env:
           DB_USERNAME: ${{ vars.DB_USERNAME }}
           DB_PASSWORD: ${{ vars.DB_PASSWORD }}

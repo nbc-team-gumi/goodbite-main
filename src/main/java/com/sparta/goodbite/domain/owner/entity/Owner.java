@@ -44,23 +44,19 @@ public class Owner extends ExtendedTimestamped implements UserCredentials {
     @Column(nullable = false, unique = true)
     private String businessNumber;
 
-    @Column(nullable = false, unique = true)
-    private Long kakaoId;
-
     /*@OneToMany(mappedBy = "owner",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Waiting> waitingList;*/
 
 
     @Builder
     public Owner(String password, String email, String nickname, String phoneNumber,
-        String businessNumber, OwnerStatus ownerStatus, Long kakaoId) {
+        String businessNumber, OwnerStatus ownerStatus) {
         this.password = password;
         this.email = email;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
         this.businessNumber = businessNumber;
         this.ownerStatus = ownerStatus;
-        this.kakaoId = kakaoId;
         //기존 방식에서는 가입후 어드민계정에서 승인을 해주는 방식을 생각했기때문에 가입하자마자는 UNVERIFIED가 되게 했지만,
         //지금은 사업자번호조회API를 통해 유효하지 않은 사업자번호일때 아예 가입이 되지 않게 했고,
         //사업자번호조회시 01인 오너유저, 즉 계속사업자의 경우에만 verifyBusinessNumber메서드에서 true를 반환하고,
@@ -78,6 +74,16 @@ public class Owner extends ExtendedTimestamped implements UserCredentials {
     @Override
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public boolean isCustomer() {
+        return false;
+    }
+
+    @Override
+    public boolean isOwner() {
+        return true;
     }
 
     public void updateNickname(String newNickname) {
@@ -103,14 +109,9 @@ public class Owner extends ExtendedTimestamped implements UserCredentials {
     //사실 애초에 사업자번호또한 유효하지 않으면 변경이 불가하기 때문에
     //UNVERIFIED상태가 저장될일은 없다. 기존번호가 VERIFIED-> 새로바뀐 번호가 VERIFIED이렇게 된다.
 
-    public void updateKakaoId(Long kakaoId) {
-        this.kakaoId = kakaoId;
-    }
-
     // 소프트 삭제를 위한 메서드 추가
     public void deactivate() {
         this.deletedAt = LocalDateTime.now();
     }
 
 }
-

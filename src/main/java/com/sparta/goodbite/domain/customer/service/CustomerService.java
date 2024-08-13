@@ -10,7 +10,6 @@ import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
 import com.sparta.goodbite.exception.customer.CustomerErrorCode;
 import com.sparta.goodbite.exception.customer.detail.CustomerAlreadyDeletedException;
-import com.sparta.goodbite.exception.customer.detail.DuplicateKakaoIdException;
 import com.sparta.goodbite.exception.user.UserErrorCode;
 import com.sparta.goodbite.exception.user.detail.PasswordMismatchException;
 import com.sparta.goodbite.exception.user.detail.SamePasswordException;
@@ -26,46 +25,34 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
 
+    //조회
+    @Transactional(readOnly = true)
+    public CustomerResponseDto getCustomer(UserCredentials user) {
+        Customer customer = (Customer) user;
+        return CustomerResponseDto.from(customerRepository.findByIdOrThrow(customer.getId()));
+    }
+
     //회원가입
     @Transactional
     public void signup(CustomerSignupRequestDto requestDto) {
         String nickname = requestDto.getNickname();
         String email = requestDto.getEmail();
         String phoneNumber = requestDto.getPhoneNumber();
-        Long kakaoId = requestDto.getKakaoId();
 
-        Customer customer = validateDuplicateFields(nickname, email, phoneNumber, kakaoId);
-        if (kakaoId == null) {
-            kakaoId = -1L;
-        }
+        validateDuplicateFields(nickname, email, phoneNumber);
 
         // 비밀번호 암호화 -> 인증인가연결시 config에서 PasswordEncoder Bean등록
         String password = passwordEncoder.encode(requestDto.getPassword());
 
-        if (customer == null) {
-            // User DB에 저장
-            customer = Customer.builder()
-                .email(email)
-                .nickname(nickname)
-                .password(password)
-                .phoneNumber(phoneNumber)
-                .kakaoId(kakaoId)
-                .build();
-        } else {
-            customer.updateKakaoId(kakaoId);
-            customer.updateNickname(nickname);
-            customer.updatePassword(password);
-            customer.updatePhoneNumber(phoneNumber);
-        }
+        // User DB에 저장
+        Customer customer = Customer.builder()
+            .email(email)
+            .nickname(nickname)
+            .password(password)
+            .phoneNumber(phoneNumber)
+            .build();
 
         customerRepository.save(customer);
-    }
-
-    //조회
-    @Transactional(readOnly = true)
-    public CustomerResponseDto getCustomer(UserCredentials user) {
-        Customer customer = (Customer) user;
-        return CustomerResponseDto.from(customerRepository.findByIdOrThrow(customer.getId()));
     }
 
     //수정-닉네임
@@ -130,17 +117,10 @@ public class CustomerService {
     }
 
     // 중복 필드 검증 메서드
-    private Customer validateDuplicateFields(String nickname, String email, String phoneNumber,
-        Long kakaoId) {
+    private void validateDuplicateFields(String nickname, String email, String phoneNumber) {
         customerRepository.validateDuplicateNickname(nickname);
+        customerRepository.validateDuplicateEmail(email);
         customerRepository.validateDuplicatePhoneNumber(phoneNumber);
-
-        Customer kakaoUser = customerRepository.findByKakaoId(kakaoId).orElse(null);
-        if (kakaoUser == null) {
-            return customerRepository.findByEmail(email).orElse(null);
-        } else {
-            throw new DuplicateKakaoIdException(CustomerErrorCode.DUPLICATE_KAKAO_ID);
-        }
     }
 
 }

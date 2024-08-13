@@ -17,8 +17,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     Optional<Customer> findByPhoneNumber(String phoneNumber);
 
-    Optional<Customer> findByKakaoId(Long kakaoId);
-
     default Customer findByIdOrThrow(Long customerId) {
         return findById(customerId).orElseThrow(
             () -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND));

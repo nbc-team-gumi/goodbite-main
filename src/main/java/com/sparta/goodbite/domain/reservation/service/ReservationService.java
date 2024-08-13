@@ -161,6 +161,6 @@ public class ReservationService {
         }
 
         // 예약 삭제
-        reservation.delete();
+        reservation.cancel();
     }
 }

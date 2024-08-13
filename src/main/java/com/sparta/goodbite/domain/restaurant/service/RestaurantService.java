@@ -48,6 +48,7 @@ public class RestaurantService {
     @Transactional(readOnly = true)
     public RestaurantResponseDto getRestaurant(Long restaurantId) {
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
+        System.out.println("-----------test------------");
         return RestaurantResponseDto.from(restaurant);
     }
 

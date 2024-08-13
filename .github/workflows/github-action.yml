@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ 191-feat-애플리케이션-포트를-8080-에서-80-으로-변경 ]
+    branches: [ 195-feat-카카오-로그인-추가 ]
 
 env:
   DOCKER_IMAGE_TAG_NAME: good-bite
@@ -34,6 +34,7 @@ jobs:
           EC2_HOST: ${{ vars.EC2_HOST }}
           DOMAIN_URL: ${{ vars.DOMAIN_URL }}
           SUBDOMAIN_URL: ${{ vars.SUBDOMAIN_URL }}
+          KAKAO_API_KEY: ${{ secrets.KAKAO_API_KEY }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -92,4 +93,5 @@ jobs:
             -e DOMAIN_URL=${{ vars.DOMAIN_URL }} \
             -e SUBDOMAIN_URL=${{ vars.SUBDOMAIN_URL }} \
             -e EC2_HOST=${{ vars.EC2_HOST }} \
+            -e KAKAO_API_KEY=${{ secrets.KAKAO_API_KEY }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest

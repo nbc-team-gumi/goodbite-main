@@ -8,6 +8,7 @@ import com.sparta.goodbite.exception.lock.LockException;
 import com.sparta.goodbite.exception.menu.MenuException;
 import com.sparta.goodbite.exception.operatinghour.OperatingHourException;
 import com.sparta.goodbite.exception.owner.OwnerException;
+import com.sparta.goodbite.exception.reservation.ReservationException;
 import com.sparta.goodbite.exception.restaurant.RestaurantException;
 import com.sparta.goodbite.exception.review.ReviewException;
 import com.sparta.goodbite.exception.waiting.WaitingException;
@@ -54,6 +55,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<MessageResponseDto> handleReviewException(ReviewException e) {
         log.error("에러 발생: ", e);
         return ResponseUtil.of(e.getReviewErrorCode().getHttpStatus(), e.getMessage());
+    }
+
+    @ExceptionHandler(ReservationException.class)
+    public ResponseEntity<MessageResponseDto> handleReservationException(ReservationException e) {
+        log.error("에러 발생: ", e);
+        return ResponseUtil.of(e.getReservationErrorCode().getHttpStatus(), e.getMessage());
     }
 
     @ExceptionHandler(RestaurantException.class)

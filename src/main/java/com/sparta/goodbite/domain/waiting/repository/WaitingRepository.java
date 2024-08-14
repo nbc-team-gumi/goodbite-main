@@ -1,8 +1,6 @@
 package com.sparta.goodbite.domain.waiting.repository;
 
 import com.sparta.goodbite.domain.waiting.entity.Waiting;
-import com.sparta.goodbite.exception.review.ReviewErrorCode;
-import com.sparta.goodbite.exception.review.detail.ReviewNotAuthorizationException;
 import com.sparta.goodbite.exception.waiting.WaitingErrorCode;
 import com.sparta.goodbite.exception.waiting.WaitingException;
 import com.sparta.goodbite.exception.waiting.detail.WaitingCanNotDuplicatedException;
@@ -61,10 +59,4 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
 
     @Query("SELECT w FROM Waiting w WHERE w.restaurant.id = :restaurantId AND w.customer.id = :customerId AND w.status = 'SEATED'")
     Optional<Waiting> findStatusByRestaurantIdAndCustomerId(Long restaurantId, Long customerId);
-
-    default void findStatusByRestaurantIdAndCustomerIdOrTrow(Long restaurantId,
-        Long customerId) {
-        findStatusByRestaurantIdAndCustomerId(restaurantId, customerId).orElseThrow(
-            () -> new ReviewNotAuthorizationException(ReviewErrorCode.REVIEW_NOT_AUTHORIZED));
-    }
 }

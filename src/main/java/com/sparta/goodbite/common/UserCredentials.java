@@ -11,5 +11,4 @@ public interface UserCredentials {
     boolean isCustomer();
 
     boolean isOwner();
-
 }

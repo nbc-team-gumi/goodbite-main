@@ -14,9 +14,6 @@ public record ReservationResponseDto(Long reservationId, Long restaurantId, Stri
                                      List<MenuItemResponseDto> menuItems) {
 
     public static ReservationResponseDto from(Reservation reservation) {
-        List<MenuItemResponseDto> menuItemResponseDtos = reservation.getReservationMenus().stream()
-            .map(MenuItemResponseDto::from).toList();
-
         return new ReservationResponseDto(
             reservation.getId(),
             reservation.getRestaurant().getId(),
@@ -29,7 +26,7 @@ public record ReservationResponseDto(Long reservationId, Long restaurantId, Stri
             reservation.getStatus(),
             reservation.getCreatedAt(),
             reservation.getDeletedAt(),
-            menuItemResponseDtos
+            reservation.getReservationMenus().stream().map(MenuItemResponseDto::from).toList()
         );
     }
 }

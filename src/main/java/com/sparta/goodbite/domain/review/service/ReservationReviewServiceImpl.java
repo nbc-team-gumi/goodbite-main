@@ -41,7 +41,11 @@ public class ReservationReviewServiceImpl implements
         if (!reservation.canSubmitReview()) {
             throw new CanNotSubmitReviewException(ReviewErrorCode.CANNOT_SUBMIT_REVIEW);
         }
-        
+
+        if (!reservation.getCustomer().getId().equals(user.getId())) {
+            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+        }
+
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
             createReservationReviewRequestDto.getRestaurantId());
         reservationReviewRepository.save(

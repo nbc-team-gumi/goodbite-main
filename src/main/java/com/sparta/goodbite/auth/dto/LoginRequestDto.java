@@ -1,5 +1,6 @@
 package com.sparta.goodbite.auth.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -13,6 +14,9 @@ public class LoginRequestDto {
 
     @NotBlank(message = "비밀번호는 필수 입력 항목입니다.")
     private String password;
+
+    @JsonProperty("isOwner")
+    private boolean isOwner;
 
 //    @Pattern(regexp = "^(CUSTOMER|OWNER|ADMIN)$", message = "역할은 CUSTOMER, OWNER, ADMIN 중 하나여야 합니다.")
 //    @NotBlank(message = "역할은 필수 입력 항목입니다.")

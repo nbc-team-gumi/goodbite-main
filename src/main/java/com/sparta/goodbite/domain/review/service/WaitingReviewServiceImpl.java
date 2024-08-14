@@ -38,6 +38,10 @@ public class WaitingReviewServiceImpl implements
         Waiting waiting = waitingRepository.findByIdOrThrow(
             createWaitingReviewRequestDto.getWaitingId());
 
+        if (!waiting.getCustomer().getId().equals(user.getId())) {
+            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+        }
+
         if (!waiting.canSubmitReview()) {
             throw new CanNotSubmitReviewException(ReviewErrorCode.CANNOT_SUBMIT_REVIEW);
         }
@@ -79,18 +83,18 @@ public class WaitingReviewServiceImpl implements
     public void updateReview(Long reviewId, UpdateReviewRequestDto updateReviewRequestDto,
         UserCredentials user) {
 
-        Review review = getReviewByIdAndValidateCustomer(reviewId, user.getId());
+        Review review = findReviewByIdAndValidateCustomer(reviewId, user.getId());
         review.update(updateReviewRequestDto);
     }
 
     @Override
     @Transactional
     public void deleteReview(Long reviewId, UserCredentials user) {
-        WaitingReview waitingReview = getReviewByIdAndValidateCustomer(reviewId, user.getId());
+        WaitingReview waitingReview = findReviewByIdAndValidateCustomer(reviewId, user.getId());
         waitingReviewRepository.delete(waitingReview);
     }
 
-    private WaitingReview getReviewByIdAndValidateCustomer(Long reviewId, Long customerId) {
+    private WaitingReview findReviewByIdAndValidateCustomer(Long reviewId, Long customerId) {
         WaitingReview waitingReview = waitingReviewRepository.findByIdOrThrow(reviewId);
 
         if (!waitingReview.getCustomer().getId().equals(customerId)) {

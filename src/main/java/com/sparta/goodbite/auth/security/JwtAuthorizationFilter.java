@@ -87,6 +87,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         List<String> authorizedPaths = List.of(
             "/restaurants/my",
             "/restaurants/{restaurantId}/waitings",
+            "/restaurants/{restaurantId}/reservations",
             "/reviews/my",
             "/waitings",
             "/waitings/{waitingId}",

@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sparta.goodbite.domain.operatinghour.dto.validation.contraint.LocalTimeFormatConstraint;
 import com.sparta.goodbite.domain.operatinghour.dto.validation.contraint.OpenTimeBeforeCloseTimeConstraint;
 import com.sparta.goodbite.domain.operatinghour.entity.OperatingHour;
-import com.sparta.goodbite.domain.operatinghour.enums.DayOfWeek;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import jakarta.validation.constraints.NotNull;
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import lombok.Getter;
 

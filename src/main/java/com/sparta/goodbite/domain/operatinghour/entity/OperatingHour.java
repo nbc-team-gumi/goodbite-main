@@ -2,7 +2,6 @@ package com.sparta.goodbite.domain.operatinghour.entity;
 
 import com.sparta.goodbite.common.Timestamped;
 import com.sparta.goodbite.domain.operatinghour.dto.UpdateOperatingHourRequestDto;
-import com.sparta.goodbite.domain.operatinghour.enums.DayOfWeek;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import lombok.Builder;
 import lombok.Getter;

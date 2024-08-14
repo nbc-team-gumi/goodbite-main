@@ -79,9 +79,9 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true); // 자격 증명 허용
+        config.addAllowedOrigin("http://localhost:3000"); // 로컬 개발용
         config.addAllowedOrigin(SUBDOMAIN_URL); // 프론트엔드 서브도메인
         config.addAllowedOrigin(DOMAIN_URL); // 프론트엔드 도메인
-        config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedHeader("*"); // 모든 헤더 허용
         config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
         config.addExposedHeader("Authorization"); // Authorization 헤더 노출
@@ -94,12 +94,6 @@ public class WebSecurityConfig {
     // 로그아웃 핸들러 Bean 등록
     @Bean
     public LogoutSuccessHandler logoutSuccessHandler() {
-
-//        // 로그아웃 페이지로 리디렉션 (프론트 개발시 고려)
-//        SimpleUrlLogoutSuccessHandler handler = new SimpleUrlLogoutSuccessHandler();
-//        handler.setDefaultTargetUrl("/users/login?logout");
-//        return handler;
-
         return new EmailLogoutSuccessHandler();
     }
 
@@ -154,12 +148,26 @@ public class WebSecurityConfig {
                     .permitAll()
                     .requestMatchers("/owners/**").hasRole(UserRole.OWNER.name())
                     .requestMatchers("/customers/**").hasRole(UserRole.CUSTOMER.name())
-                    .requestMatchers(HttpMethod.GET, "/menus/**").permitAll() // 메뉴 조회는 모두 가능
-                    .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll() // 리뷰 조회는 모두 가능
-                    .requestMatchers(HttpMethod.GET, "/restaurants/**")
-                    .permitAll() // 레스토랑 조회는 모두 가능
                     .requestMatchers(HttpMethod.GET, "/users/kakao/callback")
-                    .permitAll() // 카카오 콜백 허용
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/menus").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/menus/{menuId}").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/operating-hours/{operatingHourId}")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/restaurants").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/restaurants/{restaurantId}").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/restaurants/{restaurantId}/operating-hours")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/restaurants/{restaurantId}/menus")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/restaurants/{restaurantId}/last-waiting")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/restaurants/{restaurantId}/reviews")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/reviews").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/reviews/{reviewId}").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/server-events/**").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/server-events/**").permitAll()
                     .anyRequest().authenticated())
 
             // 기본 폼 로그인을 비활성화, 중복 인증 방지

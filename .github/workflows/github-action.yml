@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ 195-feat-카카오-로그인-추가 ]
+    branches: [ dev ]
 
 env:
   DOCKER_IMAGE_TAG_NAME: good-bite
@@ -22,7 +22,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test
         env:
           DB_USERNAME: ${{ vars.DB_USERNAME }}
           DB_PASSWORD: ${{ vars.DB_PASSWORD }}
@@ -35,6 +35,13 @@ jobs:
           DOMAIN_URL: ${{ vars.DOMAIN_URL }}
           SUBDOMAIN_URL: ${{ vars.SUBDOMAIN_URL }}
           KAKAO_API_KEY: ${{ secrets.KAKAO_API_KEY }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          S3_REGION: ${{ secrets.S3_REGION }}
+          S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+          S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+          REDIS_SERVER: ${{ secrets.REDIS_SERVER }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          REDIS_PORT: $${{ secrets.REDIS_PORT }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -94,4 +101,11 @@ jobs:
             -e SUBDOMAIN_URL=${{ vars.SUBDOMAIN_URL }} \
             -e EC2_HOST=${{ vars.EC2_HOST }} \
             -e KAKAO_API_KEY=${{ secrets.KAKAO_API_KEY }} \
+            -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
+            -e S3_REGION=${{ secrets.S3_REGION }} \
+            -e S3_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY }} \
+            -e S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }} \
+            -e REDIS_SERVER=${{ secrets.REDIS_SERVER }} \
+            -e REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
+            -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest

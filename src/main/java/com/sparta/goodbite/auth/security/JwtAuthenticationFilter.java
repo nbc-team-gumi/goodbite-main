@@ -103,7 +103,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         String email = ((EmailUserDetails) authResult.getPrincipal()).getEmail();
         String role = ((EmailUserDetails) authResult.getPrincipal()).getRole();
-        //String nickname = ((EmailUserDetails) authResult.getPrincipal()).get
 
         String accessToken = JwtUtil.createAccessToken(email, role);
         String refreshToken = JwtUtil.createRefreshToken(email, role);
@@ -116,6 +115,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         ResponseUtil.servletApi(response, HttpStatus.OK.value(), responseDto);
     }
+
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request,

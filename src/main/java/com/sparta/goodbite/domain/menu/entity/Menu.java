@@ -29,17 +29,20 @@ public class Menu extends Timestamped {
     private int price;
     private String name;
     private String description;
-//    private String imageUrl;
+    private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
     @Builder
-    public Menu(int price, String name, String description, Restaurant restaurant) {
+    public Menu(int price, String name, String description, String imageUrl,
+        Restaurant restaurant) {
+
         this.price = price;
         this.name = name;
         this.description = description;
+        this.imageUrl = imageUrl;
         this.restaurant = restaurant;
     }
 
@@ -52,5 +55,8 @@ public class Menu extends Timestamped {
         this.description =
             updateMenuRequestDto.getDescription() != null ? updateMenuRequestDto.getDescription()
                 : this.description;
+        this.imageUrl =
+            updateMenuRequestDto.getImageUrl() != null ? updateMenuRequestDto.getImageUrl()
+                : this.imageUrl;
     }
 }

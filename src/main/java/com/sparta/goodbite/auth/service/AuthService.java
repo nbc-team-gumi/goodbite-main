@@ -39,6 +39,9 @@ public class AuthService {
     @Value("${KAKAO_API_KEY}")
     private String kakaoApiKey;
 
+    @Value("${DOMAIN_URL")
+    private String domainUrl;
+
     public void updateAccessToken(HttpServletRequest request,
         HttpServletResponse response) throws UnsupportedEncodingException {
         String refreshToken = JwtUtil.getRefreshTokenFromRequest(request);
@@ -95,7 +98,6 @@ public class AuthService {
 
     private String getToken(String code) throws JsonProcessingException {
         // 구성해야하는 HTTP 구성 정보는 https://developers.kakao.com/ 에서 확인
-        log.info("인가코드: {}", code);
 
         // 요청 URL
         URI uri = UriComponentsBuilder
@@ -113,7 +115,7 @@ public class AuthService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", kakaoApiKey);
-        body.add("redirect_uri", "http://localhost:3000/kakao/callback");
+        body.add("redirect_uri", domainUrl + "/kakao/callback");
         body.add("code", code);
 
         RequestEntity<MultiValueMap<String, String>> requestEntity = RequestEntity
@@ -134,8 +136,6 @@ public class AuthService {
 
     private KakaoUserResponseDto getKakaoUserInfo(String accessToken)
         throws JsonProcessingException {
-        log.info("accessToken: {}", accessToken);
-
         // 요청 URL
         URI uri = UriComponentsBuilder
             .fromUriString("https://kapi.kakao.com")
@@ -166,7 +166,6 @@ public class AuthService {
         String email = jsonNode.get("kakao_account")
             .get("email").asText();
 
-        log.info("카카오 사용자 정보: {}, {}", nickname, email);
         return KakaoUserResponseDto.from(nickname, email);
     }
 

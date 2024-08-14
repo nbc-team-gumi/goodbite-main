@@ -40,7 +40,6 @@ public class AuthController {
     public ResponseEntity<DataResponseDto<KakaoUserResponseDto>> kakaoLogin(
         @RequestParam String code, @RequestParam Boolean owner,
         HttpServletResponse response) throws JsonProcessingException, UnsupportedEncodingException {
-        log.info("API request OK: {}, {}", code, owner);
         return ResponseUtil.findOk(authService.kakaoLogin(code, owner, response));
     }
 }

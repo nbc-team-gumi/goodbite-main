@@ -39,7 +39,7 @@ public class AuthService {
     @Value("${KAKAO_API_KEY}")
     private String kakaoApiKey;
 
-    @Value("${DOMAIN_URL")
+    @Value("${DOMAIN_URL}")
     private String domainUrl;
 
     public void updateAccessToken(HttpServletRequest request,

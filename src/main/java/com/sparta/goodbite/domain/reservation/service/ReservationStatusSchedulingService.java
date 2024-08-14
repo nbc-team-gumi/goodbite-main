@@ -28,7 +28,7 @@ public class ReservationStatusSchedulingService {
         for (Reservation reservation : reservations) {
             // 식당 이용 종료 시간이 현재 시간보다 이전이면 상태를 COMPLETED로 변경
             if (LocalDateTime.of(reservation.getDate(),
-                    reservation.getTime().plusHours(RESERVATION_DURATION_HOUR))
+                    reservation.getTime()).plusHours(RESERVATION_DURATION_HOUR)
                 .isBefore(now)) {
                 reservation.complete();
             }

@@ -115,4 +115,3 @@ public class Owner extends ExtendedTimestamped implements UserCredentials {
     }
 
 }
-

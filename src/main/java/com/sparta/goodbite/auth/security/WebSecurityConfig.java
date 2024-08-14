@@ -148,6 +148,8 @@ public class WebSecurityConfig {
                     .permitAll()
                     .requestMatchers("/owners/**").hasRole(UserRole.OWNER.name())
                     .requestMatchers("/customers/**").hasRole(UserRole.CUSTOMER.name())
+                    .requestMatchers(HttpMethod.GET, "/users/kakao/callback")
+                    .permitAll()
                     .requestMatchers(HttpMethod.GET, "/menus").permitAll()
                     .requestMatchers(HttpMethod.GET, "/menus/{menuId}").permitAll()
                     .requestMatchers(HttpMethod.GET, "/operating-hours/{operatingHourId}")

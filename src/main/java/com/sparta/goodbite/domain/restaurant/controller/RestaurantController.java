@@ -15,12 +15,15 @@ import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
 import com.sparta.goodbite.domain.restaurant.service.RestaurantService;
 import com.sparta.goodbite.domain.review.dto.ReviewResponseDto;
-import com.sparta.goodbite.domain.review.service.ReviewService;
+import com.sparta.goodbite.domain.review.service.ReservationReviewServiceImpl;
+import com.sparta.goodbite.domain.review.service.WaitingReviewServiceImpl;
 import com.sparta.goodbite.domain.waiting.dto.WaitingResponseDto;
 import com.sparta.goodbite.domain.waiting.service.WaitingService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -50,7 +53,8 @@ public class RestaurantController {
     private final OperatingHourService operatingHourService;
     private final WaitingService waitingService;
     private final MenuService menuService;
-    private final ReviewService reviewService;
+    private final WaitingReviewServiceImpl waitingReviewService;
+    private final ReservationReviewServiceImpl reservationReviewService;
     private final ReservationService reservationService;
 
     @PreAuthorize("hasRole('OWNER')")
@@ -125,7 +129,20 @@ public class RestaurantController {
     @GetMapping("/{restaurantId}/reviews")
     public ResponseEntity<DataResponseDto<List<ReviewResponseDto>>> getAllReviewsByRestaurantId(
         @PathVariable Long restaurantId) {
-        return ResponseUtil.findOk(reviewService.getAllReviewsByRestaurantId(restaurantId));
+
+        List<ReviewResponseDto> waitingReviews = waitingReviewService.getAllReviewsByRestaurantId(
+            restaurantId);
+        List<ReviewResponseDto> reservationReviews = reservationReviewService.getAllReviewsByRestaurantId(
+            restaurantId);
+
+        List<ReviewResponseDto> allReviews = new ArrayList<>();
+        allReviews.addAll(waitingReviews);
+        allReviews.addAll(reservationReviews);
+
+        // createdAt을 기준으로 정렬합니다.
+        allReviews.sort(Comparator.comparing(ReviewResponseDto::createdAt).reversed());
+
+        return ResponseUtil.findOk(allReviews);
     }
 
     @PreAuthorize("hasRole('OWNER')")

@@ -41,7 +41,7 @@ public class CreateReservationRequestDto {
     @NotNull(message = "인원 수를 입력해 주세요.")
     private int partySize;
 
-    private List<MenuItemDto> menuItems;
+    private List<MenuItemRequestDto> menuItems;
 
     public Reservation toEntity(Customer customer, Restaurant restaurant) {
         return Reservation.builder()

@@ -20,6 +20,8 @@ import com.sparta.goodbite.domain.review.service.WaitingReviewServiceImpl;
 import com.sparta.goodbite.domain.waiting.dto.WaitingResponseDto;
 import com.sparta.goodbite.domain.waiting.service.WaitingService;
 import jakarta.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -27,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,6 +39,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -148,6 +152,16 @@ public class RestaurantController {
 
         return ResponseUtil.findOk(reservationService.getAllReservationsByRestaurantId(restaurantId,
             userDetails.getUser()));
+    }
+
+    @GetMapping("/{restaurantId}/capacity")
+    public ResponseEntity<DataResponseDto<Integer>> getAvailableCapacity(
+        @PathVariable Long restaurantId,
+        @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+        @RequestParam("time") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime time) {
+
+        return ResponseUtil.findOk(
+            reservationService.getAvailableCapacity(restaurantId, date, time));
     }
 
     @PreAuthorize("hasRole('OWNER')")

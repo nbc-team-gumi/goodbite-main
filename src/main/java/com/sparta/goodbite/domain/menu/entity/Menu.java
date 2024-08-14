@@ -3,6 +3,7 @@ package com.sparta.goodbite.domain.menu.entity;
 import com.sparta.goodbite.common.Timestamped;
 import com.sparta.goodbite.domain.menu.dto.UpdateMenuRequestDto;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -29,6 +30,8 @@ public class Menu extends Timestamped {
     private int price;
     private String name;
     private String description;
+
+    @Column(length = 2083)
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)

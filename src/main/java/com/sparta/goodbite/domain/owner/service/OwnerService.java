@@ -189,22 +189,35 @@ public class OwnerService {
         Optional<Restaurant> restaurantOptional = restaurantRepository.findByOwnerId(owner.getId());
         if (restaurantOptional.isPresent()) {
             Restaurant restaurant = restaurantOptional.get();
+
+            // 레스토랑 연관 영업시간 삭제
             List<OperatingHour> operatingHours = operatingHourRepository.findAllByRestaurantId(
                 restaurant.getId());
             operatingHourRepository.deleteAll(operatingHours);
+
+            // 레스토랑 연관 메뉴 삭제
             List<Menu> menus = menuRepository.findAllByRestaurantId(restaurant.getId());
             menuRepository.deleteAll(menus);
+
+            // 레스토랑 연관 웨이팅 삭제
             List<Waiting> waitings = waitingRepository.findAllByRestaurantId(restaurant.getId());
             waitingRepository.deleteAll(waitings);
+
+            // 레스토랑 연관 예약 삭제
             List<Reservation> reservations = reservationRepository.findAllByRestaurantId(
                 restaurant.getId());
             reservationRepository.deleteAll(reservations);
+
+            // 레스토랑 연관 웨이팅리뷰 삭제
             List<WaitingReview> waitingReviews = waitingReviewRepository.findAllByRestaurantId(
                 restaurant.getId());
             waitingReviewRepository.deleteAll(waitingReviews);
+
+            // 레스토랑 연관 예약 리뷰 삭제
             List<ReservationReview> reservationReviews = reservationReviewRepository.findAllByRestaurantId(
                 restaurant.getId());
             reservationReviewRepository.deleteAll(reservationReviews);
+
             restaurantRepository.delete(restaurant);
             s3Service.deleteImageFromS3(restaurant.getImageUrl());
         }

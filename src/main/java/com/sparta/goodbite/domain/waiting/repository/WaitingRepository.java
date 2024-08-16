@@ -1,11 +1,13 @@
 package com.sparta.goodbite.domain.waiting.repository;
 
+import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.waiting.entity.Waiting;
 import com.sparta.goodbite.exception.waiting.WaitingErrorCode;
 import com.sparta.goodbite.exception.waiting.WaitingException;
 import com.sparta.goodbite.exception.waiting.detail.WaitingCanNotDuplicatedException;
 import com.sparta.goodbite.exception.waiting.detail.WaitingNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,4 +61,6 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
 
     @Query("SELECT w FROM Waiting w WHERE w.restaurant.id = :restaurantId AND w.customer.id = :customerId AND w.status = 'SEATED'")
     Optional<Waiting> findStatusByRestaurantIdAndCustomerId(Long restaurantId, Long customerId);
+
+    List<Waiting> findAllByRestaurant(Restaurant restaurant);
 }

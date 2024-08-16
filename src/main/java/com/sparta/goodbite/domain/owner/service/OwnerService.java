@@ -15,8 +15,16 @@ import com.sparta.goodbite.domain.owner.dto.UpdateOwnerPhoneNumberRequestDto;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.owner.entity.OwnerStatus;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
+import com.sparta.goodbite.domain.reservation.entity.Reservation;
+import com.sparta.goodbite.domain.reservation.repository.ReservationRepository;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
+import com.sparta.goodbite.domain.review.entity.ReservationReview;
+import com.sparta.goodbite.domain.review.entity.WaitingReview;
+import com.sparta.goodbite.domain.review.repository.ReservationReviewRepository;
+import com.sparta.goodbite.domain.review.repository.WaitingReviewRepository;
+import com.sparta.goodbite.domain.waiting.entity.Waiting;
+import com.sparta.goodbite.domain.waiting.repository.WaitingRepository;
 import com.sparta.goodbite.exception.owner.OwnerErrorCode;
 import com.sparta.goodbite.exception.owner.detail.InvalidBusinessNumberException;
 import com.sparta.goodbite.exception.owner.detail.OwnerAlreadyDeletedException;
@@ -40,6 +48,10 @@ public class OwnerService {
     private final RestaurantRepository restaurantRepository;
     private final OperatingHourRepository operatingHourRepository;
     private final MenuRepository menuRepository;
+    private final WaitingRepository waitingRepository;
+    private final ReservationRepository reservationRepository;
+    private final ReservationReviewRepository reservationReviewRepository;
+    private final WaitingReviewRepository waitingReviewRepository;
     private final S3Service s3Service;
 
     //가입
@@ -182,6 +194,17 @@ public class OwnerService {
             operatingHourRepository.deleteAll(operatingHours);
             List<Menu> menus = menuRepository.findAllByRestaurantId(restaurant.getId());
             menuRepository.deleteAll(menus);
+            List<Waiting> waitings = waitingRepository.findAllByRestaurant(restaurant);
+            waitingRepository.deleteAll(waitings);
+            List<Reservation> reservations = reservationRepository.findAllByRestaurantId(
+                restaurant.getId());
+            reservationRepository.deleteAll(reservations);
+            List<WaitingReview> waitingReviews = waitingReviewRepository.findAllByRestaurantId(
+                restaurant.getId());
+            waitingReviewRepository.deleteAll(waitingReviews);
+            List<ReservationReview> reservationReviews = reservationReviewRepository.findAllByRestaurantId(
+                restaurant.getId());
+            reservationReviewRepository.deleteAll(reservationReviews);
             restaurantRepository.delete(restaurant);
             s3Service.deleteImageFromS3(restaurant.getImageUrl());
         }

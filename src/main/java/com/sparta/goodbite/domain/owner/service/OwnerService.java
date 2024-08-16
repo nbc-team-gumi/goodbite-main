@@ -199,16 +199,7 @@ public class OwnerService {
             List<Menu> menus = menuRepository.findAllByRestaurantId(restaurant.getId());
             menuRepository.deleteAll(menus);
 
-            // 레스토랑 연관 웨이팅 삭제
-            List<Waiting> waitings = waitingRepository.findAllByRestaurantId(restaurant.getId());
-            waitingRepository.deleteAll(waitings);
-
-            // 레스토랑 연관 예약 삭제
-            List<Reservation> reservations = reservationRepository.findAllByRestaurantId(
-                restaurant.getId());
-            reservationRepository.deleteAll(reservations);
-
-            // 레스토랑 연관 웨이팅리뷰 삭제
+            // 레스토랑 연관 웨이팅 리뷰 삭제
             List<WaitingReview> waitingReviews = waitingReviewRepository.findAllByRestaurantId(
                 restaurant.getId());
             waitingReviewRepository.deleteAll(waitingReviews);
@@ -217,6 +208,15 @@ public class OwnerService {
             List<ReservationReview> reservationReviews = reservationReviewRepository.findAllByRestaurantId(
                 restaurant.getId());
             reservationReviewRepository.deleteAll(reservationReviews);
+
+            // 레스토랑 연관 웨이팅 삭제
+            List<Waiting> waitings = waitingRepository.findAllByRestaurantId(restaurant.getId());
+            waitingRepository.deleteAll(waitings);
+
+            // 레스토랑 연관 예약 삭제
+            List<Reservation> reservations = reservationRepository.findAllByRestaurantId(
+                restaurant.getId());
+            reservationRepository.deleteAll(reservations);
 
             restaurantRepository.delete(restaurant);
             s3Service.deleteImageFromS3(restaurant.getImageUrl());

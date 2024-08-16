@@ -1,6 +1,11 @@
 package com.sparta.goodbite.domain.owner.service;
 
 import com.sparta.goodbite.common.UserCredentials;
+import com.sparta.goodbite.common.s3.service.S3Service;
+import com.sparta.goodbite.domain.menu.entity.Menu;
+import com.sparta.goodbite.domain.menu.repository.MenuRepository;
+import com.sparta.goodbite.domain.operatinghour.entity.OperatingHour;
+import com.sparta.goodbite.domain.operatinghour.repository.OperatingHourRepository;
 import com.sparta.goodbite.domain.owner.dto.OwnerResponseDto;
 import com.sparta.goodbite.domain.owner.dto.OwnerSignUpRequestDto;
 import com.sparta.goodbite.domain.owner.dto.UpdateBusinessNumberRequestDto;
@@ -10,12 +15,16 @@ import com.sparta.goodbite.domain.owner.dto.UpdateOwnerPhoneNumberRequestDto;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.owner.entity.OwnerStatus;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
+import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
+import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.exception.owner.OwnerErrorCode;
 import com.sparta.goodbite.exception.owner.detail.InvalidBusinessNumberException;
 import com.sparta.goodbite.exception.owner.detail.OwnerAlreadyDeletedException;
 import com.sparta.goodbite.exception.user.UserErrorCode;
 import com.sparta.goodbite.exception.user.detail.PasswordMismatchException;
 import com.sparta.goodbite.exception.user.detail.SamePasswordException;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,6 +37,10 @@ public class OwnerService {
     private final OwnerRepository ownerRepository;
     private final PasswordEncoder passwordEncoder;
     private final BusinessVerificationService businessVerificationService;
+    private final RestaurantRepository restaurantRepository;
+    private final OperatingHourRepository operatingHourRepository;
+    private final MenuRepository menuRepository;
+    private final S3Service s3Service;
 
     //가입
     @Transactional
@@ -159,6 +172,19 @@ public class OwnerService {
         // 소프트 삭제를 위해 deletedAt 필드를 현재 시간으로 설정
         owner.deactivate();
         ownerRepository.save(owner);
+
+        //연관 레스토랑 삭제
+        Optional<Restaurant> restaurantOptional = restaurantRepository.findByOwner(owner);
+        if (restaurantOptional.isPresent()) {
+            Restaurant restaurant = restaurantOptional.get();
+            List<OperatingHour> operatingHours = operatingHourRepository.findAllByRestaurantId(
+                restaurant.getId());
+            operatingHourRepository.deleteAll(operatingHours);
+            List<Menu> menus = menuRepository.findAllByRestaurantId(restaurant.getId());
+            menuRepository.deleteAll(menus);
+            restaurantRepository.delete(restaurant);
+            s3Service.deleteImageFromS3(restaurant.getImageUrl());
+        }
     }
 
     // 중복 필드 검증 메서드
@@ -169,5 +195,4 @@ public class OwnerService {
         ownerRepository.validateDuplicatePhoneNumber(phoneNumber);
         ownerRepository.validateDuplicateBusinessNumber(businessNumber);
     }
-
 }

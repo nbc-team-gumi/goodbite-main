@@ -1,5 +1,6 @@
 package com.sparta.goodbite.domain.restaurant.repository;
 
+import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.exception.restaurant.RestaurantErrorCode;
 import com.sparta.goodbite.exception.restaurant.detail.RestaurantNotFoundException;
@@ -19,4 +20,6 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
         return findByOwnerId(ownerId).orElseThrow(() -> new RestaurantNotFoundException(
             RestaurantErrorCode.RESTAURANT_NOT_FOUND));
     }
+
+    Optional<Restaurant> findByOwner(Owner owner);
 }

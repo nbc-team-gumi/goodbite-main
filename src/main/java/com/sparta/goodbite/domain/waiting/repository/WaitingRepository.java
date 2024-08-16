@@ -1,6 +1,5 @@
 package com.sparta.goodbite.domain.waiting.repository;
 
-import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.waiting.entity.Waiting;
 import com.sparta.goodbite.exception.waiting.WaitingErrorCode;
 import com.sparta.goodbite.exception.waiting.WaitingException;
@@ -62,5 +61,5 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
     @Query("SELECT w FROM Waiting w WHERE w.restaurant.id = :restaurantId AND w.customer.id = :customerId AND w.status = 'SEATED'")
     Optional<Waiting> findStatusByRestaurantIdAndCustomerId(Long restaurantId, Long customerId);
 
-    List<Waiting> findAllByRestaurant(Restaurant restaurant);
+    List<Waiting> findAllByRestaurantId(Long restaurantId);
 }

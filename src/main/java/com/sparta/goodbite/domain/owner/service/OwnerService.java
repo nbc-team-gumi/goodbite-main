@@ -186,7 +186,7 @@ public class OwnerService {
         ownerRepository.save(owner);
 
         //연관 레스토랑 삭제
-        Optional<Restaurant> restaurantOptional = restaurantRepository.findByOwner(owner);
+        Optional<Restaurant> restaurantOptional = restaurantRepository.findByOwnerId(owner.getId());
         if (restaurantOptional.isPresent()) {
             Restaurant restaurant = restaurantOptional.get();
             List<OperatingHour> operatingHours = operatingHourRepository.findAllByRestaurantId(
@@ -194,7 +194,7 @@ public class OwnerService {
             operatingHourRepository.deleteAll(operatingHours);
             List<Menu> menus = menuRepository.findAllByRestaurantId(restaurant.getId());
             menuRepository.deleteAll(menus);
-            List<Waiting> waitings = waitingRepository.findAllByRestaurant(restaurant);
+            List<Waiting> waitings = waitingRepository.findAllByRestaurantId(restaurant.getId());
             waitingRepository.deleteAll(waitings);
             List<Reservation> reservations = reservationRepository.findAllByRestaurantId(
                 restaurant.getId());

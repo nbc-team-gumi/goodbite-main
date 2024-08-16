@@ -10,6 +10,12 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
     Optional<Restaurant> findByOwnerId(Long ownerId);
 
+    default void validateById(Long restaurantId) {
+        if (!existsById(restaurantId)) {
+            throw new RestaurantNotFoundException(RestaurantErrorCode.RESTAURANT_NOT_FOUND);
+        }
+    }
+
     default Restaurant findByIdOrThrow(Long restaurantId) {
         return findById(restaurantId).orElseThrow(() -> new RestaurantNotFoundException(
             RestaurantErrorCode.RESTAURANT_NOT_FOUND));

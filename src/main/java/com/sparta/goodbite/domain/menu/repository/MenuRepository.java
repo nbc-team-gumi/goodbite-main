@@ -3,7 +3,8 @@ package com.sparta.goodbite.domain.menu.repository;
 import com.sparta.goodbite.domain.menu.entity.Menu;
 import com.sparta.goodbite.exception.menu.MenuErrorCode;
 import com.sparta.goodbite.exception.menu.detail.MenuNotFoundException;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MenuRepository extends JpaRepository<Menu, Long> {
@@ -13,5 +14,5 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
             () -> new MenuNotFoundException(MenuErrorCode.MENU_NOT_FOUND));
     }
 
-    List<Menu> findAllByRestaurantId(Long restaurantId);
+    Page<Menu> findAllByRestaurantId(Long restaurantId, Pageable pageable);
 }

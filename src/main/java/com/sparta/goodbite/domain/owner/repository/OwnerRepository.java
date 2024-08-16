@@ -16,6 +16,8 @@ public interface OwnerRepository extends JpaRepository<Owner, Long> {
 
     Optional<Owner> findByEmail(String email);
 
+    Optional<Owner> findByEmailAndDeletedAtIsNotNull(String email);
+
     Optional<Owner> findByPhoneNumber(String phoneNumber);
 
     Optional<Owner> findByBusinessNumber(String businessNumber);

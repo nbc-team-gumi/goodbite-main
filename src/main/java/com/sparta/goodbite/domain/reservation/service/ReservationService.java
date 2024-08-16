@@ -28,6 +28,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,19 +83,19 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationResponseDto> getMyReservations(UserCredentials user) {
-        return reservationRepository.findAllByCustomerId(user.getId()).stream()
-            .map(ReservationResponseDto::from).toList();
+    public Page<ReservationResponseDto> getMyReservations(UserCredentials user, Pageable pageable) {
+        return reservationRepository.findAllByCustomerId(user.getId(), pageable)
+            .map(ReservationResponseDto::from);
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationResponseDto> getAllReservationsByRestaurantId(Long restaurantId,
-        UserCredentials user) {
+    public Page<ReservationResponseDto> getAllReservationsByRestaurantId(Long restaurantId,
+        UserCredentials user, Pageable pageable) {
+
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
         validateRestaurantOwnership(restaurant, user);
-        return reservationRepository.findAllByRestaurantId(restaurantId).stream()
-            .map(ReservationResponseDto::from)
-            .toList();
+        return reservationRepository.findAllByRestaurantId(restaurantId, pageable)
+            .map(ReservationResponseDto::from);
     }
 
     @Transactional(readOnly = true)

@@ -12,6 +12,8 @@ import com.sparta.goodbite.exception.auth.AuthErrorCode;
 import com.sparta.goodbite.exception.auth.AuthException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,12 +36,12 @@ public class MenuService {
     }
 
     @Transactional(readOnly = true)
-    public List<MenuResponseDto> getAllMenusByRestaurantId(Long restaurantId) {
-        restaurantRepository.findByIdOrThrow(restaurantId);
-        return menuRepository.findAllByRestaurantId(restaurantId).stream()
-            .map(MenuResponseDto::from).toList();
+    public Page<MenuResponseDto> getAllMenusByRestaurantId(Long restaurantId, Pageable pageable) {
+        restaurantRepository.validateById(restaurantId);
+        return menuRepository.findAllByRestaurantId(restaurantId, pageable)
+            .map(MenuResponseDto::from);
     }
-    
+
     @Transactional(readOnly = true)
     public List<MenuResponseDto> getAllMenus() {
         return menuRepository.findAll().stream().map(MenuResponseDto::from).toList();

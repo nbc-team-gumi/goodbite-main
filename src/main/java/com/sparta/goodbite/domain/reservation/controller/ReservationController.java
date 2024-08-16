@@ -6,10 +6,13 @@ import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
 import com.sparta.goodbite.domain.reservation.dto.CreateReservationRequestDto;
 import com.sparta.goodbite.domain.reservation.dto.ReservationResponseDto;
+import com.sparta.goodbite.domain.reservation.entity.Reservation;
 import com.sparta.goodbite.domain.reservation.service.ReservationService;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -49,9 +52,12 @@ public class ReservationController {
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/my")
-    public ResponseEntity<DataResponseDto<List<ReservationResponseDto>>> getMyReservations(
-        @AuthenticationPrincipal EmailUserDetails userDetails) {
-        return ResponseUtil.findOk(reservationService.getMyReservations(userDetails.getUser()));
+    public ResponseEntity<DataResponseDto<Page<ReservationResponseDto>>> getMyReservations(
+        @AuthenticationPrincipal EmailUserDetails userDetails,
+        @PageableDefault(size = Reservation.DEFAULT_PAGE_SIZE) Pageable pageable) {
+
+        return ResponseUtil.findOk(
+            reservationService.getMyReservations(userDetails.getUser(), pageable));
     }
 
     @PreAuthorize("hasAnyRole('CUSTOMER', 'OWNER')")

@@ -14,9 +14,10 @@ import com.sparta.goodbite.exception.auth.AuthException;
 import com.sparta.goodbite.exception.restaurant.RestaurantErrorCode;
 import com.sparta.goodbite.exception.restaurant.detail.RestaurantCreateFailedException;
 import com.sparta.goodbite.exception.restaurant.detail.RestaurantUpdateFailedException;
-import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,8 +59,8 @@ public class RestaurantService {
     }
 
     @Transactional(readOnly = true)
-    public List<RestaurantResponseDto> getAllRestaurants() {
-        return restaurantRepository.findAll().stream().map(RestaurantResponseDto::from).toList();
+    public Page<RestaurantResponseDto> getAllRestaurants(Pageable pageable) {
+        return restaurantRepository.findAll(pageable).map(RestaurantResponseDto::from);
     }
 
     @Transactional

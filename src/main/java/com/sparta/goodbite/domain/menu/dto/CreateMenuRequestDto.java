@@ -23,10 +23,7 @@ public class CreateMenuRequestDto {
     @NotBlank(message = "메뉴의 설명을 입력해 주세요.")
     private String description;
 
-    @NotBlank(message = "이미지 주소를 입력해 주세요.")
-    private String imageUrl;
-
-    public Menu toEntity(Restaurant restaurant) {
+    public Menu toEntity(Restaurant restaurant, String imageUrl) {
         return Menu.builder()
             .price(price)
             .name(name)

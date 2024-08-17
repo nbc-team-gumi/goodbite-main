@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RequestMapping("/menus")
@@ -34,9 +36,10 @@ public class MenuController {
     @PostMapping
     public ResponseEntity<MessageResponseDto> createMenu(
         @Valid @RequestBody CreateMenuRequestDto createMenuRequestDto,
-        @AuthenticationPrincipal EmailUserDetails userDetails) {
+        @AuthenticationPrincipal EmailUserDetails userDetails,
+        @RequestPart MultipartFile image) {
 
-        menuService.createMenu(createMenuRequestDto, userDetails.getUser());
+        menuService.createMenu(createMenuRequestDto, userDetails.getUser(), image);
         return ResponseUtil.createOk();
     }
 
@@ -54,9 +57,10 @@ public class MenuController {
     @PutMapping("/{menuId}")
     public ResponseEntity<MessageResponseDto> updateMenu(
         @PathVariable Long menuId, @Valid @RequestBody UpdateMenuRequestDto updateMenuRequestDto,
-        @AuthenticationPrincipal EmailUserDetails userDetails) {
+        @AuthenticationPrincipal EmailUserDetails userDetails,
+        @RequestPart(required = false) MultipartFile image) {
 
-        menuService.updateMenu(menuId, updateMenuRequestDto, userDetails.getUser());
+        menuService.updateMenu(menuId, updateMenuRequestDto, userDetails.getUser(), image);
         return ResponseUtil.updateOk();
     }
 

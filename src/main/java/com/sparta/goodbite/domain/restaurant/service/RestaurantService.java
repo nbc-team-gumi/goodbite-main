@@ -72,13 +72,22 @@ public class RestaurantService {
         validateRestaurantOwnership(owner, restaurant);
 
         String originalImage = restaurant.getImageUrl();
-        String restaurantImage = s3Service.upload(image);
+        String restaurantImage = originalImage;
         try {
-            restaurant.update(restaurantRequestDto, restaurantImage);
-            s3Service.deleteImageFromS3(originalImage);
+            if (image != null) {
+                restaurantImage = s3Service.upload(image);
+
+                restaurant.update(restaurantRequestDto, restaurantImage);
+                s3Service.deleteImageFromS3(originalImage);
+            } else {
+                restaurant.update(restaurantRequestDto, originalImage);
+            }
         } catch (Exception e) {
-            s3Service.deleteImageFromS3(restaurantImage);
-            throw new RestaurantUpdateFailedException(RestaurantErrorCode.RESTAURANT_UPDATE_FAILED);
+            if (!restaurantImage.equals(originalImage)) {
+                s3Service.deleteImageFromS3(restaurantImage);
+            }
+            throw new RestaurantUpdateFailedException(
+                RestaurantErrorCode.RESTAURANT_UPDATE_FAILED);
         }
     }
 

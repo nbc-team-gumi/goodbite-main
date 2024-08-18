@@ -84,6 +84,8 @@ public class WebSecurityConfig {
 
         config.setAllowCredentials(true); // 자격 증명 허용
         config.addAllowedOrigin("http://localhost:3000"); // 로컬 개발용
+        config.addAllowedOrigin("http://goodbite.site");
+        config.addAllowedOrigin("http://www.goodbite.site");
         config.addAllowedOrigin(ELB_DNS_FRONT);
         config.addAllowedHeader("*"); // 모든 헤더 허용
         config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용

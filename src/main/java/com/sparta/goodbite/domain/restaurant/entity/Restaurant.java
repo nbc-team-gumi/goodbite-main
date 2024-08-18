@@ -35,8 +35,10 @@ public class Restaurant extends Timestamped {
     @Column(length = 2083)
     private String imageUrl;
 
+    private String sido;
+    private String sigungu;
     private String address;
-    private String area;
+    private String detailAddress;
     private String phoneNumber;
     private int capacity;
 
@@ -44,13 +46,15 @@ public class Restaurant extends Timestamped {
     private Category category;
 
     @Builder
-    public Restaurant(Owner owner, String name, String imageUrl, String address, String area,
-        String phoneNumber, Category category, int capacity) {
+    public Restaurant(Owner owner, String name, String imageUrl, String sido, String sigungu,
+        String address, String detailAddress, String phoneNumber, Category category, int capacity) {
         this.owner = owner;
         this.name = name;
         this.imageUrl = imageUrl;
+        this.sido = sido;
+        this.sigungu = sigungu;
         this.address = address;
-        this.area = area;
+        this.detailAddress = detailAddress;
         this.phoneNumber = phoneNumber;
         this.category = category;
         this.capacity = capacity;
@@ -59,8 +63,10 @@ public class Restaurant extends Timestamped {
     public void update(RestaurantRequestDto restaurantRequestDto, String restaurantImage) {
         this.name = restaurantRequestDto.getName();
         this.imageUrl = restaurantImage;
+        this.sido = restaurantRequestDto.getSido();
+        this.sigungu = restaurantRequestDto.getSigungu();
         this.address = restaurantRequestDto.getAddress();
-        this.area = restaurantRequestDto.getArea();
+        this.detailAddress = restaurantRequestDto.getDetailAddress();
         this.phoneNumber = restaurantRequestDto.getPhoneNumber();
         this.category = restaurantRequestDto.getCategory();
         this.capacity = restaurantRequestDto.getCapacity();

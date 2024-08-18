@@ -27,7 +27,7 @@ PATCH {{baseUrl}}/nickname
 Content-Type: application/json
 
 {
-  "newNickname": "현지짱짱"
+  "newNickname": "현지짱짱짱"
 }
 
 ### 회원정보수정-전화번호

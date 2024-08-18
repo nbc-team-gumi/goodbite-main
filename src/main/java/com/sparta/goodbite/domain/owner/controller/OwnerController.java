@@ -10,6 +10,7 @@ import com.sparta.goodbite.domain.owner.dto.UpdateBusinessNumberRequestDto;
 import com.sparta.goodbite.domain.owner.dto.UpdateOwnerNicknameRequestDto;
 import com.sparta.goodbite.domain.owner.dto.UpdateOwnerPasswordRequestDto;
 import com.sparta.goodbite.domain.owner.dto.UpdateOwnerPhoneNumberRequestDto;
+import com.sparta.goodbite.domain.owner.service.BusinessVerificationService;
 import com.sparta.goodbite.domain.owner.service.OwnerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class OwnerController {
 
     private final OwnerService ownerService;
+    private final BusinessVerificationService businessVerificationService;
+    //private final BusinessVerificationServiceRest verificationService;
 
     /**
      * 회원가입 API
@@ -42,6 +45,46 @@ public class OwnerController {
         ownerService.signup(requestDto);
         return ResponseUtil.createOk();
     }
+    /*@PostMapping("/signup")
+    public Mono<ResponseEntity<MessageResponseDto>> signUp(
+        @Valid @RequestBody OwnerSignUpRequestDto requestDto) {
+
+        return businessVerificationService.verifyBusinessNumber(requestDto.getBusinessNumber())
+            .map(isBusinessNumberValid -> {
+                if (!isBusinessNumberValid) {
+                    return ResponseEntity.badRequest()
+                        .body(new MessageResponseDto("Invalid business number"));
+                }
+                ownerService.signup(requestDto);
+                return ResponseUtil.createOk();
+            });
+    }*/
+    /*@PostMapping("/signup")
+    public Mono<ResponseEntity<MessageResponseDto>> signUp(
+        @Validated @RequestBody OwnerSignUpRequestDto requestDto) {
+        return businessVerificationService.verifyBusinessNumber(requestDto.getBusinessNumber())
+            .flatMap(isBusinessNumberValid -> {
+                if (!isBusinessNumberValid) {
+                    return Mono.just(ResponseEntity.badRequest()
+                        .body(new MessageResponseDto("Invalid business number")));
+                }
+                return ownerService.signup(requestDto)
+                    .then(Mono.just(ResponseUtil.createOk()));
+            });
+    }*/
+    /*@PostMapping("/signup")
+    public ResponseEntity<MessageResponseDto> signUp(
+        @Validated @RequestBody OwnerSignUpRequestDto requestDto) {
+        Boolean isBusinessNumberValid = verificationService.verifyBusinessNumber(
+            requestDto.getBusinessNumber());
+        if (!isBusinessNumberValid) {
+            return ResponseEntity.badRequest()
+                .body(new MessageResponseDto("Invalid business number"));
+        }
+        // 회원가입 로직
+        return ResponseUtil.createOk();
+    }*/
+
 
     /**
      * 회원정보조회 API

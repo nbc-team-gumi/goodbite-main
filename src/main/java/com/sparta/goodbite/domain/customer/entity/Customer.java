@@ -50,11 +50,6 @@ public class Customer extends ExtendedTimestamped implements UserCredentials {
     }
 
     @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
     public String getEmail() {
         return email;
     }
@@ -62,6 +57,16 @@ public class Customer extends ExtendedTimestamped implements UserCredentials {
     @Override
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public boolean isCustomer() {
+        return true;
+    }
+
+    @Override
+    public boolean isOwner() {
+        return false;
     }
 
     public void updateNickname(String newNickname) {

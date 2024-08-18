@@ -20,7 +20,6 @@ public class EmailUserDetails implements UserDetails {
 
     // principal - email
     public String getEmail() {
-        log.debug(user.getEmail());
         return user.getEmail();
     }
 
@@ -32,16 +31,12 @@ public class EmailUserDetails implements UserDetails {
     // credentials
     @Override
     public String getPassword() {
-        log.debug(user.getPassword());
         return user.getPassword();
     }
 
     // authorities - role
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
-        log.debug(role);
-
         SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(role);
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(simpleGrantedAuthority);

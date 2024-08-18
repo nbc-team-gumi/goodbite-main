@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -38,6 +39,7 @@ public class WebSecurityConfig {
     private final EmailUserDetailsService userDetailsService;
     private final GlobalAccessDeniedHandler accessDeniedHandler;
     private final GlobalAuthenticationEntryPoint authenticationEntryPoint;
+    private final EmailAuthenticationProvider authenticationProvider;
 
     @Value("${SUBDOMAIN_URL}")
     private String SUBDOMAIN_URL;
@@ -49,6 +51,11 @@ public class WebSecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    // loadUserByEmail 사용을 위한 EmailAuthenticationProvider 설정
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(authenticationProvider);
     }
 
     // PasswordEncoder 필요
@@ -171,8 +178,18 @@ public class WebSecurityConfig {
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/restaurants/{restaurantId}/reviews")
                     .permitAll()
-                    .requestMatchers(HttpMethod.GET, "/reviews").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/reviews/{reviewId}").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/restaurants/{restaurantId}/capacity")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/reviews/{restaurantId}/capacity")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/reservation-reviews")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/reservation-reviews/{reservationReviewId}")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/waiting-reviews")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/waiting-reviews/{waitingReviewId}")
+                    .permitAll()
                     .requestMatchers(HttpMethod.GET, "/server-events/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/server-events/**").permitAll()
                     .anyRequest().authenticated())

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,6 +36,7 @@ public class WebSecurityConfig {
     private final EmailUserDetailsService userDetailsService;
     private final GlobalAccessDeniedHandler accessDeniedHandler;
     private final GlobalAuthenticationEntryPoint authenticationEntryPoint;
+    private final EmailAuthenticationProvider authenticationProvider;
 
     @Value("${SUBDOMAIN_URL}")
     private String SUBDOMAIN_URL;
@@ -46,6 +48,11 @@ public class WebSecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    // loadUserByEmail 사용을 위한 EmailAuthenticationProvider 설정
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(authenticationProvider);
     }
 
     // PasswordEncoder 필요

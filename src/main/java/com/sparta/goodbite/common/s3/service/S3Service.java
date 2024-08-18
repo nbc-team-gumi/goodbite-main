@@ -51,7 +51,9 @@ public class S3Service {
 
     // 이미지를 S3에 업로드, S3에 저장된 이미지의 public url 반환
     private String uploadImage(MultipartFile image) {
-        this.validateImageFileExtension(image.getOriginalFilename());
+        String filename = Objects.requireNonNull(image.getOriginalFilename(),
+            "파일 이름은 null일 수 없습니다.");
+        this.validateImageFileExtension(filename);
         try {
             return this.uploadImageToS3(image);
         } catch (IOException e) {

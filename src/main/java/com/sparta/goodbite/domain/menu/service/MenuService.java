@@ -31,14 +31,13 @@ public class MenuService {
     @Transactional
     public void createMenu(CreateMenuRequestDto createMenuRequestDto, UserCredentials user,
         MultipartFile image) {
-
         Restaurant restaurant = restaurantRepository.findByOwnerIdOrThrow(user.getId());
-        String imageUrl = s3Service.upload(image);
 
+        String menuImage = s3Service.upload(image);
         try {
-            menuRepository.save(createMenuRequestDto.toEntity(restaurant, imageUrl));
+            menuRepository.save(createMenuRequestDto.toEntity(restaurant, menuImage));
         } catch (Exception e) {
-            s3Service.deleteImageFromS3(imageUrl);
+            s3Service.deleteImageFromS3(menuImage);
             throw new MenuCreateFailedException(MenuErrorCode.MENU_CREATE_FAILED);
         }
     }
@@ -70,15 +69,23 @@ public class MenuService {
         // 메뉴의 레스토랑과 소유자의 레스토랑이 일치하는지 검증
         validateMenuOwnership(menu, restaurant);
 
-        String originalImageUrl = restaurant.getImageUrl();
-        String newImageUrl =
-            image != null && !image.isEmpty() ? s3Service.upload(image) : originalImageUrl;
+        String originalImage = menu.getImageUrl();
+        String menuImage = originalImage;
         try {
-            menu.update(updateMenuRequestDto, newImageUrl);
-            s3Service.deleteImageFromS3(originalImageUrl);
+            if (image != null) {
+                menuImage = s3Service.upload(image);
+
+                menu.update(updateMenuRequestDto, menuImage);
+                s3Service.deleteImageFromS3(originalImage);
+            } else {
+                menu.update(updateMenuRequestDto, originalImage);
+            }
         } catch (Exception e) {
-            s3Service.deleteImageFromS3(newImageUrl);
-            throw new MenuUpdateFailedException(MenuErrorCode.MENU_UPDATE_FAILED);
+            if (!menuImage.equals(originalImage)) {
+                s3Service.deleteImageFromS3(menuImage);
+            }
+            throw new MenuUpdateFailedException(
+                MenuErrorCode.MENU_UPDATE_FAILED);
         }
     }
 
@@ -91,6 +98,7 @@ public class MenuService {
         validateMenuOwnership(menu, restaurant);
 
         menuRepository.delete(menu);
+        s3Service.deleteImageFromS3(menu.getImageUrl());
     }
 
     private void validateMenuOwnership(Menu menu, Restaurant restaurant) {

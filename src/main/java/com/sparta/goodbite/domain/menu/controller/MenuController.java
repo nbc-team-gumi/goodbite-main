@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +34,7 @@ public class MenuController {
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping
     public ResponseEntity<MessageResponseDto> createMenu(
-        @Valid @RequestBody CreateMenuRequestDto createMenuRequestDto,
+        @Valid @RequestPart CreateMenuRequestDto createMenuRequestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails,
         @RequestPart MultipartFile image) {
 
@@ -56,7 +55,7 @@ public class MenuController {
     @PreAuthorize("hasRole('OWNER')")
     @PutMapping("/{menuId}")
     public ResponseEntity<MessageResponseDto> updateMenu(
-        @PathVariable Long menuId, @Valid @RequestBody UpdateMenuRequestDto updateMenuRequestDto,
+        @PathVariable Long menuId, @Valid @RequestPart UpdateMenuRequestDto updateMenuRequestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails,
         @RequestPart(required = false) MultipartFile image) {
 

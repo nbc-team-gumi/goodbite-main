@@ -48,8 +48,7 @@ public class Menu extends Timestamped {
         this.imageUrl = imageUrl;
         this.restaurant = restaurant;
     }
-
-    public void update(UpdateMenuRequestDto updateMenuRequestDto, String imageUrl) {
+    public void update(UpdateMenuRequestDto updateMenuRequestDto, String menuImage) {
         this.price =
             updateMenuRequestDto.getPrice() != null ? updateMenuRequestDto.getPrice() : this.price;
         this.name =
@@ -58,6 +57,6 @@ public class Menu extends Timestamped {
         this.description =
             updateMenuRequestDto.getDescription() != null ? updateMenuRequestDto.getDescription()
                 : this.description;
-        this.imageUrl = imageUrl != null && !imageUrl.isEmpty() ? imageUrl : this.imageUrl;
+        this.imageUrl = menuImage;
     }
 }

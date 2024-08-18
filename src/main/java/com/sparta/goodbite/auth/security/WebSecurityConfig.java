@@ -123,6 +123,7 @@ public class WebSecurityConfig {
             .authorizeHttpRequests(
                 (authorizeHttpRequests) -> authorizeHttpRequests
                     .requestMatchers(
+                        "/",
                         "/customers/signup",
                         "/owners/signup",
                         "/users/login",

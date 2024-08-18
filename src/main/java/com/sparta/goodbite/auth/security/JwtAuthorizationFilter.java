@@ -71,7 +71,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             "/customers/signup",
             "/owners/signup",
             "/users/login",
-            "/users/refresh"
+            "/users/refresh",
+            "/"
         );
         return excludedPaths.stream()
             .anyMatch(path -> pathMatcher.match(path, requestPath));

@@ -47,12 +47,12 @@ public class EmailUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        Optional<Customer> customer = customerRepository.findByEmailAndDeletedAtIsNotNull(username);
+        Optional<Customer> customer = customerRepository.findByEmailAndDeletedAtIsNull(username);
         if (customer.isPresent()) {
             return new EmailUserDetails(customer.get(), UserRole.CUSTOMER.getAuthority());
         }
 
-        Optional<Owner> owner = ownerRepository.findByEmailAndDeletedAtIsNotNull(username);
+        Optional<Owner> owner = ownerRepository.findByEmailAndDeletedAtIsNull(username);
         if (owner.isPresent() && Objects.equals(owner.get().getOwnerStatus(),
             OwnerStatus.VERIFIED)) {
             return new EmailUserDetails(owner.get(), UserRole.OWNER.getAuthority());

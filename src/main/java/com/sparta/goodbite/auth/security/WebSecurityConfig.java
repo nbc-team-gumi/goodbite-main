@@ -105,9 +105,6 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // HTTP 요청 차단 및 HTTPS 요청만 허용
-            .requiresChannel(channel -> channel.anyRequest().requiresSecure())
-
             // CORS 설정: 사용자 재정의 cors 필터
             .addFilterBefore(corsFilter(), CorsFilter.class)
 

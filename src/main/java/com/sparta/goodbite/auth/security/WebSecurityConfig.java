@@ -38,11 +38,8 @@ public class WebSecurityConfig {
     private final GlobalAuthenticationEntryPoint authenticationEntryPoint;
     private final EmailAuthenticationProvider authenticationProvider;
 
-    @Value("${SUBDOMAIN_URL}")
-    private String SUBDOMAIN_URL;
-
-    @Value("${DOMAIN_URL}")
-    private String DOMAIN_URL;
+    @Value("${ELB_DNS_FRONT}")
+    private String ELB_DNS_FRONT;
 
     // Manager Bean 등록
     @Bean
@@ -87,9 +84,7 @@ public class WebSecurityConfig {
 
         config.setAllowCredentials(true); // 자격 증명 허용
         config.addAllowedOrigin("http://localhost:3000"); // 로컬 개발용
-        config.addAllowedOrigin("http://goodbite-1141775836.ap-northeast-2.elb.amazonaws.com");
-        config.addAllowedOrigin(SUBDOMAIN_URL); // 프론트엔드 서브도메인
-        config.addAllowedOrigin(DOMAIN_URL); // 프론트엔드 도메인
+        config.addAllowedOrigin(ELB_DNS_FRONT);
         config.addAllowedHeader("*"); // 모든 헤더 허용
         config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
         config.addExposedHeader("Authorization"); // Authorization 헤더 노출
@@ -105,30 +100,13 @@ public class WebSecurityConfig {
         return new EmailLogoutSuccessHandler();
     }
 
-    // HTTPS 사용, 리디렉션
-//    @Bean
-//    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> servletContainer() {
-//        return server -> {
-//            server.addAdditionalTomcatConnectors(createHttpConnector());
-//        };
-//    }
-//
-//    private Connector createHttpConnector() {
-//        Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
-//        connector.setScheme("http");
-//        connector.setPort(8080);
-//        connector.setSecure(false);
-//        connector.setRedirectPort(443);
-//        return connector;
-//    }
-
     // 시큐리티 필터 체인 설정 Bean 등록
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // HTTP -> HTTPS 리다이렉트
-//            .requiresChannel(channel -> channel.anyRequest().requiresSecure())
+            // HTTP 요청 차단 및 HTTPS 요청만 허용
+            .requiresChannel(channel -> channel.anyRequest().requiresSecure())
 
             // CORS 설정: 사용자 재정의 cors 필터
             .addFilterBefore(corsFilter(), CorsFilter.class)

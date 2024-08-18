@@ -15,7 +15,6 @@ import com.sparta.goodbite.exception.restaurant.RestaurantErrorCode;
 import com.sparta.goodbite.exception.restaurant.detail.RestaurantCreateFailedException;
 import com.sparta.goodbite.exception.restaurant.detail.RestaurantUpdateFailedException;
 import java.util.List;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,7 +73,7 @@ public class RestaurantService {
         String originalImage = restaurant.getImageUrl();
         String restaurantImage = originalImage;
         try {
-            if (image != null) {
+            if (image != null && !image.isEmpty()) {
                 restaurantImage = s3Service.upload(image);
 
                 restaurant.update(restaurantRequestDto, restaurantImage);
@@ -104,7 +103,7 @@ public class RestaurantService {
     }
 
     private void validateRestaurantOwnership(Owner owner, Restaurant restaurant) {
-        if (!Objects.equals(restaurant.getOwner(), owner)) {
+        if (!restaurant.getOwner().getId().equals(owner.getId())) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
     }

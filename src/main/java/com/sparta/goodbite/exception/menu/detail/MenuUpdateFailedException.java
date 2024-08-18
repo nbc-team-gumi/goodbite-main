@@ -8,5 +8,4 @@ public class MenuUpdateFailedException extends MenuException {
     public MenuUpdateFailedException(MenuErrorCode menuErrorCode) {
         super(menuErrorCode);
     }
-
 }

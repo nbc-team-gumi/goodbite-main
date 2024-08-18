@@ -36,7 +36,6 @@ public class MenuService {
         String menuImage = s3Service.upload(image);
         try {
             menuRepository.save(createMenuRequestDto.toEntity(restaurant, menuImage));
-            ;
         } catch (Exception e) {
             s3Service.deleteImageFromS3(menuImage);
             throw new MenuCreateFailedException(MenuErrorCode.MENU_CREATE_FAILED);

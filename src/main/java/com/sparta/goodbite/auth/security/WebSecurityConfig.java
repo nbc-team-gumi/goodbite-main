@@ -87,6 +87,7 @@ public class WebSecurityConfig {
 
         config.setAllowCredentials(true); // 자격 증명 허용
         config.addAllowedOrigin("http://localhost:3000"); // 로컬 개발용
+        config.addAllowedOrigin("goodbite-1141775836.ap-northeast-2.elb.amazonaws.com");
         config.addAllowedOrigin(SUBDOMAIN_URL); // 프론트엔드 서브도메인
         config.addAllowedOrigin(DOMAIN_URL); // 프론트엔드 도메인
         config.addAllowedHeader("*"); // 모든 헤더 허용

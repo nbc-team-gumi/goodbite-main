@@ -113,7 +113,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     // 인증 객체 생성
     private Authentication createAuthentication(String email, String role) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        UserDetails userDetails = userDetailsService.loadUserByEmail(email, role);
         return new UsernamePasswordAuthenticationToken(
             userDetails,
             null,

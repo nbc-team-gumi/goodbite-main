@@ -58,7 +58,6 @@ public final class JwtUtil {
             } else {
                 res.addHeader(REFRESH_HEADER, token);
             }
-            System.out.println(token);
 
         } catch (UnsupportedEncodingException e) {
             log.error(e.getMessage());

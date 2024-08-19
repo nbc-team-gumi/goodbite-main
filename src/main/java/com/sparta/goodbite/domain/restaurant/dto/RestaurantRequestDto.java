@@ -11,19 +11,22 @@ import lombok.Getter;
 @Getter
 public class RestaurantRequestDto {
 
-    @NotBlank(message = "가게 이름을 입력해주세요.")
+    @NotBlank(message = "식당 이름을 입력해주세요.")
     private String name;
 
-//    @NotBlank(message = "가게 사진을 넣어주세요.")
-//    private String imageUrl;
+    @NotBlank(message = "식당의 시/도를 입력해 주세요.")
+    private String sido;
 
-    @NotBlank(message = "가게 주소를 입력해주세요.")
+    @NotBlank(message = "식당의 시/군/구를 입력해 주세요.")
+    private String sigungu;
+
+    @NotBlank(message = "식당 주소를 입력해주세요.")
     private String address;
 
-    @NotBlank(message = "가게 지역을 입력해주세요.")
-    private String area;
+    @NotBlank(message = "식당 상세 주소를 입력해주세요.")
+    private String detailAddress;
 
-    @NotBlank(message = "가게 전화번호를 입력해주세요.")
+    @NotBlank(message = "식당 전화번호를 입력해주세요.")
     @Pattern(regexp = "^(0[2-8][0-5]?|01[01346-9])-?([1-9]{1}[0-9]{2,3})-?([0-9]{4})$", message = "전화번호 형식에 맞게 입력해주세요.")
     private String phoneNumber;
 
@@ -38,8 +41,10 @@ public class RestaurantRequestDto {
             .owner(owner)
             .name(name)
             .imageUrl(image)
+            .sido(sido)
+            .sigungu(sigungu)
             .address(address)
-            .area(area)
+            .detailAddress(detailAddress)
             .phoneNumber(phoneNumber)
             .category(category)
             .capacity(capacity)

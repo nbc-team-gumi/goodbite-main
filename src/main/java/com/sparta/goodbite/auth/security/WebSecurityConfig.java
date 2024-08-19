@@ -114,11 +114,6 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // HTTP -> HTTPS 리다이렉트
-            .requiresChannel(channel -> channel
-                .requestMatchers(HttpMethod.OPTIONS, "/**").requiresInsecure()
-                .anyRequest().requiresSecure())
-
             // CORS 설정: 사용자 재정의 cors 필터
             .addFilterBefore(corsFilter(), CorsFilter.class)
 

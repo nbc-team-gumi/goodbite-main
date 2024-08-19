@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ 175-feat-https-리디렉션 ]
+    branches: [ dev ]
 
 env:
   DOCKER_IMAGE_TAG_NAME: good-bite

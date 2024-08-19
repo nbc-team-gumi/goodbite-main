@@ -84,11 +84,6 @@ jobs:
             sudo usermod -aG docker $USER
             newgrp docker
             
-            echo "${{ secrets.PKCS12_BASE64 }}" | base64 --decode > /home/ubuntu/goodbite/api.goodbite.site.p12
-
-            # 권한 설정
-            sudo chmod 600 /home/ubuntu/goodbite/api.goodbite.site.p12
-            
             CONTAINER_ID=$(sudo docker ps -q --filter "publish=443-443")
             
             if [ ! -z "$CONTAINER_ID" ]; then
@@ -118,5 +113,4 @@ jobs:
                 -e REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
                 -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
                 -e SSL_KEY=${{secrets.SSL_KEY}} \
-                -v /home/ubuntu/goodbite/api.goodbite.site.p12:/path/inside/container/api.goodbite.site.p12 \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest

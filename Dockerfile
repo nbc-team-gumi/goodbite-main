@@ -3,6 +3,7 @@ FROM openjdk:21-jdk-slim
 LABEL authors="white"
 
 COPY build/libs/goodbite-0.0.1-SNAPSHOT.jar /app/goodbite.jar
+COPY src/main/resources/api.goodbite.site.p12 /path/inside/container/api.goodbite.site.p12
 
 EXPOSE 443
 

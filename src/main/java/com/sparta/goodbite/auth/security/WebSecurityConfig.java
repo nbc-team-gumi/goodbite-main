@@ -41,6 +41,9 @@ public class WebSecurityConfig {
     @Value("${ELB_DNS_FRONT}")
     private String ELB_DNS_FRONT;
 
+    @Value("${ELB_DNS_FRONT}")
+    private String ELB_DNS_FRONT;
+
     // Manager Bean 등록
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
@@ -84,13 +87,14 @@ public class WebSecurityConfig {
 
         config.setAllowCredentials(true); // 자격 증명 허용
         config.addAllowedOrigin("http://localhost:3000"); // 로컬 개발용
-        config.addAllowedOrigin("http://goodbite.site");
-        config.addAllowedOrigin("http://www.goodbite.site");
-        config.addAllowedOrigin(ELB_DNS_FRONT);
+        config.addAllowedOrigin(SUBDOMAIN_URL); // 프론트엔드 서브도메인
+        config.addAllowedOrigin(DOMAIN_URL); // 프론트엔드 도메인
+        config.addAllowedOrigin(ELB_DNS_FRONT); // 로드밸런서 DNS
         config.addAllowedHeader("*"); // 모든 헤더 허용
         config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
-        config.addExposedHeader("Authorization"); // Authorization 헤더 노출
-        config.addExposedHeader("Refresh"); // Refresh 헤더 노출
+        config.addExposedHeader(JwtUtil.AUTHORIZATION_HEADER); // Authorization 헤더 노출
+        config.addExposedHeader(JwtUtil.REFRESH_HEADER); // Refresh 헤더 노출
+        config.addExposedHeader("Set-Cookie");
         source.registerCorsConfiguration("/**", config);
 
         return new CorsFilter(source);
@@ -107,6 +111,11 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+            // HTTP -> HTTPS 리다이렉트
+            .requiresChannel(channel -> channel
+                .requestMatchers(HttpMethod.OPTIONS, "/**").requiresInsecure()
+                .anyRequest().requiresSecure())
+
             // CORS 설정: 사용자 재정의 cors 필터
             .addFilterBefore(corsFilter(), CorsFilter.class)
 
@@ -124,6 +133,7 @@ public class WebSecurityConfig {
             // 인가 설정
             .authorizeHttpRequests(
                 (authorizeHttpRequests) -> authorizeHttpRequests
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 프리플라이트 요청 허용
                     .requestMatchers(
                         "/",
                         "/customers/signup",

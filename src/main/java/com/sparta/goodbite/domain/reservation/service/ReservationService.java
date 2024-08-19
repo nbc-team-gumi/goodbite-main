@@ -84,7 +84,7 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public Page<ReservationResponseDto> getMyReservations(UserCredentials user, Pageable pageable) {
-        return reservationRepository.findAllByCustomerId(user.getId(), pageable)
+        return reservationRepository.findPageByCustomerId(user.getId(), pageable)
             .map(ReservationResponseDto::from);
     }
 
@@ -94,7 +94,7 @@ public class ReservationService {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
         validateRestaurantOwnership(restaurant, user);
-        return reservationRepository.findAllByRestaurantId(restaurantId, pageable)
+        return reservationRepository.findPageByRestaurantId(restaurantId, pageable)
             .map(ReservationResponseDto::from);
     }
 

@@ -12,9 +12,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    Page<Reservation> findAllByCustomerId(Long customerId, Pageable pageable);
+    Page<Reservation> findPageByCustomerId(Long customerId, Pageable pageable);
 
-    Page<Reservation> findAllByRestaurantId(Long restaurantId, Pageable pageable);
+    Page<Reservation> findPageByRestaurantId(Long restaurantId, Pageable pageable);
+
+    List<Reservation> findAllByRestaurantId(Long restaurantId);
 
     List<Reservation> findAllByStatus(ReservationStatus reservationStatus);
 

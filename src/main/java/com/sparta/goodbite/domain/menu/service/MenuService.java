@@ -52,7 +52,7 @@ public class MenuService {
     @Transactional(readOnly = true)
     public Page<MenuResponseDto> getAllMenusByRestaurantId(Long restaurantId, Pageable pageable) {
         restaurantRepository.validateById(restaurantId);
-        return menuRepository.findAllByRestaurantId(restaurantId, pageable)
+        return menuRepository.findPageByRestaurantId(restaurantId, pageable)
             .map(MenuResponseDto::from);
     }
 

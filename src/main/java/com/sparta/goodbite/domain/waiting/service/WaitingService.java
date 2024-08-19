@@ -187,7 +187,8 @@ public class WaitingService {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
 
-        Page<Waiting> waitingPage = waitingRepository.findByRestaurantId(restaurantId, pageable);
+        Page<Waiting> waitingPage = waitingRepository.findPageByRestaurantId(restaurantId,
+            pageable);
 
         List<WaitingResponseDto> waitingResponseDtos = waitingPage.stream()
             .map(this::convertToDto).toList();
@@ -204,7 +205,7 @@ public class WaitingService {
             Sort.by(Sort.Direction.DESC, "createdAt")  // 최신순으로 정렬
         );
 
-        Page<Waiting> waitingPage = waitingRepository.findByCustomerId(user.getId(),
+        Page<Waiting> waitingPage = waitingRepository.findPageByCustomerId(user.getId(),
             sortedPageable);
 
         List<WaitingResponseDto> waitingResponseDtos = waitingPage.stream()

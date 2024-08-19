@@ -38,7 +38,7 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
     Long findMaxWaitingOrderByRestaurantId(@Param("restaurant_id") Long restaurant_id);
 
     @Query("SELECT w FROM Waiting w WHERE w.restaurant.id = :restaurantId AND w.deletedAt IS NULL")
-    Page<Waiting> findByRestaurantId(Long restaurantId, Pageable pageable);
+    Page<Waiting> findPageByRestaurantId(Long restaurantId, Pageable pageable);
 
     default void validateByRestaurantIdAndCustomerId(Long restaurantId, Long customerId) {
         findByRestaurantIdAndCustomerId(restaurantId, customerId).ifPresent(_waiting -> {
@@ -57,7 +57,7 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
     @Query("SELECT w FROM Waiting w WHERE w.id = :waitingId AND w.deletedAt IS NULL")
     Optional<Waiting> findByIdAndDeletedAtIsNull(@Param("waitingId") Long waitingId);
 
-    Page<Waiting> findByCustomerId(Long customerId, Pageable pageable);
+    Page<Waiting> findPageByCustomerId(Long customerId, Pageable pageable);
 
     @Query("SELECT w FROM Waiting w WHERE w.restaurant.id = :restaurantId AND w.customer.id = :customerId AND w.status = 'SEATED'")
     Optional<Waiting> findStatusByRestaurantIdAndCustomerId(Long restaurantId, Long customerId);

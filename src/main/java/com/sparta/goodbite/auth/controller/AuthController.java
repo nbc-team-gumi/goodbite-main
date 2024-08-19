@@ -6,13 +6,12 @@ import com.sparta.goodbite.auth.service.AuthService;
 import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
-import com.sparta.goodbite.domain.customer.service.CustomerService;
-import com.sparta.goodbite.domain.owner.service.OwnerService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,8 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
-    private final CustomerService customerService;
-    private final OwnerService ownerService;
+
+    @GetMapping("/")
+    public ResponseEntity<MessageResponseDto> checkConnection() {
+        return ResponseUtil.of(HttpStatus.OK, "통신 성공");
+    }
 
     @PostMapping("/users/refresh")
     public ResponseEntity<MessageResponseDto> updateAccessToken(HttpServletRequest request,

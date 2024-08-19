@@ -171,7 +171,7 @@ public class RestaurantController {
     public ResponseEntity<MessageResponseDto> updateRestaurant(@PathVariable Long restaurantId,
         @RequestPart RestaurantRequestDto restaurantRequestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails,
-        @RequestPart MultipartFile image) {
+        @RequestPart(required = false) MultipartFile image) {
 
         restaurantService.updateRestaurant(restaurantId, restaurantRequestDto,
             userDetails.getUser(), image);

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,17 +36,26 @@ public class WebSecurityConfig {
     private final EmailUserDetailsService userDetailsService;
     private final GlobalAccessDeniedHandler accessDeniedHandler;
     private final GlobalAuthenticationEntryPoint authenticationEntryPoint;
+    private final EmailAuthenticationProvider authenticationProvider;
 
-    @Value("${SUBDOMAIN_URL}")
-    private String SUBDOMAIN_URL;
+    @Value("${ELB_DNS_FRONT}")
+    private String ELB_DNS_FRONT;
 
     @Value("${DOMAIN_URL}")
     private String DOMAIN_URL;
+
+    @Value("${SUBDOMAIN_URL}")
+    private String SUBDOMAIN_URL;
 
     // Manager Bean 등록
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    // loadUserByEmail 사용을 위한 EmailAuthenticationProvider 설정
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(authenticationProvider);
     }
 
     // PasswordEncoder 필요
@@ -82,10 +92,12 @@ public class WebSecurityConfig {
         config.addAllowedOrigin("http://localhost:3000"); // 로컬 개발용
         config.addAllowedOrigin(SUBDOMAIN_URL); // 프론트엔드 서브도메인
         config.addAllowedOrigin(DOMAIN_URL); // 프론트엔드 도메인
+        config.addAllowedOrigin(ELB_DNS_FRONT); // 로드밸런서 DNS
         config.addAllowedHeader("*"); // 모든 헤더 허용
         config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
-        config.addExposedHeader("Authorization"); // Authorization 헤더 노출
-        config.addExposedHeader("Refresh"); // Refresh 헤더 노출
+        config.addExposedHeader(JwtUtil.AUTHORIZATION_HEADER); // Authorization 헤더 노출
+        config.addExposedHeader(JwtUtil.REFRESH_HEADER); // Refresh 헤더 노출
+        config.addExposedHeader("Set-Cookie");
         source.registerCorsConfiguration("/**", config);
 
         return new CorsFilter(source);
@@ -97,31 +109,11 @@ public class WebSecurityConfig {
         return new EmailLogoutSuccessHandler();
     }
 
-    // HTTPS 사용, 리디렉션
-//    @Bean
-//    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> servletContainer() {
-//        return server -> {
-//            server.addAdditionalTomcatConnectors(createHttpConnector());
-//        };
-//    }
-//
-//    private Connector createHttpConnector() {
-//        Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
-//        connector.setScheme("http");
-//        connector.setPort(8080);
-//        connector.setSecure(false);
-//        connector.setRedirectPort(443);
-//        return connector;
-//    }
-
     // 시큐리티 필터 체인 설정 Bean 등록
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // HTTP -> HTTPS 리다이렉트
-//            .requiresChannel(channel -> channel.anyRequest().requiresSecure())
-
             // CORS 설정: 사용자 재정의 cors 필터
             .addFilterBefore(corsFilter(), CorsFilter.class)
 
@@ -139,7 +131,9 @@ public class WebSecurityConfig {
             // 인가 설정
             .authorizeHttpRequests(
                 (authorizeHttpRequests) -> authorizeHttpRequests
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 프리플라이트 요청 허용
                     .requestMatchers(
+                        "/",
                         "/customers/signup",
                         "/owners/signup",
                         "/users/login",
@@ -164,8 +158,18 @@ public class WebSecurityConfig {
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/restaurants/{restaurantId}/reviews")
                     .permitAll()
-                    .requestMatchers(HttpMethod.GET, "/reviews").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/reviews/{reviewId}").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/restaurants/{restaurantId}/capacity")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/reviews/{restaurantId}/capacity")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/reservation-reviews")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/reservation-reviews/{reservationReviewId}")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/waiting-reviews")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/waiting-reviews/{waitingReviewId}")
+                    .permitAll()
                     .requestMatchers(HttpMethod.GET, "/server-events/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/server-events/**").permitAll()
                     .anyRequest().authenticated())

@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Menu extends Timestamped {
 
-    public static final int DEFAULT_PAGE_SIZE = 12;
+    public static final int DEFAULT_PAGE_SIZE = 9;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

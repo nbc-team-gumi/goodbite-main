@@ -1,12 +1,13 @@
 @restaurantId = 1
 @baseUrl = http://localhost:8080
+@waitingId = 38
 ### Passw120rd! / Passw0rd!
 
 ### 로그인 요청
 POST {{baseUrl}}/users/login
 
 {
-  "email": "testuser3@example.com",
+  "email": "test.customerA@email.com",
   "password": "Passw0rd!"
 }
 
@@ -50,13 +51,16 @@ Authorization:{{Authorization}}
 PATCH {{baseUrl}}/waitings/{{waitingId}}
 Content-Type: application/json
 
+
 {
   "partySize": 4,
   "demand": "제일 가운데 자리로 수정해주세요"
 }
 
+
 ### Waiting 취소/삭제
 DELETE {{baseUrl}}/waitings/{{waitingId}}
+Authorization: {{Authorization}}
 
 ### Restaurant의 마지막 Waiting번호 가져오기
 GET {{baseUrl}}/restaurants/{{restaurantId}}/last-waiting

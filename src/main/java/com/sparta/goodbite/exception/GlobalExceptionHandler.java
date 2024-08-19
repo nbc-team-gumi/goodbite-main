@@ -12,15 +12,13 @@ import com.sparta.goodbite.exception.reservation.ReservationException;
 import com.sparta.goodbite.exception.restaurant.RestaurantException;
 import com.sparta.goodbite.exception.review.ReviewException;
 import com.sparta.goodbite.exception.waiting.WaitingException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
@@ -89,14 +87,22 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
+    public ResponseEntity<MessageResponseDto> handleValidationExceptions(
+        MethodArgumentNotValidException ex) {
+
+        List<String> errorMessages = new ArrayList<>();
+
+        ex.getBindingResult().getFieldErrors().forEach((error) -> {
             String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            errorMessages.add(errorMessage);
         });
-        return errors;
+
+        ex.getBindingResult().getGlobalErrors().forEach((error) -> {
+            String errorMessage = error.getDefaultMessage();
+            errorMessages.add(errorMessage);
+        });
+
+        String combinedErrorMessage = String.join("\n", errorMessages);
+        return ResponseUtil.of(HttpStatus.BAD_REQUEST, combinedErrorMessage);
     }
 }

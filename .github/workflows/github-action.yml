@@ -24,6 +24,9 @@ jobs:
       - name: Decode keystore and save
         run: echo "${{ secrets.PKCS12_BASE64 }}" | base64 --decode > src/main/resources/api.goodbite.site.p12
 
+      - name: Verify p12 file exists
+        run: ls -l src/main/resources/api.goodbite.site.p12
+
       - name: Build with Gradle
         run: ./gradlew clean build -x test
         env:

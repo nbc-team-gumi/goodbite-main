@@ -41,8 +41,11 @@ public class WebSecurityConfig {
     @Value("${ELB_DNS_FRONT}")
     private String ELB_DNS_FRONT;
 
-    @Value("${ELB_DNS_FRONT}")
-    private String ELB_DNS_FRONT;
+    @Value("${DOMAIN_URL}")
+    private String DOMAIN_URL;
+
+    @Value("${SUBDOMAIN_URL}")
+    private String SUBDOMAIN_URL;
 
     // Manager Bean 등록
     @Bean

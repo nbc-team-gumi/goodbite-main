@@ -36,7 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 
-### AWS ###
-dev-goodbite-key.pem
-goodbite-server.pem
+### KEY ###
+*.pem
+*.pub
+*.base64
+*.p12
 .keystore

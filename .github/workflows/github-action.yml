@@ -69,6 +69,7 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
+          no-cache: true
 
   deploy-to-ec2:
     needs: build-and-docker-push

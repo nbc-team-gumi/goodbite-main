@@ -6,6 +6,7 @@ import com.sparta.goodbite.exception.waiting.WaitingException;
 import com.sparta.goodbite.exception.waiting.detail.WaitingCanNotDuplicatedException;
 import com.sparta.goodbite.exception.waiting.detail.WaitingNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +31,8 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
     Optional<Waiting> findByRestaurantIdAndCustomerId(Long restaurantId, Long customerId);
 
     @Query("SELECT w FROM Waiting w WHERE w.restaurant.id = :restaurantId AND w.deletedAt IS NULL")
-    ArrayList<Waiting> findALLByRestaurantId(Long restaurantId);
+    ArrayList<Waiting> findAllByRestaurantIdDeletedAtIsNull(
+        Long restaurantId);
 
     @Query("SELECT MAX(w.waitingOrder) FROM Waiting w WHERE w.restaurant.id = :restaurant_id AND w.deletedAt IS NULL")
     Long findMaxWaitingOrderByRestaurantId(@Param("restaurant_id") Long restaurant_id);
@@ -45,7 +47,7 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
     }
 
     default ArrayList<Waiting> findALLByRestaurantIdOrThrow(Long restaurantId) {
-        ArrayList<Waiting> waitings = findALLByRestaurantId(restaurantId);
+        ArrayList<Waiting> waitings = findAllByRestaurantIdDeletedAtIsNull(restaurantId);
         if (waitings.isEmpty()) {
             throw new WaitingNotFoundException(WaitingErrorCode.WAITING_NOT_FOUND);
         }
@@ -59,4 +61,6 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
 
     @Query("SELECT w FROM Waiting w WHERE w.restaurant.id = :restaurantId AND w.customer.id = :customerId AND w.status = 'SEATED'")
     Optional<Waiting> findStatusByRestaurantIdAndCustomerId(Long restaurantId, Long customerId);
+
+    List<Waiting> findAllByRestaurantId(Long restaurantId);
 }

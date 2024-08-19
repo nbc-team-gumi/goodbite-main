@@ -163,7 +163,7 @@ public class WaitingService {
 
     @Transactional(readOnly = true)
     public Long findLastOrderNumber(Long restaurantId) {
-        if (!waitingRepository.findALLByRestaurantId(restaurantId).isEmpty()) {
+        if (!waitingRepository.findAllByRestaurantIdDeletedAtIsNull(restaurantId).isEmpty()) {
             // 해당하는 레스토랑에 예약이 하나라도 존재한다면
             return waitingRepository.findMaxWaitingOrderByRestaurantId(
                 restaurantId);
@@ -219,7 +219,7 @@ public class WaitingService {
     private void reduceWaitingOrders(Long waitingId, String type) {
         Waiting waitingOne = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
 
-        List<Waiting> waitingList = waitingRepository.findALLByRestaurantId(
+        List<Waiting> waitingList = waitingRepository.findAllByRestaurantIdDeletedAtIsNull(
             waitingOne.getRestaurant().getId());
 
         String message = "";
@@ -287,7 +287,8 @@ public class WaitingService {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
 
-        List<Waiting> waitingList = waitingRepository.findALLByRestaurantId(restaurant.getId());
+        List<Waiting> waitingList = waitingRepository.findAllByRestaurantIdDeletedAtIsNull(
+            restaurant.getId());
         if (waitingList.isEmpty()) {
             throw new WaitingException(WaitingErrorCode.WAITING_NOT_FOUND);
         }

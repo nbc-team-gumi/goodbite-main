@@ -8,6 +8,8 @@ import com.sparta.goodbite.domain.customer.dto.UpdatePasswordRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePhoneNumberRequestDto;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
+import com.sparta.goodbite.domain.reservation.entity.Reservation;
+import com.sparta.goodbite.domain.reservation.repository.ReservationRepository;
 import com.sparta.goodbite.domain.waiting.entity.Waiting;
 import com.sparta.goodbite.domain.waiting.repository.WaitingRepository;
 import com.sparta.goodbite.exception.customer.CustomerErrorCode;
@@ -28,6 +30,7 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
     private final WaitingRepository waitingRepository;
+    private final ReservationRepository reservationRepository;
 
     //조회
     @Transactional(readOnly = true)
@@ -119,6 +122,9 @@ public class CustomerService {
         //사용자의 웨이팅을 하드 딜리트 함
         List<Waiting> waitingList = waitingRepository.findALLByCustomerId(user.getId());
         waitingRepository.deleteAll(waitingList);
+
+        List<Reservation> reservationList = reservationRepository.findAllByCustomerId(user.getId());
+        reservationRepository.deleteAll(reservationList);
 
         //명시적으로 저장
         customerRepository.save(customer);

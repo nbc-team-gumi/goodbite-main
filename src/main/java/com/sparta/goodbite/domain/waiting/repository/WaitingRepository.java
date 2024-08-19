@@ -32,7 +32,7 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
     @Query("SELECT w FROM Waiting w WHERE w.restaurant.id = :restaurantId AND w.deletedAt IS NULL")
     ArrayList<Waiting> findALLByRestaurantId(Long restaurantId);
 
-    @Query("SELECT w FROM Waiting w WHERE w.customer.id = :custormerId")
+    @Query("SELECT w FROM Waiting w WHERE w.customer.id = :customerId")
     ArrayList<Waiting> findALLByCustomerId(Long customerId);
 
     @Query("SELECT MAX(w.waitingOrder) FROM Waiting w WHERE w.restaurant.id = :restaurant_id AND w.deletedAt IS NULL")

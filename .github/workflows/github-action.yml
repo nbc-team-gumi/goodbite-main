@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ dev ]
+    branches: [ 175-feat-https-리디렉션 ]
 
 env:
   DOCKER_IMAGE_TAG_NAME: good-bite
@@ -22,7 +22,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Decode keystore and save
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > src/main/resources/goodbite.p12
+        run: echo "${{ secrets.PKCS12_BASE64 }}" | base64 --decode > src/main/resources/api.goodbite.site.p12
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
@@ -34,7 +34,7 @@ jobs:
           DB_PORT: ${{ vars.DB_PORT }}
           JWT_SECRET_KEY: ${{ vars.JWT_SECRET_KEY }}
           PUBLIC_DATA_KEY: ${{ secrets.PUBLIC_DATA_KEY }}
-          EC2_HOST: ${{ vars.EC2_HOST }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
           DOMAIN_URL: ${{ vars.DOMAIN_URL }}
           SUBDOMAIN_URL: ${{ vars.SUBDOMAIN_URL }}
           KAKAO_API_KEY: ${{ secrets.KAKAO_API_KEY }}
@@ -75,7 +75,7 @@ jobs:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ vars.EC2_HOST }}
+          host: ${{ secrets.EC2_HOST }}
           username: ${{ vars.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
@@ -84,12 +84,12 @@ jobs:
             sudo usermod -aG docker $USER
             newgrp docker
             
-            echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > /home/ubuntu/goodbite/goodbite.p12
+            echo "${{ secrets.PKCS12_BASE64 }}" | base64 --decode > /home/ubuntu/goodbite/api.goodbite.site.p12
 
             # 권한 설정
-            sudo chmod 600 /home/ubuntu/goodbite/goodbite.p12
+            sudo chmod 600 /home/ubuntu/goodbite/api.goodbite.site.p12
             
-            CONTAINER_ID=$(sudo docker ps -q --filter "publish=80-8080" --filter "publish=443-443")
+            CONTAINER_ID=$(sudo docker ps -q --filter "publish=443-443")
             
             if [ ! -z "$CONTAINER_ID" ]; then
             sudo docker stop $CONTAINER_ID
@@ -98,7 +98,7 @@ jobs:
             
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
             
-            sudo docker run -d -p 80:8080 -p 443:443 \
+            sudo docker run -d -p 443:443 \
                 -e DB_USERNAME=${{vars.DB_USERNAME}} \
                 -e DB_PASSWORD=${{vars.DB_PASSWORD}} \
                 -e DB_HOST=${{vars.DB_HOST}} \
@@ -108,7 +108,7 @@ jobs:
                 -e PUBLIC_DATA_KEY=${{ secrets.PUBLIC_DATA_KEY }} \
                 -e DOMAIN_URL=${{ vars.DOMAIN_URL }} \
                 -e SUBDOMAIN_URL=${{ vars.SUBDOMAIN_URL }} \
-                -e EC2_HOST=${{ vars.EC2_HOST }} \
+                -e EC2_HOST=${{ secrets.EC2_HOST }} \
                 -e KAKAO_API_KEY=${{ secrets.KAKAO_API_KEY }} \
                 -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
                 -e S3_REGION=${{ secrets.S3_REGION }} \
@@ -118,5 +118,5 @@ jobs:
                 -e REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
                 -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
                 -e SSL_KEY=${{secrets.SSL_KEY}} \
-                -v /home/ubuntu/goodbite/goodbite.p12:/path/inside/container/goodbite.p12 \
+                -v /home/ubuntu/goodbite/api.goodbite.site.p12:/path/inside/container/api.goodbite.site.p12 \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest

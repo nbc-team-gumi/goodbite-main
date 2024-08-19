@@ -49,7 +49,7 @@ server:
   port: 443
   ssl:
     enabled: true
-    key-store: /home/ubuntu/goodbite/goodbite.p12
+    key-store: /path/inside/container/api.goodbite.site.p12
     key-store-password: ${SSL_KEY}
     key-store-type: PKCS12
     key-alias: goodbite
@@ -65,8 +65,3 @@ logging:
     root: INFO
     org.springframework: INFO
     com.sparta.goodbite.aspect: DEBUG
-  file:
-    name: /var/log/goodbite/application.log
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

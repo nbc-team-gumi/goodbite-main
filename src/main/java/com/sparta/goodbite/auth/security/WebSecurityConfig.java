@@ -5,10 +5,7 @@ import com.sparta.goodbite.auth.util.JwtUtil;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -46,6 +43,9 @@ public class WebSecurityConfig {
 
     @Value("${DOMAIN_URL}")
     private String DOMAIN_URL;
+
+    @Value("${ELB_DNS_FRONT}")
+    private String ELB_DNS_FRONT;
 
     // Manager Bean 등록
     @Bean
@@ -92,6 +92,7 @@ public class WebSecurityConfig {
         config.addAllowedOrigin("http://localhost:3000"); // 로컬 개발용
         config.addAllowedOrigin(SUBDOMAIN_URL); // 프론트엔드 서브도메인
         config.addAllowedOrigin(DOMAIN_URL); // 프론트엔드 도메인
+        config.addAllowedOrigin(ELB_DNS_FRONT); // 로드밸런서 DNS
         config.addAllowedHeader("*"); // 모든 헤더 허용
         config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
         config.addExposedHeader(JwtUtil.AUTHORIZATION_HEADER); // Authorization 헤더 노출
@@ -106,23 +107,6 @@ public class WebSecurityConfig {
     @Bean
     public LogoutSuccessHandler logoutSuccessHandler() {
         return new EmailLogoutSuccessHandler();
-    }
-
-    // HTTPS 사용, 리디렉션
-    @Bean
-    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> servletContainer() {
-        return server -> {
-            server.addAdditionalTomcatConnectors(createHttpConnector());
-        };
-    }
-
-    private Connector createHttpConnector() {
-        Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
-        connector.setScheme("http");
-        connector.setPort(8080);
-        connector.setSecure(false);
-        connector.setRedirectPort(443);
-        return connector;
     }
 
     // 시큐리티 필터 체인 설정 Bean 등록

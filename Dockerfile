@@ -5,7 +5,6 @@ LABEL authors="white"
 COPY build/libs/goodbite-0.0.1-SNAPSHOT.jar /app/goodbite.jar
 
 EXPOSE 443
-EXPOSE 8080
 
 ENV DB_HOST=${DB_HOST} \
     DB_PORT=${DB_PORT} \

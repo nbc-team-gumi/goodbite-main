@@ -38,11 +38,8 @@ public class WebSecurityConfig {
     private final GlobalAuthenticationEntryPoint authenticationEntryPoint;
     private final EmailAuthenticationProvider authenticationProvider;
 
-    @Value("${SUBDOMAIN_URL}")
-    private String SUBDOMAIN_URL;
-
-    @Value("${DOMAIN_URL}")
-    private String DOMAIN_URL;
+    @Value("${ELB_DNS_FRONT}")
+    private String ELB_DNS_FRONT;
 
     @Value("${ELB_DNS_FRONT}")
     private String ELB_DNS_FRONT;
@@ -138,6 +135,7 @@ public class WebSecurityConfig {
                 (authorizeHttpRequests) -> authorizeHttpRequests
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 프리플라이트 요청 허용
                     .requestMatchers(
+                        "/",
                         "/customers/signup",
                         "/owners/signup",
                         "/users/login",

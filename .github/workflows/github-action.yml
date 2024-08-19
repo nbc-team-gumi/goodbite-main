@@ -39,7 +39,7 @@ jobs:
           PUBLIC_DATA_KEY: ${{ secrets.PUBLIC_DATA_KEY }}
           EC2_HOST: ${{ secrets.EC2_HOST }}
           DOMAIN_URL: ${{ vars.DOMAIN_URL }}
-          SUBDOMAIN_URL: ${{ vars.SUBDOMAIN_URL }}
+          ELB_DNS_FRONT: ${{ secrets.ELB_DNS_FRONT }}
           KAKAO_API_KEY: ${{ secrets.KAKAO_API_KEY }}
           S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
           S3_REGION: ${{ secrets.S3_REGION }}

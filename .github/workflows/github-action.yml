@@ -24,9 +24,6 @@ jobs:
       - name: Decode keystore and save
         run: echo "${{ secrets.PKCS12_BASE64 }}" | base64 --decode > src/main/resources/api.goodbite.site.p12
 
-      - name: Verify p12 file exists
-        run: ls -l src/main/resources/api.goodbite.site.p12
-
       - name: Build with Gradle
         run: ./gradlew clean build -x test
         env:
@@ -49,6 +46,7 @@ jobs:
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           REDIS_PORT: $${{ secrets.REDIS_PORT }}
           SSL_KEY: ${{ secrets.SSL_KEY }}
+          KEY_STORE_PATH: ${{ secrets.KEY_STORE_PATH }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -118,4 +116,5 @@ jobs:
                 -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
                 -e SSL_KEY=${{ secrets.SSL_KEY }} \
                 -e ELB_DNS_FRONT=${{ secrets.ELB_DNS_FRONT }} \
+                -e KEY_STORE_PATH=${{ secrets.KEY_STORE_PATH }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest

@@ -25,6 +25,7 @@ ENV DB_HOST=${DB_HOST} \
     REDIS_SERVER=${REDIS_SERVER} \
     REDIS_PASSWORD=${REDIS_PASSWORD} \
     REDIS_PORT=${REDIS_PORT} \
-    SSL_KEY=${SSL_KEY}
+    SSL_KEY=${SSL_KEY} \
+    ELB_DNS_FRONT=${ELB_DNS_FRONT}
 
 ENTRYPOINT ["java", "-jar", "/app/goodbite.jar"]

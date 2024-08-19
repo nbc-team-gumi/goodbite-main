@@ -49,6 +49,7 @@ jobs:
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           REDIS_PORT: $${{ secrets.REDIS_PORT }}
           SSL_KEY: ${{ secrets.SSL_KEY }}
+          ELB_DNS_FRONT: ${{ secrets.ELB_DNS_FRONT }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -116,5 +117,6 @@ jobs:
                 -e REDIS_SERVER=${{ secrets.REDIS_SERVER }} \
                 -e REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
                 -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
-                -e SSL_KEY=${{secrets.SSL_KEY}} \
+                -e SSL_KEY=${{ secrets.SSL_KEY }} \
+                -e ELB_DNS_FRONT=${{ secrets.ELB_DNS_FRONT }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest

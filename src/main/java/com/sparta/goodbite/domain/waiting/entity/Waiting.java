@@ -24,6 +24,8 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Waiting extends ExtendedTimestamped {
 
+    public static final int DEFAULT_PAGE_SIZE = 5;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

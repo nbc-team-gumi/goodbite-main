@@ -5,25 +5,29 @@ import com.sparta.goodbite.common.response.DataResponseDto;
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
 import com.sparta.goodbite.domain.menu.dto.MenuResponseDto;
+import com.sparta.goodbite.domain.menu.entity.Menu;
 import com.sparta.goodbite.domain.menu.service.MenuService;
 import com.sparta.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
 import com.sparta.goodbite.domain.operatinghour.service.OperatingHourService;
 import com.sparta.goodbite.domain.reservation.dto.ReservationResponseDto;
+import com.sparta.goodbite.domain.reservation.entity.Reservation;
 import com.sparta.goodbite.domain.reservation.service.ReservationService;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantIdResponseDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
+import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.service.RestaurantService;
 import com.sparta.goodbite.domain.review.dto.ReviewResponseDto;
+import com.sparta.goodbite.domain.review.entity.Review;
 import com.sparta.goodbite.domain.review.service.ReservationReviewServiceImpl;
+import com.sparta.goodbite.domain.review.service.ReviewService;
 import com.sparta.goodbite.domain.review.service.WaitingReviewServiceImpl;
 import com.sparta.goodbite.domain.waiting.dto.WaitingResponseDto;
+import com.sparta.goodbite.domain.waiting.entity.Waiting;
 import com.sparta.goodbite.domain.waiting.service.WaitingService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -78,16 +82,16 @@ public class RestaurantController {
     @PreAuthorize("hasRole('OWNER')")
     @GetMapping("/my")
     public ResponseEntity<DataResponseDto<RestaurantIdResponseDto>> getMyRestaurant(
-        @AuthenticationPrincipal EmailUserDetails userDetails
-    ) {
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
 
         return ResponseUtil.findOk(restaurantService.getMyRestaurant(userDetails.getUser()));
     }
 
     @GetMapping
-    public ResponseEntity<DataResponseDto<List<RestaurantResponseDto>>> getAllRestaurants() {
+    public ResponseEntity<DataResponseDto<Page<RestaurantResponseDto>>> getAllRestaurants(
+        @PageableDefault(size = Restaurant.DEFAULT_PAGE_SIZE, sort = "name") Pageable pageable) {
 
-        return ResponseUtil.findOk(restaurantService.getAllRestaurants());
+        return ResponseUtil.findOk(restaurantService.getAllRestaurants(pageable));
     }
 
     @GetMapping("/{restaurantId}/operating-hours")
@@ -99,10 +103,11 @@ public class RestaurantController {
     }
 
     @GetMapping("/{restaurantId}/menus")
-    public ResponseEntity<DataResponseDto<List<MenuResponseDto>>> getAllMenusByRestaurantId(
-        @PathVariable Long restaurantId) {
+    public ResponseEntity<DataResponseDto<Page<MenuResponseDto>>> getAllMenusByRestaurantId(
+        @PathVariable Long restaurantId,
+        @PageableDefault(size = Menu.DEFAULT_PAGE_SIZE) Pageable pageable) {
 
-        return ResponseUtil.findOk(menuService.getAllMenusByRestaurantId(restaurantId));
+        return ResponseUtil.findOk(menuService.getAllMenusByRestaurantId(restaurantId, pageable));
     }
 
     // 사업자 대시보드용 전체 웨이팅 조회
@@ -111,7 +116,7 @@ public class RestaurantController {
     public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getAllWaitingsByRestaurantId(
         @AuthenticationPrincipal EmailUserDetails userDetails,
         @PathVariable Long restaurantId,
-        @PageableDefault(size = 5) Pageable pageable) {
+        @PageableDefault(size = Waiting.DEFAULT_PAGE_SIZE) Pageable pageable) {
 
         return ResponseUtil.createOk(
             waitingService.getWaitingsByRestaurantId(userDetails.getUser(), restaurantId,
@@ -127,31 +132,28 @@ public class RestaurantController {
     }
 
     @GetMapping("/{restaurantId}/reviews")
-    public ResponseEntity<DataResponseDto<List<ReviewResponseDto>>> getAllReviewsByRestaurantId(
-        @PathVariable Long restaurantId) {
+    public ResponseEntity<DataResponseDto<Page<ReviewResponseDto>>> getAllReviewsByRestaurantId(
+        @PathVariable Long restaurantId,
+        @PageableDefault(size = Review.DEFAULT_PAGE_SIZE) Pageable pageable) {
 
-        List<ReviewResponseDto> waitingReviews = waitingReviewService.getAllReviewsByRestaurantId(
-            restaurantId);
         List<ReviewResponseDto> reservationReviews = reservationReviewService.getAllReviewsByRestaurantId(
             restaurantId);
+        List<ReviewResponseDto> waitingReviews = waitingReviewService.getAllReviewsByRestaurantId(
+            restaurantId);
 
-        List<ReviewResponseDto> allReviews = new ArrayList<>();
-        allReviews.addAll(waitingReviews);
-        allReviews.addAll(reservationReviews);
-
-        // createdAt을 기준으로 정렬합니다.
-        allReviews.sort(Comparator.comparing(ReviewResponseDto::createdAt).reversed());
-
-        return ResponseUtil.findOk(allReviews);
+        return ResponseUtil.findOk(
+            ReviewService.getAllReviewsSortedAndPaged(pageable, reservationReviews,
+                waitingReviews));
     }
 
     @PreAuthorize("hasRole('OWNER')")
     @GetMapping("/{restaurantId}/reservations")
-    public ResponseEntity<DataResponseDto<List<ReservationResponseDto>>> getAllReservationsByRestaurantId(
-        @PathVariable Long restaurantId, @AuthenticationPrincipal EmailUserDetails userDetails) {
+    public ResponseEntity<DataResponseDto<Page<ReservationResponseDto>>> getAllReservationsByRestaurantId(
+        @PathVariable Long restaurantId, @AuthenticationPrincipal EmailUserDetails userDetails,
+        @PageableDefault(size = Reservation.DEFAULT_PAGE_SIZE) Pageable pageable) {
 
         return ResponseUtil.findOk(reservationService.getAllReservationsByRestaurantId(restaurantId,
-            userDetails.getUser()));
+            userDetails.getUser(), pageable));
     }
 
     @GetMapping("/{restaurantId}/capacity")

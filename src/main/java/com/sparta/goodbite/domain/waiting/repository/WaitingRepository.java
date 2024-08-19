@@ -38,7 +38,7 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
     @Query("SELECT w FROM Waiting w WHERE w.restaurant.id = :restaurantId AND w.deletedAt IS NULL")
     Page<Waiting> findByRestaurantId(Long restaurantId, Pageable pageable);
 
-    default void validateRestaurantIdAndCustomerId(Long restaurantId, Long customerId) {
+    default void validateByRestaurantIdAndCustomerId(Long restaurantId, Long customerId) {
         findByRestaurantIdAndCustomerId(restaurantId, customerId).ifPresent(_waiting -> {
             throw new WaitingCanNotDuplicatedException(WaitingErrorCode.WAITING_DUPLICATED);
         });

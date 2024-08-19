@@ -57,7 +57,7 @@ public class WaitingService {
 
         Customer customer = customerRepository.findByIdOrThrow(user.getId());
 
-        waitingRepository.validateRestaurantIdAndCustomerId(restaurant.getId(),
+        waitingRepository.validateByRestaurantIdAndCustomerId(restaurant.getId(),
             customer.getId());
 
         Long LastOrderNumber = findLastOrderNumber(restaurant.getId());

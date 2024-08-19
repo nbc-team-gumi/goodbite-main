@@ -17,6 +17,8 @@ import lombok.NoArgsConstructor;
 @MappedSuperclass
 public abstract class Review extends Timestamped {
 
+    public static final int DEFAULT_PAGE_SIZE = 10;
+
     private float rating;
     private String content;
 

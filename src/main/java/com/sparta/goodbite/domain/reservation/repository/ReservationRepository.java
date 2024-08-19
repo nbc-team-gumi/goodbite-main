@@ -6,13 +6,15 @@ import com.sparta.goodbite.exception.reservation.ReservationErrorCode;
 import com.sparta.goodbite.exception.reservation.detail.ReservationNotFoundException;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    List<Reservation> findAllByCustomerId(Long customerId);
+    Page<Reservation> findAllByCustomerId(Long customerId, Pageable pageable);
 
-    List<Reservation> findAllByRestaurantId(Long restaurantId);
+    Page<Reservation> findAllByRestaurantId(Long restaurantId, Pageable pageable);
 
     List<Reservation> findAllByStatus(ReservationStatus reservationStatus);
 

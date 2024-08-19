@@ -22,6 +22,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Restaurant extends Timestamped {
 
+    public static final int DEFAULT_PAGE_SIZE = 20;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

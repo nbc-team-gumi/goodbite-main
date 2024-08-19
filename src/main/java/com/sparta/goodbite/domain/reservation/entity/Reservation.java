@@ -31,6 +31,7 @@ import lombok.NoArgsConstructor;
 public class Reservation extends ExtendedTimestamped {
 
     public static final int RESERVATION_DURATION_HOUR = 1;
+    public static final int DEFAULT_PAGE_SIZE = 5;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

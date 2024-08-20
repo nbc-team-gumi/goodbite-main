@@ -25,7 +25,7 @@
 >   - 2024.08.05: 중간 발표회
 >   - 2024.08.21: 최종 발표회
 
-# <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/My-Gummy-logo-removebg2.png" width="60"/>팀 마이구미 [<img src="https://img.icons8.com/?size=100&id=CexFs1lac6J7&format=png&color=000000" width="30">](https://github.com/nbc-team-gumi)
+# <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/My-Gummy-logo-simplify-removebg.png" width=35/>팀 마이구미 [<img src="https://img.icons8.com/?size=100&id=CexFs1lac6J7&format=png&color=000000" width="30">](https://github.com/nbc-team-gumi)
 
 |                                        강현지                                        |                                        김정민                                        |                                       김현성                                       |                                       양소영                                       |                                       이하은                                        |                                                                                                              
 |:---------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------:|
@@ -120,8 +120,8 @@ S3_SECRET_KEY={secret_key}
 
 # <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> API 명세서
 
-🔗API 명세서 노션 페이지 링크
-</br>
+🔗 API 명세서 노션 페이지 링크
+
 <a href="https://teamsparta.notion.site/3eb86cddac8f4123bf9a677f34e30671?v=08d7113eab5b4f0488b30fd0e76f5f2c">
 <img src="https://img.shields.io/badge/Notion-%23000000.svg?style=for-the-badge&logo=notion&logoColor=white" width="100"/>
 </a>
@@ -129,7 +129,7 @@ S3_SECRET_KEY={secret_key}
 # <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> 서비스 아키텍처
 
 <div align="center">
-        <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/architecture.png" alt="architecture"/>
+        <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/goodbite_infra.png" alt="architecture"/>
 </div>
 
 # <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> ERD

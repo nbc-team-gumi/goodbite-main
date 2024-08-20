@@ -27,7 +27,7 @@ public class RestaurantRequestDto {
     private String detailAddress;
 
     @NotBlank(message = "식당 전화번호를 입력해주세요.")
-    @Pattern(regexp = "^(0[2-8][0-5]?|01[01346-9])-?([1-9]{1}[0-9]{2,3})-?([0-9]{4})$", message = "전화번호 형식에 맞게 입력해주세요.")
+    @Pattern(regexp = "^(0[2-8][0-5]?|01[01346-9]|050[2-9]?)-?([1-9]{1}[0-9]{2,3})-?([0-9]{4})$", message = "전화번호 형식에 맞게 입력해주세요.")
     private String phoneNumber;
 
     @NotNull(message = "카테고리를 입력해주세요.")

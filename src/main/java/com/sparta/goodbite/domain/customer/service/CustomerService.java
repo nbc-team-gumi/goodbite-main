@@ -8,11 +8,16 @@ import com.sparta.goodbite.domain.customer.dto.UpdatePasswordRequestDto;
 import com.sparta.goodbite.domain.customer.dto.UpdatePhoneNumberRequestDto;
 import com.sparta.goodbite.domain.customer.entity.Customer;
 import com.sparta.goodbite.domain.customer.repository.CustomerRepository;
+import com.sparta.goodbite.domain.reservation.entity.Reservation;
+import com.sparta.goodbite.domain.reservation.repository.ReservationRepository;
+import com.sparta.goodbite.domain.waiting.entity.Waiting;
+import com.sparta.goodbite.domain.waiting.repository.WaitingRepository;
 import com.sparta.goodbite.exception.customer.CustomerErrorCode;
 import com.sparta.goodbite.exception.customer.detail.CustomerAlreadyDeletedException;
 import com.sparta.goodbite.exception.user.UserErrorCode;
 import com.sparta.goodbite.exception.user.detail.PasswordMismatchException;
 import com.sparta.goodbite.exception.user.detail.SamePasswordException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +29,8 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final WaitingRepository waitingRepository;
+    private final ReservationRepository reservationRepository;
 
     //조회
     @Transactional(readOnly = true)
@@ -111,6 +118,13 @@ public class CustomerService {
 
         // 소프트 삭제를 위해 deletedAt 필드를 현재 시간으로 설정
         customer.deactivate();
+
+        //사용자의 웨이팅을 하드 딜리트 함
+        List<Waiting> waitingList = waitingRepository.findALLByCustomerId(user.getId());
+        waitingRepository.deleteAll(waitingList);
+
+        List<Reservation> reservationList = reservationRepository.findAllByCustomerId(user.getId());
+        reservationRepository.deleteAll(reservationList);
 
         //명시적으로 저장
         customerRepository.save(customer);

@@ -43,6 +43,7 @@ public class Restaurant extends Timestamped {
     private String detailAddress;
     private String phoneNumber;
     private int capacity;
+    private double rating;
 
     @Enumerated(EnumType.STRING)
     private Category category;
@@ -60,6 +61,10 @@ public class Restaurant extends Timestamped {
         this.phoneNumber = phoneNumber;
         this.category = category;
         this.capacity = capacity;
+    }
+
+    public void updateRating(double rating) {
+        this.rating = rating;
     }
 
     public void update(RestaurantRequestDto restaurantRequestDto, String restaurantImage) {

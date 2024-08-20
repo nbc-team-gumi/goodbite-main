@@ -5,7 +5,8 @@ import com.sparta.goodbite.domain.restaurant.enums.Category;
 
 public record RestaurantResponseDto(Long restaurantId, String name, String imageUrl, String sido,
                                     String sigungu, String address, String detailAddress,
-                                    String phoneNumber, Category category, int capacity) {
+                                    String phoneNumber, Category category, int capacity,
+                                    double rating) {
 
     public static RestaurantResponseDto from(Restaurant restaurant) {
         return new RestaurantResponseDto(
@@ -18,6 +19,7 @@ public record RestaurantResponseDto(Long restaurantId, String name, String image
             restaurant.getDetailAddress(),
             restaurant.getPhoneNumber(),
             restaurant.getCategory(),
-            restaurant.getCapacity());
+            restaurant.getCapacity(),
+            Math.round(restaurant.getRating() * 10) / 10.0);
     }
 }

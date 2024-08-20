@@ -1,7 +1,5 @@
 # Good Bite <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> Back-end
 
----
-
 <div align="center">
     <a href="https://goodbite.site">
         <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-removebg-preview.png" alt="logo" width="500"/>
@@ -14,17 +12,12 @@
 
 ## <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> 프로젝트 소개
 
----
-
-
 가게에서 손님의 대기 순번을 관리하고, 차례가 되었을 때 그 손님들에게 알려줄 수 있는 시스템을 개발합니다.
 이 시스템은 손님들이 대기 시간을 효율적으로 관리할 수 있도록 도와주며, 가게 운영자와 관리자에게도 편리한 도구를 제공합니다.
 손님은 대기 순번을 실시간으로 확인할 수 있으며, 자신의 차례가 다가오면 알림을 받게 됩니다.
 가게 측에서는 손님의 대기 순번을 체계적으로 관리하고, 손님들에게 원활한 서비스를 제공할 수 있습니다.
 
 ## ⏱️ 개발 기간
-
----
 
 > **내일배움캠프 Java 5기 팀프로젝트**
 >
@@ -34,8 +27,6 @@
 
 # <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/My-Gummy-logo-removebg2.png" width="60"/>팀 마이구미 [<img src="https://img.icons8.com/?size=100&id=CexFs1lac6J7&format=png&color=000000" width="30">](https://github.com/nbc-team-gumi)
 
----
-
 |                                        강현지                                        |                                        김정민                                        |                                       김현성                                       |                                       양소영                                       |                                       이하은                                        |                                                                                                              
 |:---------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------:|
 | <img width="160px" src="https://avatars.githubusercontent.com/u/102335813?v=4" /> | <img width="160px" src="https://avatars.githubusercontent.com/u/112466204?v=4" /> | <img width="160px" src="https://avatars.githubusercontent.com/u/66352581?v=4"/> | <img width="160px" src="https://avatars.githubusercontent.com/u/72538861?v=4"/> | <img width="160px" src="https://avatars.githubusercontent.com/u/166499347?v=4"/> |
@@ -43,8 +34,6 @@
 |                                사용자 도메인, 성능 최적화, 캐싱                                |                              리뷰 기능, 가게 메뉴, 가게 예약 구현                               |                             가게 웨이팅 기능, 알림 기능 (SSE)                              |                              사용자 인증/인가, 배포 아키텍처 관리                              |                       가게 도메인, 영업시간 기능 구현, 이미지 클라우드(S3) 관리                        |
 
 # <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> 가이드
-
----
 
 ## Requirements
 
@@ -91,8 +80,6 @@ S3_SECRET_KEY={secret_key}
 
 # <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> 기술 스택
 
----
-
 ### 개발 환경
 
 | Type          | Tech                                                                                                                                                                                                                                                                                                                                                                                                                                   | 
@@ -111,11 +98,9 @@ S3_SECRET_KEY={secret_key}
 
 # <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> 주요 기능
 
----
-
 > ### 계정
 > - 같은 계정으로 총 두 종류의 계정 가입이 가능합니다.
-> - 예시) my_email@email.com 손님 계정과, my_eamil@email.com 가게 계정은 별개
+> - 예시) my_email@email.com 손님 계정과, my_email@email.com 가게 계정은 별개
 > - 가게 관리자 계정은 **사업자 번호가 필요**합니다.
 >
 > ### 손님 (일반 사용자) 기능:
@@ -135,8 +120,6 @@ S3_SECRET_KEY={secret_key}
 
 # <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> API 명세서
 
----
-
 🔗API 명세서 노션 페이지 링크
 </br>
 <a href="https://teamsparta.notion.site/3eb86cddac8f4123bf9a677f34e30671?v=08d7113eab5b4f0488b30fd0e76f5f2c">
@@ -145,15 +128,11 @@ S3_SECRET_KEY={secret_key}
 
 # <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> 서비스 아키텍처
 
----
-
 <div align="center">
         <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/architecture.png" alt="architecture"/>
 </div>
 
 # <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> ERD
-
----
 
 <div align="center">
     <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/erd.png" alt="erd"/>

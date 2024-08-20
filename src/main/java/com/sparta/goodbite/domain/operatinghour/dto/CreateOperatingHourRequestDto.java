@@ -2,7 +2,6 @@ package com.sparta.goodbite.domain.operatinghour.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sparta.goodbite.domain.operatinghour.dto.validation.contraint.LocalTimeFormatConstraint;
-import com.sparta.goodbite.domain.operatinghour.dto.validation.contraint.OpenTimeBeforeCloseTimeConstraint;
 import com.sparta.goodbite.domain.operatinghour.entity.OperatingHour;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +10,6 @@ import java.time.LocalTime;
 import lombok.Getter;
 
 @Getter
-@OpenTimeBeforeCloseTimeConstraint
 public class CreateOperatingHourRequestDto {
 
     @NotNull(message = "가게를 입력해주세요.")

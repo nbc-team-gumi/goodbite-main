@@ -3,6 +3,7 @@ package com.sparta.goodbite.domain.restaurant.dto;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.enums.Category;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -33,6 +34,7 @@ public class RestaurantRequestDto {
     @NotNull(message = "카테고리를 입력해주세요.")
     private Category category;
 
+    @Min(value = 1, message = "최대 수용 인원은 0명 이하일 수 없습니다.")
     @NotNull(message = "최대 수용 인원을 입력해주세요.")
     private Integer capacity;
 

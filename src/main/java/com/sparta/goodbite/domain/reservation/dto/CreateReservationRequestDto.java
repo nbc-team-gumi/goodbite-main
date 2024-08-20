@@ -11,6 +11,8 @@ import com.sparta.goodbite.domain.reservation.entity.Reservation;
 import com.sparta.goodbite.domain.reservation.entity.ReservationMenu;
 import com.sparta.goodbite.domain.reservation.entity.ReservationStatus;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -38,6 +40,8 @@ public class CreateReservationRequestDto {
 
     private String requirement;
 
+    @Min(value = 1, message = "예약 인원 수는 0명일 수 없습니다.")
+    @Max(value = 10, message = "예약 인원이 11명 이상일 시, 가게로 문의주세요.")
     @NotNull(message = "인원 수를 입력해 주세요.")
     private int partySize;
 

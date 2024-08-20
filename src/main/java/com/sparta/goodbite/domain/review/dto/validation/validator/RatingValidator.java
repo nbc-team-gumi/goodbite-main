@@ -4,14 +4,14 @@ import com.sparta.goodbite.domain.review.dto.validation.constraint.RatingConstra
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class RatingValidator implements ConstraintValidator<RatingConstraint, Float> {
+public class RatingValidator implements ConstraintValidator<RatingConstraint, Double> {
 
     @Override
     public void initialize(RatingConstraint rating) {
     }
 
     @Override
-    public boolean isValid(Float rating, ConstraintValidatorContext context) {
+    public boolean isValid(Double rating, ConstraintValidatorContext context) {
         if (rating == null) {
             return true;
         }

@@ -19,7 +19,7 @@ public abstract class Review extends Timestamped {
 
     public static final int DEFAULT_PAGE_SIZE = 10;
 
-    private float rating;
+    private double rating;
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,7 +30,7 @@ public abstract class Review extends Timestamped {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    protected Review(float rating, String content, Restaurant restaurant, Customer customer) {
+    protected Review(double rating, String content, Restaurant restaurant, Customer customer) {
         this.rating = rating;
         this.content = content;
         this.restaurant = restaurant;

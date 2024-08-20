@@ -29,7 +29,7 @@ public class WaitingReview extends Review {
     private Waiting waiting;
 
     @Builder
-    public WaitingReview(float rating, String content, Restaurant restaurant, Customer customer,
+    public WaitingReview(double rating, String content, Restaurant restaurant, Customer customer,
         Waiting waiting) {
 
         super(rating, content, restaurant, customer);

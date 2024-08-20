@@ -2,8 +2,11 @@ spring:
   application:
     name: goodbite
 
-  profiles:
-    active: test
+  data:
+    redis:
+      host: ${REDIS_SERVER}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
 
   datasource:
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
@@ -21,9 +24,44 @@ spring:
         use_sql_comments: true
         dialect: org.hibernate.dialect.MySQLDialect
 
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  jackson:
+    time-zone: Asia/Seoul
 
-# WebSocket 설정
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+cloud:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET_NAME}
+    region:
+      static: ${S3_REGION}
+      auto: false
+    stack:
+      auto: false
+    credentials:
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+
 server:
-  port: 8080
+  port: 443
+  ssl:
+    enabled: true
+    key-store: /app/api.goodbite.site.p12
+    key-store-password: ${SSL_KEY}
+    key-store-type: PKCS12
+    key-alias: goodbite
+
+publicdata:
+  api:
+    key: ${PUBLIC_DATA_KEY}
+    url: https://api.odcloud.kr/api/nts-businessman/v1/status
+
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    com.sparta.goodbite.aspect: DEBUG

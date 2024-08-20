@@ -4,8 +4,21 @@
 POST {{baseUrl}}/users/login
 
 {
-  "email": "testuser1@example.com",
+  "email": "testowner2@email.com",
   "password": "Passw0rd!"
+}
+
+> {%
+  client.global.set("accessToken", response.cookies["Authorization"].value);
+  client.global.set("refreshToken", response.cookies["Refresh"].value);
+%}
+
+### 로그인 요청
+POST {{baseUrl}}/users/login
+
+{
+  "email": "hyunji@example.com",
+  "password": "Passw120rd!"
 }
 
 > {%

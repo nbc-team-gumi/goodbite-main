@@ -2,23 +2,23 @@ package com.sparta.goodbite.exception;
 
 import com.sparta.goodbite.common.response.MessageResponseDto;
 import com.sparta.goodbite.common.response.ResponseUtil;
-import com.sparta.goodbite.exception.customer.CustomerException;
 import com.sparta.goodbite.exception.auth.AuthException;
+import com.sparta.goodbite.exception.customer.CustomerException;
+import com.sparta.goodbite.exception.lock.LockException;
 import com.sparta.goodbite.exception.menu.MenuException;
 import com.sparta.goodbite.exception.operatinghour.OperatingHourException;
 import com.sparta.goodbite.exception.owner.OwnerException;
+import com.sparta.goodbite.exception.reservation.ReservationException;
 import com.sparta.goodbite.exception.restaurant.RestaurantException;
 import com.sparta.goodbite.exception.review.ReviewException;
 import com.sparta.goodbite.exception.waiting.WaitingException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
@@ -55,6 +55,12 @@ public class GlobalExceptionHandler {
         return ResponseUtil.of(e.getReviewErrorCode().getHttpStatus(), e.getMessage());
     }
 
+    @ExceptionHandler(ReservationException.class)
+    public ResponseEntity<MessageResponseDto> handleReservationException(ReservationException e) {
+        log.error("에러 발생: ", e);
+        return ResponseUtil.of(e.getReservationErrorCode().getHttpStatus(), e.getMessage());
+    }
+
     @ExceptionHandler(RestaurantException.class)
     public ResponseEntity<MessageResponseDto> handleRestaurantException(RestaurantException e) {
         log.error("에러 발생: ", e);
@@ -67,22 +73,36 @@ public class GlobalExceptionHandler {
         log.error("에러 발생: ", e);
         return ResponseUtil.of(e.getOperatingHourErrorCode().getHttpStatus(), e.getMessage());
     }
-  
+
     @ExceptionHandler(WaitingException.class)
     public ResponseEntity<MessageResponseDto> handleWaitingException(WaitingException e) {
         log.error("에러 발생: ", e);
         return ResponseUtil.of(e.getWaitingErrorCode().getHttpStatus(), e.getMessage());
     }
 
+    @ExceptionHandler(LockException.class)
+    public ResponseEntity<MessageResponseDto> handleWaitingException(LockException e) {
+        log.error("에러 발생: ", e);
+        return ResponseUtil.of(e.getLockErrorCode().getHttpStatus(), e.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
+    public ResponseEntity<MessageResponseDto> handleValidationExceptions(
+        MethodArgumentNotValidException ex) {
+
+        List<String> errorMessages = new ArrayList<>();
+
+        ex.getBindingResult().getFieldErrors().forEach((error) -> {
             String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            errorMessages.add(errorMessage);
         });
-        return errors;
+
+        ex.getBindingResult().getGlobalErrors().forEach((error) -> {
+            String errorMessage = error.getDefaultMessage();
+            errorMessages.add(errorMessage);
+        });
+
+        String combinedErrorMessage = String.join("\n", errorMessages);
+        return ResponseUtil.of(HttpStatus.BAD_REQUEST, combinedErrorMessage);
     }
 }

@@ -1,24 +1,28 @@
 @restaurantId = 1
 @baseUrl = http://localhost:8080
+@waitingId = 38
 ### Passw120rd! / Passw0rd!
 
 ### 로그인 요청
 POST {{baseUrl}}/users/login
 
 {
-  "email": "testuser3@example.com",
+  "email": "test.customerA@email.com",
   "password": "Passw0rd!"
 }
 
 > {%
-  client.global.set("accessToken", response.cookies["Authorization"].value);
-  client.global.set("refreshToken", response.cookies["Refresh"].value);
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.log("Authorization: " + response.headers.valueOf("Authorization"));
+
+  client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
 %}
 
 
 ### Waiting 손님이 등록
 POST {{baseUrl}}/waitings
 Content-Type: application/json
+Authorization:{{Authorization}}
 
 {
   "restaurantId": 1,
@@ -37,6 +41,8 @@ GET {{baseUrl}}/waitings/{{waitingId}}
 
 ### Waiting 손님의 웨이팅 전체 정보 조회
 GET {{baseUrl}}/waitings
+Content-Type: application/json
+Authorization:{{Authorization}}
 
 
 
@@ -45,13 +51,16 @@ GET {{baseUrl}}/waitings
 PATCH {{baseUrl}}/waitings/{{waitingId}}
 Content-Type: application/json
 
+
 {
   "partySize": 4,
   "demand": "제일 가운데 자리로 수정해주세요"
 }
 
+
 ### Waiting 취소/삭제
 DELETE {{baseUrl}}/waitings/{{waitingId}}
+Authorization: {{Authorization}}
 
 ### Restaurant의 마지막 Waiting번호 가져오기
 GET {{baseUrl}}/restaurants/{{restaurantId}}/last-waiting
@@ -70,12 +79,19 @@ PUT {{baseUrl}}/waitings/3
 POST {{baseUrl}}/users/login
 
 {
-  "email": "testowner2@email.com",
+  "email": "testowner2@example.com",
   "password": "Passw0rd!"
 }
 
 > {%
-  client.global.set("accessToken", response.cookies["Authorization"].value);
-  client.global.set("refreshToken", response.cookies["Refresh"].value);
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.log("Authorization: " + response.headers.valueOf("Authorization"));
+
+  client.global.set("RefreshToken", response.headers.valueOf("RefreshToken"));
 %}
+
+###
+GET http://localhost:8080/owners
+Content-Type: application/json
+Authorization:{{Authorization}}
 

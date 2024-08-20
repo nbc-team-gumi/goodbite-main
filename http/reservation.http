@@ -1,0 +1,31 @@
+@baseUrl = http://localhost:8080
+
+### 로그인 요청
+POST {{baseUrl}}/users/login
+
+{
+  "email": "test.customerA@email.com",
+  "password": "Passw0rd!"
+}
+
+> {%
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("Refresh", response.headers.valueOf("Refresh"));
+%}
+
+### 예약 신청
+POST {{baseUrl}}/reservations
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "restaurantId": 5,
+  "date": "2024-08-18",
+  "time": "17:00",
+  "requirement": "창가 자리 부탁드립니다.",
+  "partySize": 4,
+  "menuQuantities": {
+    "1": 2,
+    "2": 1
+  }
+}

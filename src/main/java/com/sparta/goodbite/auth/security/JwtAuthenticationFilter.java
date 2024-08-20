@@ -1,6 +1,7 @@
 package com.sparta.goodbite.auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.goodbite.auth.UserRole;
 import com.sparta.goodbite.auth.dto.LoginRequestDto;
 import com.sparta.goodbite.auth.dto.LoginSuccessResponseDto;
 import com.sparta.goodbite.auth.util.JwtUtil;
@@ -46,8 +47,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(
         HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
-        log.info("로그인 시도");
-
         try {
             // 이 필터가 서블릿 요청을 가로채 로그인 처리를 수행
             LoginRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(),
@@ -62,7 +61,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 return null;
             }
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(requestDto.getEmail());
+            String role;
+            if (requestDto.isOwner()) {
+                role = UserRole.OWNER.getAuthority();
+            } else {
+                role = UserRole.CUSTOMER.getAuthority();
+            }
+
+            UserDetails userDetails = userDetailsService.loadUserByEmail(requestDto.getEmail(),
+                role);
             if (userDetails == null) {
                 log.error("사용자를 찾을 수 없습니다.");
                 ResponseUtil.servletApi(response, HttpStatus.BAD_REQUEST.value(),
@@ -71,7 +78,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             }
 
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                userDetails.getUsername(), requestDto.getPassword(), userDetails.getAuthorities());
+                userDetails, requestDto.getPassword(), userDetails.getAuthorities());
 
             return this.getAuthenticationManager().authenticate(authenticationToken);
 
@@ -103,19 +110,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         String email = ((EmailUserDetails) authResult.getPrincipal()).getEmail();
         String role = ((EmailUserDetails) authResult.getPrincipal()).getRole();
-        //String nickname = ((EmailUserDetails) authResult.getPrincipal()).get
 
         String accessToken = JwtUtil.createAccessToken(email, role);
         String refreshToken = JwtUtil.createRefreshToken(email, role);
 
-        JwtUtil.addJwtToCookie(accessToken, response);
-        JwtUtil.addJwtToCookie(refreshToken, response);
+        JwtUtil.addJwtToHeader(accessToken, response);
+        JwtUtil.addJwtToHeader(refreshToken, response);
 
         // 사용자 역할 정보를 포함한 응답 생성
         LoginSuccessResponseDto responseDto = LoginSuccessResponseDto.from("로그인 성공", role);
 
         ResponseUtil.servletApi(response, HttpStatus.OK.value(), responseDto);
     }
+
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request,

@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 public class Waiting extends ExtendedTimestamped {
+
+    public static final int DEFAULT_PAGE_SIZE = 5;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +37,7 @@ public class Waiting extends ExtendedTimestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
-    
+
     private Long waitingOrder;
 
     @Enumerated(EnumType.STRING)
@@ -77,6 +80,10 @@ public class Waiting extends ExtendedTimestamped {
         --this.waitingOrder;
     }
 
+    public boolean canSubmitReview() {
+        return this.status == WaitingStatus.SEATED && this.deletedAt != null
+            && ChronoUnit.MINUTES.between(deletedAt, LocalDateTime.now()) <= 60 * 24 * 3;
+    }
 
     public enum WaitingStatus {
 

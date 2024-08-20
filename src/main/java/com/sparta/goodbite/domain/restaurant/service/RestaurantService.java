@@ -1,6 +1,7 @@
 package com.sparta.goodbite.domain.restaurant.service;
 
 import com.sparta.goodbite.common.UserCredentials;
+import com.sparta.goodbite.common.s3.service.S3Service;
 import com.sparta.goodbite.domain.owner.entity.Owner;
 import com.sparta.goodbite.domain.owner.repository.OwnerRepository;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantIdResponseDto;
@@ -10,11 +11,15 @@ import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.exception.auth.AuthErrorCode;
 import com.sparta.goodbite.exception.auth.AuthException;
-import java.util.List;
-import java.util.Objects;
+import com.sparta.goodbite.exception.restaurant.RestaurantErrorCode;
+import com.sparta.goodbite.exception.restaurant.detail.RestaurantCreateFailedException;
+import com.sparta.goodbite.exception.restaurant.detail.RestaurantUpdateFailedException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -22,13 +27,22 @@ public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
     private final OwnerRepository ownerRepository;
+    private final S3Service s3Service;
 
     @Transactional
-    public void createRestaurant(RestaurantRequestDto restaurantRequestDto, UserCredentials user) {
+    public void createRestaurant(RestaurantRequestDto restaurantRequestDto, UserCredentials user,
+        MultipartFile image) {
 
         Owner owner = ownerRepository.findByIdOrThrow(user.getId());
 
-        restaurantRepository.save(restaurantRequestDto.toEntity(owner));
+        String restaurantImage = s3Service.upload(image);
+
+        try {
+            restaurantRepository.save(restaurantRequestDto.toEntity(owner, restaurantImage));
+        } catch (Exception e) {
+            s3Service.deleteImageFromS3(restaurantImage);
+            throw new RestaurantCreateFailedException(RestaurantErrorCode.RESTAURANT_CREATE_FAILED);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -44,20 +58,37 @@ public class RestaurantService {
     }
 
     @Transactional(readOnly = true)
-    public List<RestaurantResponseDto> getAllRestaurants() {
-        return restaurantRepository.findAll().stream().map(RestaurantResponseDto::from).toList();
+    public Page<RestaurantResponseDto> getAllRestaurants(Pageable pageable) {
+        return restaurantRepository.findAll(pageable).map(RestaurantResponseDto::from);
     }
-  
+
     @Transactional
     public void updateRestaurant(Long restaurantId, RestaurantRequestDto restaurantRequestDto,
-        UserCredentials user) {
+        UserCredentials user, MultipartFile image) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
         Owner owner = ownerRepository.findByIdOrThrow(user.getId());
 
         validateRestaurantOwnership(owner, restaurant);
 
-        restaurant.update(restaurantRequestDto);
+        String originalImage = restaurant.getImageUrl();
+        String restaurantImage = originalImage;
+        try {
+            if (image != null && !image.isEmpty()) {
+                restaurantImage = s3Service.upload(image);
+
+                restaurant.update(restaurantRequestDto, restaurantImage);
+                s3Service.deleteImageFromS3(originalImage);
+            } else {
+                restaurant.update(restaurantRequestDto, originalImage);
+            }
+        } catch (Exception e) {
+            if (!restaurantImage.equals(originalImage)) {
+                s3Service.deleteImageFromS3(restaurantImage);
+            }
+            throw new RestaurantUpdateFailedException(
+                RestaurantErrorCode.RESTAURANT_UPDATE_FAILED);
+        }
     }
 
     @Transactional
@@ -69,10 +100,11 @@ public class RestaurantService {
         validateRestaurantOwnership(owner, restaurant);
 
         restaurantRepository.delete(restaurant);
+        s3Service.deleteImageFromS3(restaurant.getImageUrl());
     }
 
     private void validateRestaurantOwnership(Owner owner, Restaurant restaurant) {
-        if (!Objects.equals(restaurant.getOwner(), owner)) {
+        if (!restaurant.getOwner().getId().equals(owner.getId())) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
     }

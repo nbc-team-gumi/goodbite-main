@@ -1,72 +1,41 @@
 package com.sparta.goodbite.domain.review.service;
 
 import com.sparta.goodbite.common.UserCredentials;
-import com.sparta.goodbite.domain.customer.entity.Customer;
-import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
-import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
-import com.sparta.goodbite.domain.review.dto.CreateReviewRequestDto;
 import com.sparta.goodbite.domain.review.dto.ReviewResponseDto;
-import com.sparta.goodbite.domain.review.dto.UpdateReviewRequestDto;
-import com.sparta.goodbite.domain.review.entity.Review;
-import com.sparta.goodbite.domain.review.repository.ReviewRepository;
-import com.sparta.goodbite.exception.auth.AuthErrorCode;
-import com.sparta.goodbite.exception.auth.AuthException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
-@RequiredArgsConstructor
-@Service
-public class ReviewService {
+public interface ReviewService<T, U> {
 
-    private final RestaurantRepository restaurantRepository;
-    private final ReviewRepository reviewRepository;
+    static Page<ReviewResponseDto> getAllReviewsSortedAndPaged(Pageable pageable,
+        List<ReviewResponseDto> reservationReviews, List<ReviewResponseDto> waitingReviews) {
 
-    @Transactional
-    public void createReview(CreateReviewRequestDto createReviewRequestDto, UserCredentials user) {
-        Restaurant restaurant = restaurantRepository.findByIdOrThrow(
-            createReviewRequestDto.getRestaurantId());
-        reviewRepository.save(createReviewRequestDto.toEntity(restaurant, (Customer) user));
+        List<ReviewResponseDto> allReviews = new ArrayList<>();
+        allReviews.addAll(waitingReviews);
+        allReviews.addAll(reservationReviews);
+
+        allReviews.sort(Comparator.comparing(ReviewResponseDto::createdAt).reversed());
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), allReviews.size());
+        return new PageImpl<>(allReviews.subList(start, end), pageable, allReviews.size());
     }
 
-    @Transactional(readOnly = true)
-    public ReviewResponseDto getReview(Long reviewId) {
-        return ReviewResponseDto.from(reviewRepository.findByIdOrThrow(reviewId));
-    }
+    void createReview(T dto, UserCredentials user);
 
-    @Transactional(readOnly = true)
-    public List<ReviewResponseDto> getAllReviews() {
-        return reviewRepository.findAll().stream().map(ReviewResponseDto::from).toList();
-    }
+    ReviewResponseDto getReview(Long reviewId);
 
-    @Transactional(readOnly = true)
-    public List<ReviewResponseDto> getAllReviewsByRestaurantId(Long restaurantId) {
-        return reviewRepository.findAllByRestaurantId(restaurantId).stream()
-            .map(ReviewResponseDto::from).toList();
-    }
+    List<ReviewResponseDto> getAllReviews();
 
-    @Transactional
-    public void updateReview(Long reviewId, UpdateReviewRequestDto updateReviewRequestDto,
-        UserCredentials user) {
+    List<ReviewResponseDto> getAllReviewsByRestaurantId(Long restaurantId);
 
-        Review review = getReviewByIdAndValidateCustomer(reviewId, user);
-        review.update(updateReviewRequestDto);
-    }
+    List<ReviewResponseDto> getMyReviews(UserCredentials user);
 
-    @Transactional
-    public void deleteReview(Long reviewId, UserCredentials user) {
-        Review review = getReviewByIdAndValidateCustomer(reviewId, user);
-        reviewRepository.delete(review);
-    }
+    void updateReview(Long reviewId, U dto, UserCredentials user);
 
-    private Review getReviewByIdAndValidateCustomer(Long reviewId, UserCredentials user) {
-        Review review = reviewRepository.findByIdOrThrow(reviewId);
-
-        if (!review.getCustomer().getId().equals(user.getId())) {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
-        }
-
-        return review;
-    }
+    void deleteReview(Long reviewId, UserCredentials user);
 }

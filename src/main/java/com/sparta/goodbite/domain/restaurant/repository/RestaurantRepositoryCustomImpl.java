@@ -36,10 +36,12 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
         long total = queryFactory
             .selectFrom(restaurant)
             .where(
-                eqSido(sido),
-                eqSigungu(sigungu),
-                eqCategory(category),
-                goeRating(rating)
+                allOf(
+                    eqSido(sido),
+                    eqSigungu(sigungu),
+                    eqCategory(category),
+                    goeRating(rating)
+                )
             )
             .fetch()
             .size();
@@ -61,5 +63,15 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
 
     private BooleanExpression goeRating(Double rating) {
         return rating != null ? QRestaurant.restaurant.rating.goe(rating) : null;
+    }
+
+    private BooleanExpression allOf(BooleanExpression... expressions) {
+        BooleanExpression result = null;
+        for (BooleanExpression expression : expressions) {
+            if (expression != null) {
+                result = result == null ? expression : result.and(expression);
+            }
+        }
+        return result;
     }
 }

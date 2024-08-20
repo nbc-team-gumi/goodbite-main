@@ -16,11 +16,12 @@ import com.sparta.goodbite.domain.restaurant.dto.RestaurantIdResponseDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
+import com.sparta.goodbite.domain.restaurant.enums.Category;
 import com.sparta.goodbite.domain.restaurant.service.RestaurantService;
 import com.sparta.goodbite.domain.review.dto.ReviewResponseDto;
 import com.sparta.goodbite.domain.review.entity.Review;
 import com.sparta.goodbite.domain.review.service.ReservationReviewServiceImpl;
-import com.sparta.goodbite.domain.review.service.ReviewService;
+import com.sparta.goodbite.domain.review.service.TotalReviewService;
 import com.sparta.goodbite.domain.review.service.WaitingReviewServiceImpl;
 import com.sparta.goodbite.domain.waiting.dto.WaitingResponseDto;
 import com.sparta.goodbite.domain.waiting.entity.Waiting;
@@ -57,9 +58,10 @@ public class RestaurantController {
     private final OperatingHourService operatingHourService;
     private final WaitingService waitingService;
     private final MenuService menuService;
+    private final ReservationService reservationService;
+    private final TotalReviewService totalReviewService;
     private final WaitingReviewServiceImpl waitingReviewService;
     private final ReservationReviewServiceImpl reservationReviewService;
-    private final ReservationService reservationService;
 
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping
@@ -142,7 +144,7 @@ public class RestaurantController {
             restaurantId);
 
         return ResponseUtil.findOk(
-            ReviewService.getAllReviewsSortedAndPaged(pageable, reservationReviews,
+            totalReviewService.getAllReviewsSortedAndPaged(pageable, reservationReviews,
                 waitingReviews));
     }
 
@@ -164,6 +166,18 @@ public class RestaurantController {
 
         return ResponseUtil.findOk(
             reservationService.getAvailableCapacity(restaurantId, date, time));
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<DataResponseDto<Page<RestaurantResponseDto>>> getFilteredRestaurants(
+        @RequestParam(required = false) String sido,
+        @RequestParam(required = false) String sigungu,
+        @RequestParam(required = false) Category category,
+        @RequestParam(required = false) Double rating,
+        @PageableDefault(size = Restaurant.DEFAULT_PAGE_SIZE) Pageable pageable) {
+
+        return ResponseUtil.findOk(
+            restaurantService.getFilteredRestaurants(sido, sigungu, category, rating, pageable));
     }
 
     @PreAuthorize("hasRole('OWNER')")

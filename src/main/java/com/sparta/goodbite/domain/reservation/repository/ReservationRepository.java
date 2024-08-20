@@ -26,4 +26,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         return findById(reservationId).orElseThrow(() -> new ReservationNotFoundException(
             ReservationErrorCode.RESERVATION_NOT_FOUND));
     }
+
+    List<Reservation> findAllByCustomerId(Long id);
 }

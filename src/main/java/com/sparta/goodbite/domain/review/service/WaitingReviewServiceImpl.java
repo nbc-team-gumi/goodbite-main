@@ -7,7 +7,6 @@ import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.domain.review.dto.CreateWaitingReviewRequestDto;
 import com.sparta.goodbite.domain.review.dto.ReviewResponseDto;
 import com.sparta.goodbite.domain.review.dto.UpdateReviewRequestDto;
-import com.sparta.goodbite.domain.review.entity.Review;
 import com.sparta.goodbite.domain.review.entity.WaitingReview;
 import com.sparta.goodbite.domain.review.repository.WaitingReviewRepository;
 import com.sparta.goodbite.domain.waiting.entity.Waiting;
@@ -29,6 +28,7 @@ public class WaitingReviewServiceImpl implements
     private final RestaurantRepository restaurantRepository;
     private final WaitingRepository waitingRepository;
     private final WaitingReviewRepository waitingReviewRepository;
+    private final TotalReviewService totalReviewService;
 
     @Override
     @Transactional
@@ -50,6 +50,7 @@ public class WaitingReviewServiceImpl implements
             createWaitingReviewRequestDto.getRestaurantId());
         waitingReviewRepository.save(
             createWaitingReviewRequestDto.toEntity(restaurant, (Customer) user, waiting));
+        totalReviewService.updateRestaurantRating(restaurant.getId());
     }
 
     @Override
@@ -83,15 +84,17 @@ public class WaitingReviewServiceImpl implements
     public void updateReview(Long reviewId, UpdateReviewRequestDto updateReviewRequestDto,
         UserCredentials user) {
 
-        Review review = findReviewByIdAndValidateCustomer(reviewId, user.getId());
+        WaitingReview review = findReviewByIdAndValidateCustomer(reviewId, user.getId());
         review.update(updateReviewRequestDto);
+        totalReviewService.updateRestaurantRating(review.getRestaurant().getId());
     }
 
     @Override
     @Transactional
     public void deleteReview(Long reviewId, UserCredentials user) {
-        WaitingReview waitingReview = findReviewByIdAndValidateCustomer(reviewId, user.getId());
-        waitingReviewRepository.delete(waitingReview);
+        WaitingReview review = findReviewByIdAndValidateCustomer(reviewId, user.getId());
+        waitingReviewRepository.delete(review);
+        totalReviewService.updateRestaurantRating(review.getRestaurant().getId());
     }
 
     private WaitingReview findReviewByIdAndValidateCustomer(Long reviewId, Long customerId) {

@@ -29,8 +29,8 @@ public class ReservationReview extends Review {
     private Reservation reservation;
 
     @Builder
-    public ReservationReview(float rating, String content, Restaurant restaurant, Customer customer,
-        Reservation reservation) {
+    public ReservationReview(double rating, String content, Restaurant restaurant,
+        Customer customer, Reservation reservation) {
 
         super(rating, content, restaurant, customer);
         this.reservation = reservation;

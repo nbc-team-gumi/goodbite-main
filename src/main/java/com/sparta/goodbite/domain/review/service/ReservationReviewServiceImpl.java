@@ -10,7 +10,6 @@ import com.sparta.goodbite.domain.review.dto.CreateReservationReviewRequestDto;
 import com.sparta.goodbite.domain.review.dto.ReviewResponseDto;
 import com.sparta.goodbite.domain.review.dto.UpdateReviewRequestDto;
 import com.sparta.goodbite.domain.review.entity.ReservationReview;
-import com.sparta.goodbite.domain.review.entity.Review;
 import com.sparta.goodbite.domain.review.repository.ReservationReviewRepository;
 import com.sparta.goodbite.exception.auth.AuthErrorCode;
 import com.sparta.goodbite.exception.auth.AuthException;
@@ -29,6 +28,7 @@ public class ReservationReviewServiceImpl implements
     private final RestaurantRepository restaurantRepository;
     private final ReservationRepository reservationRepository;
     private final ReservationReviewRepository reservationReviewRepository;
+    private final TotalReviewService totalReviewService;
 
     @Override
     @Transactional
@@ -50,6 +50,7 @@ public class ReservationReviewServiceImpl implements
             createReservationReviewRequestDto.getRestaurantId());
         reservationReviewRepository.save(
             createReservationReviewRequestDto.toEntity(restaurant, (Customer) user, reservation));
+        totalReviewService.updateRestaurantRating(restaurant.getId());
     }
 
     @Override
@@ -81,15 +82,17 @@ public class ReservationReviewServiceImpl implements
     public void updateReview(Long reviewId, UpdateReviewRequestDto updateReviewRequestDto,
         UserCredentials user) {
 
-        Review review = getReviewByIdAndValidateCustomer(reviewId, user.getId());
+        ReservationReview review = getReviewByIdAndValidateCustomer(reviewId, user.getId());
         review.update(updateReviewRequestDto);
+        totalReviewService.updateRestaurantRating(review.getRestaurant().getId());
     }
 
     @Override
     public void deleteReview(Long reviewId, UserCredentials user) {
-        ReservationReview reservationReview = getReviewByIdAndValidateCustomer(reviewId,
+        ReservationReview review = getReviewByIdAndValidateCustomer(reviewId,
             user.getId());
-        reservationReviewRepository.delete(reservationReview);
+        reservationReviewRepository.delete(review);
+        totalReviewService.updateRestaurantRating(review.getRestaurant().getId());
     }
 
     private ReservationReview getReviewByIdAndValidateCustomer(Long reviewId, Long customerId) {

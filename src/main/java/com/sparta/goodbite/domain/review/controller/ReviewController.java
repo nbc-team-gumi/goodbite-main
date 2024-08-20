@@ -6,7 +6,7 @@ import com.sparta.goodbite.common.response.ResponseUtil;
 import com.sparta.goodbite.domain.review.dto.ReviewResponseDto;
 import com.sparta.goodbite.domain.review.entity.Review;
 import com.sparta.goodbite.domain.review.service.ReservationReviewServiceImpl;
-import com.sparta.goodbite.domain.review.service.ReviewService;
+import com.sparta.goodbite.domain.review.service.TotalReviewService;
 import com.sparta.goodbite.domain.review.service.WaitingReviewServiceImpl;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,7 @@ public class ReviewController {
 
     private final WaitingReviewServiceImpl waitingReviewService;
     private final ReservationReviewServiceImpl reservationReviewService;
+    private final TotalReviewService totalReviewService;
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/my")
@@ -40,7 +41,7 @@ public class ReviewController {
             userDetails.getUser());
 
         return ResponseUtil.findOk(
-            ReviewService.getAllReviewsSortedAndPaged(pageable, reservationReviews,
+            totalReviewService.getAllReviewsSortedAndPaged(pageable, reservationReviews,
                 waitingReviews));
     }
 }

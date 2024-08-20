@@ -8,6 +8,7 @@ import com.sparta.goodbite.domain.restaurant.dto.RestaurantIdResponseDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.goodbite.domain.restaurant.dto.RestaurantResponseDto;
 import com.sparta.goodbite.domain.restaurant.entity.Restaurant;
+import com.sparta.goodbite.domain.restaurant.enums.Category;
 import com.sparta.goodbite.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.goodbite.exception.auth.AuthErrorCode;
 import com.sparta.goodbite.exception.auth.AuthException;
@@ -60,6 +61,14 @@ public class RestaurantService {
     @Transactional(readOnly = true)
     public Page<RestaurantResponseDto> getAllRestaurants(Pageable pageable) {
         return restaurantRepository.findAll(pageable).map(RestaurantResponseDto::from);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RestaurantResponseDto> getFilteredRestaurants(String sido, String sigungu,
+        Category category, Double rating, Pageable pageable) {
+
+        return restaurantRepository.findPageByFilters(sido, sigungu, category, rating, pageable)
+            .map(RestaurantResponseDto::from);
     }
 
     @Transactional

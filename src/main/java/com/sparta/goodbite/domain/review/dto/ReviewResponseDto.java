@@ -5,7 +5,7 @@ import com.sparta.goodbite.domain.review.entity.WaitingReview;
 import java.time.LocalDateTime;
 
 public record ReviewResponseDto(Long reviewId, String nickname, Long restaurantId,
-                                String restaurantName, float rating, String content,
+                                String restaurantName, double rating, String content,
                                 LocalDateTime createdAt) {
 
     public static ReviewResponseDto from(ReservationReview review) {

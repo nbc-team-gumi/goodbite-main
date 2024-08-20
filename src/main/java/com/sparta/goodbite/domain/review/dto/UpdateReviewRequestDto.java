@@ -7,7 +7,7 @@ import lombok.Getter;
 public class UpdateReviewRequestDto {
 
     @RatingConstraint
-    Float rating;
+    Double rating;
 
     String content;
 }

@@ -6,7 +6,8 @@ import com.sparta.goodbite.exception.restaurant.detail.RestaurantNotFoundExcepti
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
+public interface RestaurantRepository extends JpaRepository<Restaurant, Long>,
+    RestaurantRepositoryCustom {
 
     Optional<Restaurant> findByOwnerId(Long ownerId);
 

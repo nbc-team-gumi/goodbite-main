@@ -67,10 +67,6 @@ public class RestaurantService {
     public Page<RestaurantResponseDto> getFilteredRestaurants(String sido, String sigungu,
         Category category, Double rating, Pageable pageable) {
 
-        if (sido == null || sido.isEmpty()) {
-            sigungu = null;
-        }
-
         return restaurantRepository.findPageByFilters(sido, sigungu, category, rating, pageable)
             .map(RestaurantResponseDto::from);
     }

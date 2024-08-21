@@ -23,6 +23,7 @@ import com.sparta.goodbite.exception.auth.AuthException;
 import com.sparta.goodbite.exception.reservation.ReservationErrorCode;
 import com.sparta.goodbite.exception.reservation.detail.DuplicateReservationException;
 import com.sparta.goodbite.exception.reservation.detail.InvalidReservationTimeException;
+import com.sparta.goodbite.exception.reservation.detail.MaxCapacityExceededException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -169,10 +170,19 @@ public class ReservationService {
         LocalTime reservationTime = requestDto.getTime();
         LocalTime reservationEndTime = reservationTime.plusHours(RESERVATION_DURATION_HOUR);
 
-        if (reservationTime.isBefore(operatingHour.getOpenTime()) ||
-            reservationEndTime.isAfter(operatingHour.getCloseTime())) {
-            throw new InvalidReservationTimeException(
-                ReservationErrorCode.INVALID_RESERVATION_TIME);
+        if (operatingHour.getCloseTime().isAfter(LocalTime.MIDNIGHT)) {
+            if ((operatingHour.getCloseTime().isBefore(reservationTime) && reservationTime.isBefore(
+                operatingHour.getOpenTime())) || reservationEndTime.isAfter(
+                operatingHour.getOpenTime())) {
+                throw new InvalidReservationTimeException(
+                    ReservationErrorCode.INVALID_RESERVATION_TIME);
+            }
+        } else {
+            if (reservationTime.isBefore(operatingHour.getOpenTime()) ||
+                reservationEndTime.isAfter(operatingHour.getCloseTime())) {
+                throw new InvalidReservationTimeException(
+                    ReservationErrorCode.INVALID_RESERVATION_TIME);
+            }
         }
     }
 
@@ -212,7 +222,7 @@ public class ReservationService {
      *
      * @param requestDto 예약 세부 사항이 담긴 CreateReservationRequestDto 객체
      * @param restaurant 예약하려는 식당 정보
-     * @throws InvalidReservationTimeException 예약 인원이 수용 인원을 초과할 경우 발생
+     * @throws MaxCapacityExceededException 예약 인원이 수용 인원을 초과할 경우 발생
      */
     private void validateRestaurantCapacity(CreateReservationRequestDto requestDto,
         Restaurant restaurant) {
@@ -236,8 +246,7 @@ public class ReservationService {
 //                customerRepository.findByIdOrThrow(requestDto.getRestaurantId()), restaurant);
 //            rejectedReservation.reject();
 //            reservationRepository.save(rejectedReservation);
-            throw new InvalidReservationTimeException(
-                ReservationErrorCode.INVALID_RESERVATION_TIME);
+            throw new MaxCapacityExceededException(ReservationErrorCode.MAX_CAPACITY_EXCEEDED);
         }
     }
 

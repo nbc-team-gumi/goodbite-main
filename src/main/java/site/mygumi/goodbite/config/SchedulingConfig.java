@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.domain.reservation.config;
+package site.mygumi.goodbite.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;

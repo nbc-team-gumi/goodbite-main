@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.domain.auth.util;
+package site.mygumi.goodbite.config;
 
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;

@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.common.s3.config;
+package site.mygumi.goodbite.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;

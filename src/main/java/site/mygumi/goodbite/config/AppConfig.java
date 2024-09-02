@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.common;
+package site.mygumi.goodbite.config;
 
 import java.time.Duration;
 import org.springframework.boot.web.client.RestTemplateBuilder;

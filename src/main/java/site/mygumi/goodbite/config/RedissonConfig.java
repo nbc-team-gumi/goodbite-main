@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.common;
+package site.mygumi.goodbite.config;
 
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;

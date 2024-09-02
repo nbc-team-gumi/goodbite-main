@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.domain.auth.security;
+package site.mygumi.goodbite.security;
 
 import site.mygumi.goodbite.domain.auth.UserRole;
 import site.mygumi.goodbite.domain.customer.entity.Customer;

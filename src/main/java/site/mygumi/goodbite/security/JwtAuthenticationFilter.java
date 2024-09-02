@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.domain.auth.security;
+package site.mygumi.goodbite.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import site.mygumi.goodbite.domain.auth.UserRole;

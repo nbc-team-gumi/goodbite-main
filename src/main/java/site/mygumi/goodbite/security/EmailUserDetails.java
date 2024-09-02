@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.domain.auth.security;
+package site.mygumi.goodbite.security;
 
 import site.mygumi.goodbite.common.UserCredentials;
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package site.mygumi.goodbite.domain.review.controller;
 
-import site.mygumi.goodbite.domain.auth.security.EmailUserDetails;
+import site.mygumi.goodbite.security.EmailUserDetails;
 import site.mygumi.goodbite.common.response.DataResponseDto;
 import site.mygumi.goodbite.common.response.MessageResponseDto;
 import site.mygumi.goodbite.common.response.ResponseUtil;

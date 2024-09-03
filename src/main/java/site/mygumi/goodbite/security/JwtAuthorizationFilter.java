@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+import site.mygumi.goodbite.domain.user.service.EmailUserDetailsService;
 
 // JWT 인가 필터 사용자 정의
 @Slf4j(topic = "JWT 검증 및 인가")

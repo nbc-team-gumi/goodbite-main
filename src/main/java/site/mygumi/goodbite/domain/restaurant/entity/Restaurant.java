@@ -1,7 +1,7 @@
 package site.mygumi.goodbite.domain.restaurant.entity;
 
-import site.mygumi.goodbite.common.Timestamped;
-import site.mygumi.goodbite.domain.owner.entity.Owner;
+import site.mygumi.goodbite.common.entity.Timestamped;
+import site.mygumi.goodbite.domain.user.owner.entity.Owner;
 import site.mygumi.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import site.mygumi.goodbite.domain.restaurant.enums.Category;
 import jakarta.persistence.Column;

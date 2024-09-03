@@ -1,6 +1,6 @@
 package site.mygumi.goodbite.domain.restaurant.dto;
 
-import site.mygumi.goodbite.domain.owner.entity.Owner;
+import site.mygumi.goodbite.domain.user.owner.entity.Owner;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import site.mygumi.goodbite.domain.restaurant.enums.Category;
 import jakarta.validation.constraints.Min;

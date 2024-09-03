@@ -1,9 +1,9 @@
 package site.mygumi.goodbite.domain.restaurant.service;
 
-import site.mygumi.goodbite.common.UserCredentials;
+import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.common.s3.service.S3Service;
-import site.mygumi.goodbite.domain.owner.entity.Owner;
-import site.mygumi.goodbite.domain.owner.repository.OwnerRepository;
+import site.mygumi.goodbite.domain.user.owner.entity.Owner;
+import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
 import site.mygumi.goodbite.domain.restaurant.dto.RestaurantIdResponseDto;
 import site.mygumi.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import site.mygumi.goodbite.domain.restaurant.dto.RestaurantResponseDto;

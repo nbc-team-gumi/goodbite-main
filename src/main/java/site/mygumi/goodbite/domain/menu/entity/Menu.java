@@ -1,6 +1,6 @@
 package site.mygumi.goodbite.domain.menu.entity;
 
-import site.mygumi.goodbite.common.Timestamped;
+import site.mygumi.goodbite.common.entity.Timestamped;
 import site.mygumi.goodbite.domain.menu.dto.UpdateMenuRequestDto;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import jakarta.persistence.Column;
@@ -50,6 +50,7 @@ public class Menu extends Timestamped {
         this.imageUrl = imageUrl;
         this.restaurant = restaurant;
     }
+
     public void update(UpdateMenuRequestDto updateMenuRequestDto, String menuImage) {
         this.price =
             updateMenuRequestDto.getPrice() != null ? updateMenuRequestDto.getPrice() : this.price;

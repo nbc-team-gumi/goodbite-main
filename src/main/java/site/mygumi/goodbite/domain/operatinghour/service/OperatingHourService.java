@@ -1,13 +1,13 @@
 package site.mygumi.goodbite.domain.operatinghour.service;
 
-import site.mygumi.goodbite.common.UserCredentials;
+import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.domain.operatinghour.dto.CreateOperatingHourRequestDto;
 import site.mygumi.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
 import site.mygumi.goodbite.domain.operatinghour.dto.UpdateOperatingHourRequestDto;
 import site.mygumi.goodbite.domain.operatinghour.entity.OperatingHour;
 import site.mygumi.goodbite.domain.operatinghour.repository.OperatingHourRepository;
-import site.mygumi.goodbite.domain.owner.entity.Owner;
-import site.mygumi.goodbite.domain.owner.repository.OwnerRepository;
+import site.mygumi.goodbite.domain.user.owner.entity.Owner;
+import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import site.mygumi.goodbite.domain.restaurant.repository.RestaurantRepository;
 import site.mygumi.goodbite.exception.auth.AuthErrorCode;

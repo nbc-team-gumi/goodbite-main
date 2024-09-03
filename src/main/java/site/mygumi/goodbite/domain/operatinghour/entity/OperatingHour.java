@@ -1,6 +1,6 @@
 package site.mygumi.goodbite.domain.operatinghour.entity;
 
-import site.mygumi.goodbite.common.Timestamped;
+import site.mygumi.goodbite.common.entity.Timestamped;
 import site.mygumi.goodbite.domain.operatinghour.dto.UpdateOperatingHourRequestDto;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import jakarta.persistence.Entity;

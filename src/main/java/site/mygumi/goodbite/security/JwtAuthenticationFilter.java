@@ -25,6 +25,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import site.mygumi.goodbite.domain.user.entity.EmailUserDetails;
+import site.mygumi.goodbite.domain.user.service.EmailUserDetailsService;
 
 // JWT 인증 필터
 @Slf4j(topic = "로그인 및 JWT 생성")

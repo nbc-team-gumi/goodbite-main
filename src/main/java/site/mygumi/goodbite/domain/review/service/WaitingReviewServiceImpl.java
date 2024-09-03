@@ -1,7 +1,7 @@
 package site.mygumi.goodbite.domain.review.service;
 
-import site.mygumi.goodbite.common.UserCredentials;
-import site.mygumi.goodbite.domain.customer.entity.Customer;
+import site.mygumi.goodbite.domain.user.entity.UserCredentials;
+import site.mygumi.goodbite.domain.user.customer.entity.Customer;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import site.mygumi.goodbite.domain.restaurant.repository.RestaurantRepository;
 import site.mygumi.goodbite.domain.review.dto.CreateWaitingReviewRequestDto;

@@ -26,7 +26,7 @@ import site.mygumi.goodbite.domain.auth.UserRole;
 import site.mygumi.goodbite.domain.auth.util.JwtUtil;
 import site.mygumi.goodbite.security.EmailAuthenticationProvider;
 import site.mygumi.goodbite.security.EmailLogoutSuccessHandler;
-import site.mygumi.goodbite.security.EmailUserDetailsService;
+import site.mygumi.goodbite.domain.user.service.EmailUserDetailsService;
 import site.mygumi.goodbite.security.GlobalAccessDeniedHandler;
 import site.mygumi.goodbite.security.GlobalAuthenticationEntryPoint;
 import site.mygumi.goodbite.security.JwtAuthenticationFilter;

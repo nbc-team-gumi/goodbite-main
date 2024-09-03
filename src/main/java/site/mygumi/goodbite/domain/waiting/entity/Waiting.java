@@ -1,7 +1,7 @@
 package site.mygumi.goodbite.domain.waiting.entity;
 
-import site.mygumi.goodbite.common.ExtendedTimestamped;
-import site.mygumi.goodbite.domain.customer.entity.Customer;
+import site.mygumi.goodbite.common.entity.ExtendedTimestamped;
+import site.mygumi.goodbite.domain.user.customer.entity.Customer;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,7 +1,7 @@
 package site.mygumi.goodbite.domain.review.entity;
 
-import site.mygumi.goodbite.common.Timestamped;
-import site.mygumi.goodbite.domain.customer.entity.Customer;
+import site.mygumi.goodbite.common.entity.Timestamped;
+import site.mygumi.goodbite.domain.user.customer.entity.Customer;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import site.mygumi.goodbite.domain.review.dto.UpdateReviewRequestDto;
 import jakarta.persistence.FetchType;

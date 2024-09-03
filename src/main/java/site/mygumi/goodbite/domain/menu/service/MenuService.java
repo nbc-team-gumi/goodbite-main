@@ -1,6 +1,6 @@
 package site.mygumi.goodbite.domain.menu.service;
 
-import site.mygumi.goodbite.common.UserCredentials;
+import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.common.s3.service.S3Service;
 import site.mygumi.goodbite.domain.menu.dto.CreateMenuRequestDto;
 import site.mygumi.goodbite.domain.menu.dto.MenuResponseDto;

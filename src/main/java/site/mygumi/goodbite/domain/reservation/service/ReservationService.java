@@ -2,9 +2,9 @@ package site.mygumi.goodbite.domain.reservation.service;
 
 import static site.mygumi.goodbite.domain.reservation.entity.Reservation.RESERVATION_DURATION_HOUR;
 
-import site.mygumi.goodbite.common.UserCredentials;
-import site.mygumi.goodbite.domain.customer.entity.Customer;
-import site.mygumi.goodbite.domain.customer.repository.CustomerRepository;
+import site.mygumi.goodbite.domain.user.entity.UserCredentials;
+import site.mygumi.goodbite.domain.user.customer.entity.Customer;
+import site.mygumi.goodbite.domain.user.customer.repository.CustomerRepository;
 import site.mygumi.goodbite.domain.menu.entity.Menu;
 import site.mygumi.goodbite.domain.menu.repository.MenuRepository;
 import site.mygumi.goodbite.domain.operatinghour.entity.OperatingHour;

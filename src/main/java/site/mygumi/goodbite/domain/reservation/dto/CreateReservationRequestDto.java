@@ -1,7 +1,7 @@
 package site.mygumi.goodbite.domain.reservation.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import site.mygumi.goodbite.domain.customer.entity.Customer;
+import site.mygumi.goodbite.domain.user.customer.entity.Customer;
 import site.mygumi.goodbite.domain.operatinghour.dto.validation.contraint.LocalTimeFormatConstraint;
 import site.mygumi.goodbite.domain.reservation.dto.validation.constraint.LocalDateFormatConstraint;
 import site.mygumi.goodbite.domain.reservation.dto.validation.constraint.ReservationDateConstraint;

@@ -1,6 +1,6 @@
 package site.mygumi.goodbite.domain.review.service;
 
-import site.mygumi.goodbite.common.UserCredentials;
+import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.domain.review.dto.ReviewResponseDto;
 import java.util.List;
 

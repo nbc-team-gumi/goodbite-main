@@ -1,6 +1,6 @@
 package site.mygumi.goodbite.domain.review.dto;
 
-import site.mygumi.goodbite.domain.customer.entity.Customer;
+import site.mygumi.goodbite.domain.user.customer.entity.Customer;
 import site.mygumi.goodbite.domain.reservation.entity.Reservation;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import site.mygumi.goodbite.domain.review.entity.ReservationReview;

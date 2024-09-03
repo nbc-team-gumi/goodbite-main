@@ -1,12 +1,12 @@
 package site.mygumi.goodbite.domain.waiting.service;
 
 import site.mygumi.goodbite.aspect.RedisLock;
-import site.mygumi.goodbite.common.UserCredentials;
-import site.mygumi.goodbite.domain.customer.entity.Customer;
-import site.mygumi.goodbite.domain.customer.repository.CustomerRepository;
+import site.mygumi.goodbite.domain.user.entity.UserCredentials;
+import site.mygumi.goodbite.domain.user.customer.entity.Customer;
+import site.mygumi.goodbite.domain.user.customer.repository.CustomerRepository;
 import site.mygumi.goodbite.domain.notification.controller.NotificationController;
-import site.mygumi.goodbite.domain.owner.entity.Owner;
-import site.mygumi.goodbite.domain.owner.repository.OwnerRepository;
+import site.mygumi.goodbite.domain.user.owner.entity.Owner;
+import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import site.mygumi.goodbite.domain.restaurant.repository.RestaurantRepository;
 import site.mygumi.goodbite.domain.waiting.dto.PostWaitingRequestDto;

@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.common;
+package site.mygumi.goodbite.common.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

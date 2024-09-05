@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.domain.auth;
+package site.mygumi.goodbite.domain.user.entity;
 
 import lombok.Getter;
 

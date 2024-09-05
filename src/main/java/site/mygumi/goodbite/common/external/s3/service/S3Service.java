@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.common.s3.service;
+package site.mygumi.goodbite.common.external.s3.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
@@ -6,12 +6,6 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.util.IOUtils;
-import site.mygumi.goodbite.exception.s3.S3ErrorCode;
-import site.mygumi.goodbite.exception.s3.detail.S3EmptyFileException;
-import site.mygumi.goodbite.exception.s3.detail.S3FileDeleteFailedException;
-import site.mygumi.goodbite.exception.s3.detail.S3FileUploadFailedException;
-import site.mygumi.goodbite.exception.s3.detail.S3InvalidFileExtensionException;
-import site.mygumi.goodbite.exception.s3.detail.S3InvalidS3UrlException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +24,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import site.mygumi.goodbite.exception.s3.S3ErrorCode;
+import site.mygumi.goodbite.exception.s3.detail.S3EmptyFileException;
+import site.mygumi.goodbite.exception.s3.detail.S3FileDeleteFailedException;
+import site.mygumi.goodbite.exception.s3.detail.S3FileUploadFailedException;
+import site.mygumi.goodbite.exception.s3.detail.S3InvalidFileExtensionException;
+import site.mygumi.goodbite.exception.s3.detail.S3InvalidS3UrlException;
 
 @Slf4j
 @RequiredArgsConstructor

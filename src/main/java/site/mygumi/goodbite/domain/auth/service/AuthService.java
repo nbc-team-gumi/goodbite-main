@@ -3,14 +3,6 @@ package site.mygumi.goodbite.domain.auth.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import site.mygumi.goodbite.domain.auth.UserRole;
-import site.mygumi.goodbite.domain.auth.dto.KakaoUserResponseDto;
-import site.mygumi.goodbite.domain.auth.util.JwtUtil;
-import site.mygumi.goodbite.domain.user.entity.UserCredentials;
-import site.mygumi.goodbite.domain.user.customer.repository.CustomerRepository;
-import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
-import site.mygumi.goodbite.exception.auth.AuthErrorCode;
-import site.mygumi.goodbite.exception.auth.detail.InvalidRefreshTokenException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
@@ -26,6 +18,14 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import site.mygumi.goodbite.domain.auth.dto.KakaoUserResponseDto;
+import site.mygumi.goodbite.domain.user.customer.repository.CustomerRepository;
+import site.mygumi.goodbite.domain.user.entity.UserCredentials;
+import site.mygumi.goodbite.domain.user.entity.UserRole;
+import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
+import site.mygumi.goodbite.exception.auth.AuthErrorCode;
+import site.mygumi.goodbite.exception.auth.detail.InvalidRefreshTokenException;
+import site.mygumi.goodbite.security.util.JwtUtil;
 
 @Slf4j(topic = "AuthService")
 @Service

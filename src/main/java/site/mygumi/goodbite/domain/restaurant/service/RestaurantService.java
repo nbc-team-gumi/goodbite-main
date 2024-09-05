@@ -1,26 +1,26 @@
 package site.mygumi.goodbite.domain.restaurant.service;
 
-import site.mygumi.goodbite.domain.user.entity.UserCredentials;
-import site.mygumi.goodbite.common.s3.service.S3Service;
-import site.mygumi.goodbite.domain.user.owner.entity.Owner;
-import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
-import site.mygumi.goodbite.domain.restaurant.dto.RestaurantIdResponseDto;
-import site.mygumi.goodbite.domain.restaurant.dto.RestaurantRequestDto;
-import site.mygumi.goodbite.domain.restaurant.dto.RestaurantResponseDto;
-import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
-import site.mygumi.goodbite.domain.restaurant.enums.Category;
-import site.mygumi.goodbite.domain.restaurant.repository.RestaurantRepository;
-import site.mygumi.goodbite.exception.auth.AuthErrorCode;
-import site.mygumi.goodbite.exception.auth.AuthException;
-import site.mygumi.goodbite.exception.restaurant.RestaurantErrorCode;
-import site.mygumi.goodbite.exception.restaurant.detail.RestaurantCreateFailedException;
-import site.mygumi.goodbite.exception.restaurant.detail.RestaurantUpdateFailedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import site.mygumi.goodbite.common.external.s3.service.S3Service;
+import site.mygumi.goodbite.domain.restaurant.dto.RestaurantIdResponseDto;
+import site.mygumi.goodbite.domain.restaurant.dto.RestaurantRequestDto;
+import site.mygumi.goodbite.domain.restaurant.dto.RestaurantResponseDto;
+import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
+import site.mygumi.goodbite.domain.restaurant.enums.Category;
+import site.mygumi.goodbite.domain.restaurant.repository.RestaurantRepository;
+import site.mygumi.goodbite.domain.user.entity.UserCredentials;
+import site.mygumi.goodbite.domain.user.owner.entity.Owner;
+import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
+import site.mygumi.goodbite.exception.auth.AuthErrorCode;
+import site.mygumi.goodbite.exception.auth.AuthException;
+import site.mygumi.goodbite.exception.restaurant.RestaurantErrorCode;
+import site.mygumi.goodbite.exception.restaurant.detail.RestaurantCreateFailedException;
+import site.mygumi.goodbite.exception.restaurant.detail.RestaurantUpdateFailedException;
 
 @Service
 @RequiredArgsConstructor

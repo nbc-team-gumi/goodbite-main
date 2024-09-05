@@ -1,11 +1,25 @@
 package site.mygumi.goodbite.domain.user.owner.service;
 
-import site.mygumi.goodbite.domain.user.entity.UserCredentials;
-import site.mygumi.goodbite.common.s3.service.S3Service;
+import java.util.List;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import site.mygumi.goodbite.common.external.s3.service.S3Service;
 import site.mygumi.goodbite.domain.menu.entity.Menu;
 import site.mygumi.goodbite.domain.menu.repository.MenuRepository;
 import site.mygumi.goodbite.domain.operatinghour.entity.OperatingHour;
 import site.mygumi.goodbite.domain.operatinghour.repository.OperatingHourRepository;
+import site.mygumi.goodbite.domain.reservation.entity.Reservation;
+import site.mygumi.goodbite.domain.reservation.repository.ReservationRepository;
+import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
+import site.mygumi.goodbite.domain.restaurant.repository.RestaurantRepository;
+import site.mygumi.goodbite.domain.review.entity.ReservationReview;
+import site.mygumi.goodbite.domain.review.entity.WaitingReview;
+import site.mygumi.goodbite.domain.review.repository.ReservationReviewRepository;
+import site.mygumi.goodbite.domain.review.repository.WaitingReviewRepository;
+import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.domain.user.owner.dto.OwnerResponseDto;
 import site.mygumi.goodbite.domain.user.owner.dto.OwnerSignUpRequestDto;
 import site.mygumi.goodbite.domain.user.owner.dto.UpdateBusinessNumberRequestDto;
@@ -15,14 +29,6 @@ import site.mygumi.goodbite.domain.user.owner.dto.UpdateOwnerPhoneNumberRequestD
 import site.mygumi.goodbite.domain.user.owner.entity.Owner;
 import site.mygumi.goodbite.domain.user.owner.entity.OwnerStatus;
 import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
-import site.mygumi.goodbite.domain.reservation.entity.Reservation;
-import site.mygumi.goodbite.domain.reservation.repository.ReservationRepository;
-import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
-import site.mygumi.goodbite.domain.restaurant.repository.RestaurantRepository;
-import site.mygumi.goodbite.domain.review.entity.ReservationReview;
-import site.mygumi.goodbite.domain.review.entity.WaitingReview;
-import site.mygumi.goodbite.domain.review.repository.ReservationReviewRepository;
-import site.mygumi.goodbite.domain.review.repository.WaitingReviewRepository;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting;
 import site.mygumi.goodbite.domain.waiting.repository.WaitingRepository;
 import site.mygumi.goodbite.exception.owner.OwnerErrorCode;
@@ -31,12 +37,6 @@ import site.mygumi.goodbite.exception.owner.detail.OwnerAlreadyDeletedException;
 import site.mygumi.goodbite.exception.user.UserErrorCode;
 import site.mygumi.goodbite.exception.user.detail.PasswordMismatchException;
 import site.mygumi.goodbite.exception.user.detail.SamePasswordException;
-import java.util.List;
-import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

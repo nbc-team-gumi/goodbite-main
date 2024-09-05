@@ -1,9 +1,6 @@
 package site.mygumi.goodbite.domain.user.owner.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import site.mygumi.goodbite.domain.auth.util.ApiKeyEncoder;
-import site.mygumi.goodbite.domain.user.owner.dto.BusinessValidationRequestDto;
-import site.mygumi.goodbite.domain.user.owner.dto.BusinessValidationResponseDto;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -18,6 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import site.mygumi.goodbite.domain.user.owner.dto.BusinessValidationRequestDto;
+import site.mygumi.goodbite.domain.user.owner.dto.BusinessValidationResponseDto;
+import site.mygumi.goodbite.security.util.ApiKeyEncoder;
 
 @Slf4j
 @Service

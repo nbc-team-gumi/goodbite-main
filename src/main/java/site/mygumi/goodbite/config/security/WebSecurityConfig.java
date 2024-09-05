@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.config;
+package site.mygumi.goodbite.config.security;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -22,15 +22,15 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import site.mygumi.goodbite.domain.auth.UserRole;
-import site.mygumi.goodbite.domain.auth.util.JwtUtil;
-import site.mygumi.goodbite.security.EmailAuthenticationProvider;
-import site.mygumi.goodbite.security.EmailLogoutSuccessHandler;
-import site.mygumi.goodbite.domain.user.service.EmailUserDetailsService;
-import site.mygumi.goodbite.security.GlobalAccessDeniedHandler;
-import site.mygumi.goodbite.security.GlobalAuthenticationEntryPoint;
-import site.mygumi.goodbite.security.JwtAuthenticationFilter;
-import site.mygumi.goodbite.security.JwtAuthorizationFilter;
+import site.mygumi.goodbite.domain.user.entity.UserRole;
+import site.mygumi.goodbite.security.authentication.EmailAuthenticationProvider;
+import site.mygumi.goodbite.security.authentication.EmailUserDetailsService;
+import site.mygumi.goodbite.security.authentication.JwtAuthenticationFilter;
+import site.mygumi.goodbite.security.authorization.JwtAuthorizationFilter;
+import site.mygumi.goodbite.security.handler.EmailLogoutSuccessHandler;
+import site.mygumi.goodbite.security.handler.GlobalAccessDeniedHandler;
+import site.mygumi.goodbite.security.handler.GlobalAuthenticationEntryPoint;
+import site.mygumi.goodbite.security.util.JwtUtil;
 
 @Configuration
 @RequiredArgsConstructor

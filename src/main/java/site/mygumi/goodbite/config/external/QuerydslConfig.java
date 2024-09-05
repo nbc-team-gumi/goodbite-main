@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.config;
+package site.mygumi.goodbite.config.external;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

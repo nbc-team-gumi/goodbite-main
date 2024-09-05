@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.config;
+package site.mygumi.goodbite.config.security;
 
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;

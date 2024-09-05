@@ -22,7 +22,7 @@ spring:
         show_sql: true
         format_sql: true
         use_sql_comments: true
-        dialect: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
 
   jackson:
     time-zone: Asia/Seoul

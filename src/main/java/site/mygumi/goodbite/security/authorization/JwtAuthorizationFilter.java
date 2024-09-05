@@ -1,7 +1,5 @@
-package site.mygumi.goodbite.security;
+package site.mygumi.goodbite.security.authorization;
 
-import site.mygumi.goodbite.domain.auth.util.JwtUtil;
-import site.mygumi.goodbite.common.response.ResponseUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,7 +18,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
-import site.mygumi.goodbite.domain.user.service.EmailUserDetailsService;
+import site.mygumi.goodbite.common.response.ResponseUtil;
+import site.mygumi.goodbite.security.authentication.EmailUserDetailsService;
+import site.mygumi.goodbite.security.util.JwtUtil;
 
 // JWT 인가 필터 사용자 정의
 @Slf4j(topic = "JWT 검증 및 인가")

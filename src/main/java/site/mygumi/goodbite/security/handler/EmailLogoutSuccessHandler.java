@@ -1,7 +1,5 @@
-package site.mygumi.goodbite.security;
+package site.mygumi.goodbite.security.handler;
 
-import site.mygumi.goodbite.domain.auth.util.JwtUtil;
-import site.mygumi.goodbite.common.response.ResponseUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -9,6 +7,8 @@ import java.io.IOException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import site.mygumi.goodbite.common.response.ResponseUtil;
+import site.mygumi.goodbite.security.util.JwtUtil;
 
 public class EmailLogoutSuccessHandler implements LogoutSuccessHandler {
 

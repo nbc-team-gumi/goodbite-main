@@ -1,11 +1,5 @@
-package site.mygumi.goodbite.domain.user.service;
+package site.mygumi.goodbite.security.authentication;
 
-import site.mygumi.goodbite.domain.auth.UserRole;
-import site.mygumi.goodbite.domain.user.customer.entity.Customer;
-import site.mygumi.goodbite.domain.user.customer.repository.CustomerRepository;
-import site.mygumi.goodbite.domain.user.owner.entity.Owner;
-import site.mygumi.goodbite.domain.user.owner.entity.OwnerStatus;
-import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +8,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import site.mygumi.goodbite.domain.user.customer.entity.Customer;
+import site.mygumi.goodbite.domain.user.customer.repository.CustomerRepository;
 import site.mygumi.goodbite.domain.user.entity.EmailUserDetails;
+import site.mygumi.goodbite.domain.user.entity.UserRole;
+import site.mygumi.goodbite.domain.user.owner.entity.Owner;
+import site.mygumi.goodbite.domain.user.owner.entity.OwnerStatus;
+import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
 
 @Slf4j(topic = "EmailUserDetailsService")
 @Service

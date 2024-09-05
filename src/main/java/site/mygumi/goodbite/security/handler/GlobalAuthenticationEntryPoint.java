@@ -1,6 +1,5 @@
-package site.mygumi.goodbite.security;
+package site.mygumi.goodbite.security.handler;
 
-import site.mygumi.goodbite.common.response.ResponseUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -9,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import site.mygumi.goodbite.common.response.ResponseUtil;
 
 @Component
 public class GlobalAuthenticationEntryPoint implements AuthenticationEntryPoint {

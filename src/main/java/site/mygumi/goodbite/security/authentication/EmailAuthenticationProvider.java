@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.security;
+package site.mygumi.goodbite.security.authentication;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;

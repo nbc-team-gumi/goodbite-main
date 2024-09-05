@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.domain.auth.util;
+package site.mygumi.goodbite.security.util;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -14,7 +14,7 @@ import java.net.URLEncoder;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-import site.mygumi.goodbite.config.JwtConfig;
+import site.mygumi.goodbite.config.security.JwtConfig;
 
 // Util Class, static class
 @Slf4j(topic = "JwtUtil")

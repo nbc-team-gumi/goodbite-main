@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.security;
+package site.mygumi.goodbite.security.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,9 +1,6 @@
-package site.mygumi.goodbite.aspect;
+package site.mygumi.goodbite.aspect.lock;
 
 
-import site.mygumi.goodbite.domain.waiting.dto.PostWaitingRequestDto;
-import site.mygumi.goodbite.exception.lock.LockErrorCode;
-import site.mygumi.goodbite.exception.lock.LockException;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +10,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
+import site.mygumi.goodbite.domain.waiting.dto.PostWaitingRequestDto;
+import site.mygumi.goodbite.exception.lock.LockErrorCode;
+import site.mygumi.goodbite.exception.lock.LockException;
 
 @Slf4j
 @Aspect

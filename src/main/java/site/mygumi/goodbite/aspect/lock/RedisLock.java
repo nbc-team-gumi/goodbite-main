@@ -1,4 +1,4 @@
-package site.mygumi.goodbite.aspect;
+package site.mygumi.goodbite.aspect.lock;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

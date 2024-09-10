@@ -46,9 +46,9 @@ cloud:
       secret-key: ${S3_SECRET_KEY}
 
 server:
-  port: 443
+  port: 8080
   ssl:
-    enabled: true
+    enabled: false
     key-store: /app/api.goodbite.site.p12
     key-store-password: ${SSL_KEY}
     key-store-type: PKCS12

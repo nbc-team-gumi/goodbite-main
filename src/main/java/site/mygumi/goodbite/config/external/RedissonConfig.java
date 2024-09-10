@@ -17,12 +17,12 @@ public class RedissonConfig {
     @Bean
     public RedissonClient redissonClient() {
         String redisAddress = env.getProperty("spring.data.redis.host");
-        String redisPassword = env.getProperty("spring.data.redis.password");
+        //String redisPassword = env.getProperty("spring.data.redis.password");
         String redisPort = env.getProperty("spring.data.redis.port");
 
         Config config = new Config();
-        config.useSingleServer().setAddress("redis://" + redisAddress + ":" + redisPort)
-            .setPassword(redisPassword);  // Redis 서버에 설정된 비밀번호
+        config.useSingleServer().setAddress("redis://" + redisAddress + ":" + redisPort);
+        //    .setPassword(redisPassword);  // Redis 서버에 설정된 비밀번호
         return Redisson.create(config);
     }
 

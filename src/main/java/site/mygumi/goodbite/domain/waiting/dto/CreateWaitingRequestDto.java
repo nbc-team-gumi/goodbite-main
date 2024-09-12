@@ -1,15 +1,15 @@
 package site.mygumi.goodbite.domain.waiting.dto;
 
-import site.mygumi.goodbite.domain.waiting.entity.Waiting.WaitingStatus;
-import site.mygumi.goodbite.domain.waiting.entity.Waiting.WaitingType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import site.mygumi.goodbite.domain.waiting.entity.Waiting.WaitingStatus;
+import site.mygumi.goodbite.domain.waiting.entity.Waiting.WaitingType;
 
 @Getter
-public class PostWaitingRequestDto {
+public class CreateWaitingRequestDto {
 
     @NotNull(message = "레스토랑 Id를 입력하세요")
     private Long restaurantId;
@@ -25,5 +25,4 @@ public class PostWaitingRequestDto {
 
     @Size(min = 0, max = 50, message = "웨이팅 요구사항은 50자 이내로 기입 가능합니다.")
     private String demand;
-
 }

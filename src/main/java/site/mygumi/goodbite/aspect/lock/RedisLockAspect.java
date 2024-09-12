@@ -10,7 +10,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
-import site.mygumi.goodbite.domain.waiting.dto.PostWaitingRequestDto;
+import site.mygumi.goodbite.domain.waiting.dto.CreateWaitingRequestDto;
 import site.mygumi.goodbite.exception.lock.LockErrorCode;
 import site.mygumi.goodbite.exception.lock.LockException;
 
@@ -32,8 +32,8 @@ public class RedisLockAspect {
         String restaurantId = "";
 
         for (Object arg : args) {
-            if (arg instanceof PostWaitingRequestDto) {
-                restaurantId = String.valueOf(((PostWaitingRequestDto) arg).getRestaurantId());
+            if (arg instanceof CreateWaitingRequestDto) {
+                restaurantId = String.valueOf(((CreateWaitingRequestDto) arg).getRestaurantId());
                 break;
             }
         }

@@ -10,7 +10,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.mygumi.goodbite.aspect.lock.RedisLock;
@@ -22,7 +21,7 @@ import site.mygumi.goodbite.domain.user.customer.repository.CustomerRepository;
 import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.domain.user.owner.entity.Owner;
 import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
-import site.mygumi.goodbite.domain.waiting.dto.PostWaitingRequestDto;
+import site.mygumi.goodbite.domain.waiting.dto.CreateWaitingRequestDto;
 import site.mygumi.goodbite.domain.waiting.dto.UpdateWaitingRequestDto;
 import site.mygumi.goodbite.domain.waiting.dto.WaitingResponseDto;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting;
@@ -43,17 +42,16 @@ public class WaitingService {
     private final WaitingRepository waitingRepository;
     private final RestaurantRepository restaurantRepository;
     private final CustomerRepository customerRepository;
-    private final SimpMessagingTemplate messagingTemplate;
     private final OwnerRepository ownerRepository;
     private final NotificationController notificationController;
 
     @RedisLock(key = "createWaitingLock")
     @Transactional
     public WaitingResponseDto createWaiting(UserCredentials user,
-        PostWaitingRequestDto postWaitingRequestDto) {
+        CreateWaitingRequestDto createWaitingRequestDto) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
-            postWaitingRequestDto.getRestaurantId());
+            createWaitingRequestDto.getRestaurantId());
 
         Customer customer = customerRepository.findByIdOrThrow(user.getId());
 
@@ -67,9 +65,9 @@ public class WaitingService {
             customer,
             LastOrderNumber + 1,
             WaitingStatus.WAITING, // 생성 시 무조건 Waiting
-            postWaitingRequestDto.getPartySize(),
-            postWaitingRequestDto.getWaitingType(),
-            postWaitingRequestDto.getDemand());
+            createWaitingRequestDto.getPartySize(),
+            createWaitingRequestDto.getWaitingType(),
+            createWaitingRequestDto.getDemand());
 
         waitingRepository.save(waiting);
 

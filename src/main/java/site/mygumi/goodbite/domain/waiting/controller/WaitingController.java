@@ -1,13 +1,5 @@
 package site.mygumi.goodbite.domain.waiting.controller;
 
-import site.mygumi.goodbite.domain.user.entity.EmailUserDetails;
-import site.mygumi.goodbite.common.response.DataResponseDto;
-import site.mygumi.goodbite.common.response.MessageResponseDto;
-import site.mygumi.goodbite.common.response.ResponseUtil;
-import site.mygumi.goodbite.domain.waiting.dto.PostWaitingRequestDto;
-import site.mygumi.goodbite.domain.waiting.dto.UpdateWaitingRequestDto;
-import site.mygumi.goodbite.domain.waiting.dto.WaitingResponseDto;
-import site.mygumi.goodbite.domain.waiting.service.WaitingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +17,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import site.mygumi.goodbite.common.response.DataResponseDto;
+import site.mygumi.goodbite.common.response.MessageResponseDto;
+import site.mygumi.goodbite.common.response.ResponseUtil;
+import site.mygumi.goodbite.domain.user.entity.EmailUserDetails;
+import site.mygumi.goodbite.domain.waiting.dto.CreateWaitingRequestDto;
+import site.mygumi.goodbite.domain.waiting.dto.UpdateWaitingRequestDto;
+import site.mygumi.goodbite.domain.waiting.dto.WaitingResponseDto;
+import site.mygumi.goodbite.domain.waiting.service.WaitingService;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,10 +38,10 @@ public class WaitingController {
     @PostMapping
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> createWaiting(
         @AuthenticationPrincipal EmailUserDetails userDetails,
-        @Valid @RequestBody PostWaitingRequestDto postWaitingRequestDto
+        @Valid @RequestBody CreateWaitingRequestDto createWaitingRequestDto
     ) {
         return ResponseUtil.createOk(
-            waitingService.createWaiting(userDetails.getUser(), postWaitingRequestDto));
+            waitingService.createWaiting(userDetails.getUser(), createWaitingRequestDto));
     }
 
     // 손님이 보는 웨이팅 목록 조회

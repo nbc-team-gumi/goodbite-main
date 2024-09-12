@@ -16,5 +16,4 @@ public class UpdateWaitingRequestDto {
 
     @Size(min = 0, max = 50, message = "웨이팅 요구사항은 50자 이내로 기입 가능합니다.")
     private String demand;
-
 }

@@ -1,11 +1,10 @@
 package site.mygumi.goodbite.domain.waiting.dto;
 
+import java.time.LocalDateTime;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting.WaitingStatus;
-import java.time.LocalDateTime;
 
 public record WaitingResponseDto(
-
     Long waitingId,
     Long restaurantId,
     String restaurantName,
@@ -16,9 +15,7 @@ public record WaitingResponseDto(
     String customerNickname,
     Long partySize,
     LocalDateTime createAt,
-    LocalDateTime deletedAt
-
-) {
+    LocalDateTime deletedAt) {
 
     public static WaitingResponseDto of(Waiting waiting) {
         return new WaitingResponseDto(
@@ -34,5 +31,4 @@ public record WaitingResponseDto(
             waiting.getCreatedAt(),
             waiting.getDeletedAt());
     }
-
 }

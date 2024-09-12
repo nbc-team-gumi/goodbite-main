@@ -47,12 +47,11 @@ public class WaitingService {
 
     @RedisLock(key = "createWaitingLock")
     @Transactional
-    public WaitingResponseDto createWaiting(UserCredentials user,
-        CreateWaitingRequestDto createWaitingRequestDto) {
+    public WaitingResponseDto createWaiting(CreateWaitingRequestDto createWaitingRequestDto,
+        UserCredentials user) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
             createWaitingRequestDto.getRestaurantId());
-
         Customer customer = customerRepository.findByIdOrThrow(user.getId());
 
         waitingRepository.validateByRestaurantIdAndCustomerId(restaurant.getId(),
@@ -79,7 +78,7 @@ public class WaitingService {
 
     // 단일 조회용 메서드
     @Transactional(readOnly = true)
-    public WaitingResponseDto getWaiting(UserCredentials user, Long waitingId) {
+    public WaitingResponseDto getWaiting(Long waitingId, UserCredentials user) {
 
         validateWaitingRequest(user, waitingId);
 
@@ -105,7 +104,7 @@ public class WaitingService {
 
         List<Waiting> waitingArrayList = new ArrayList<>();
         for (Waiting waiting : waitingList) {
-            waiting.reduceWaitingOrder();
+            waiting.decrementWaitingOrder();
             if (waiting.getWaitingOrder() == 0) {
 
                 //--------------
@@ -127,7 +126,7 @@ public class WaitingService {
 
     // 웨이팅 하나만 삭제하고 뒤 웨이팅 숫자 하나씩 감소
     @Transactional
-    public void reduceOneWaitingOrders(UserCredentials user, Long waitingId) {
+    public void decrementWaitingOrder(Long waitingId, UserCredentials user) {
 
         validateWaitingRequest(user, waitingId);
 
@@ -137,8 +136,8 @@ public class WaitingService {
     // 가게용 api
     // 예약 인원수와 요청사항만 변경 가능함 ( 추후 합의를 통해 ?건 이하의 순서일 때는 수정하지 못하도록 로직 수정 필요)
     @Transactional
-    public WaitingResponseDto updateWaiting(UserCredentials user, Long waitingId,
-        UpdateWaitingRequestDto updateWaitingRequestDto) {
+    public WaitingResponseDto updateWaiting(Long waitingId,
+        UpdateWaitingRequestDto updateWaitingRequestDto, UserCredentials user) {
 
         validateWaitingRequest(user, waitingId);
 
@@ -152,7 +151,7 @@ public class WaitingService {
 
     // 취소 메서드
     @Transactional
-    public void deleteWaiting(UserCredentials user, Long waitingId) {
+    public void deleteWaiting(Long waitingId, UserCredentials user) {
 
         validateWaitingRequest(user, waitingId);
 
@@ -250,7 +249,7 @@ public class WaitingService {
 
                 flag = true;
             } else if (flag) {
-                waiting.reduceWaitingOrder();
+                waiting.decrementWaitingOrder();
                 waitingArrayList.add(waiting);
             }
         }

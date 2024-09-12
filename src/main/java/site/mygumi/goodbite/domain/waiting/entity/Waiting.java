@@ -1,8 +1,5 @@
 package site.mygumi.goodbite.domain.waiting.entity;
 
-import site.mygumi.goodbite.common.entity.ExtendedTimestamped;
-import site.mygumi.goodbite.domain.user.customer.entity.Customer;
-import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,6 +15,9 @@ import java.time.temporal.ChronoUnit;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import site.mygumi.goodbite.common.entity.ExtendedTimestamped;
+import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
+import site.mygumi.goodbite.domain.user.customer.entity.Customer;
 
 @Getter
 @NoArgsConstructor
@@ -76,7 +76,7 @@ public class Waiting extends ExtendedTimestamped {
         this.status = status;
     }
 
-    public void reduceWaitingOrder() {
+    public void decrementWaitingOrder() {
         --this.waitingOrder;
     }
 
@@ -97,5 +97,4 @@ public class Waiting extends ExtendedTimestamped {
         OFFLINE,
         ONLINE
     }
-
 }

@@ -24,6 +24,7 @@ import site.mygumi.goodbite.domain.user.entity.EmailUserDetails;
 import site.mygumi.goodbite.domain.waiting.dto.CreateWaitingRequestDto;
 import site.mygumi.goodbite.domain.waiting.dto.UpdateWaitingRequestDto;
 import site.mygumi.goodbite.domain.waiting.dto.WaitingResponseDto;
+import site.mygumi.goodbite.domain.waiting.entity.Waiting;
 import site.mygumi.goodbite.domain.waiting.service.WaitingService;
 
 @RestController
@@ -37,11 +38,11 @@ public class WaitingController {
     @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> createWaiting(
-        @AuthenticationPrincipal EmailUserDetails userDetails,
-        @Valid @RequestBody CreateWaitingRequestDto createWaitingRequestDto
-    ) {
+        @Valid @RequestBody CreateWaitingRequestDto createWaitingRequestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
+
         return ResponseUtil.createOk(
-            waitingService.createWaiting(userDetails.getUser(), createWaitingRequestDto));
+            waitingService.createWaiting(createWaitingRequestDto, userDetails.getUser()));
     }
 
     // 손님이 보는 웨이팅 목록 조회
@@ -49,50 +50,47 @@ public class WaitingController {
     @GetMapping
     public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getWaitingList(
         @AuthenticationPrincipal EmailUserDetails userDetails,
-        @PageableDefault(size = 5) Pageable pageable
-    ) {
-        return ResponseUtil.createOk(
-            waitingService.getWaitings(userDetails.getUser(),
-                pageable));
+        @PageableDefault(size = Waiting.DEFAULT_PAGE_SIZE) Pageable pageable) {
+
+        return ResponseUtil.createOk(waitingService.getWaitings(userDetails.getUser(), pageable));
     }
 
     // 웨이팅 단일 조회
     @GetMapping("/{waitingId}")
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> getWaiting(
-        @AuthenticationPrincipal EmailUserDetails userDetails,
-        @PathVariable Long waitingId
-    ) {
-        return ResponseUtil.findOk(waitingService.getWaiting(userDetails.getUser(), waitingId));
+        @PathVariable Long waitingId, @AuthenticationPrincipal EmailUserDetails userDetails) {
+
+        return ResponseUtil.findOk(waitingService.getWaiting(waitingId, userDetails.getUser()));
     }
 
     // 가게 주인이 웨이팅 ID 하나 선택 후 웨이팅 줄이기
     @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
     @PutMapping("/{waitingId}")
-    public ResponseEntity<MessageResponseDto> reduceOneWaitingOrders(
-        @AuthenticationPrincipal EmailUserDetails userDetails,
-        @PathVariable Long waitingId
-    ) {
-        waitingService.reduceOneWaitingOrders(userDetails.getUser(), waitingId);
+    public ResponseEntity<MessageResponseDto> decrementWaitingOrder(
+        @PathVariable Long waitingId, @AuthenticationPrincipal EmailUserDetails userDetails) {
+
+        waitingService.decrementWaitingOrder(waitingId, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
     // 웨이팅 정보 수정
     @PatchMapping("/{waitingId}")
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> updateWaiting(
-        @AuthenticationPrincipal EmailUserDetails userDetails,
         @PathVariable Long waitingId,
-        @Valid @RequestBody UpdateWaitingRequestDto updateWaitingRequestDto) {
+        @Valid @RequestBody UpdateWaitingRequestDto updateWaitingRequestDto,
+        @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        return ResponseUtil.updateOk(waitingService.updateWaiting(userDetails.getUser(), waitingId,
-            updateWaitingRequestDto));
+        return ResponseUtil.updateOk(
+            waitingService.updateWaiting(waitingId, updateWaitingRequestDto,
+                userDetails.getUser()));
     }
 
     // 웨이팅 취소
     @DeleteMapping("/{waitingId}")
     public ResponseEntity<MessageResponseDto> deleteWaiting(
-        @AuthenticationPrincipal EmailUserDetails userDetails,
-        @PathVariable Long waitingId) {
-        waitingService.deleteWaiting(userDetails.getUser(), waitingId);
+        @PathVariable Long waitingId, @AuthenticationPrincipal EmailUserDetails userDetails) {
+
+        waitingService.deleteWaiting(waitingId, userDetails.getUser());
         return ResponseUtil.deleteOk();
     }
 }

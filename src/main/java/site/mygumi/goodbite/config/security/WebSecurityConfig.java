@@ -1,9 +1,9 @@
 package site.mygumi.goodbite.config.security;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -44,15 +44,7 @@ public class WebSecurityConfig {
     private final GlobalAccessDeniedHandler accessDeniedHandler;
     private final GlobalAuthenticationEntryPoint authenticationEntryPoint;
     private final EmailAuthenticationProvider authenticationProvider;
-
-    @Value("${ELB_DNS_FRONT}")
-    private String ELB_DNS_FRONT;
-
-    @Value("${DOMAIN_URL}")
-    private String DOMAIN_URL;
-
-    @Value("${SUBDOMAIN_URL}")
-    private String SUBDOMAIN_URL;
+    private final Dotenv dotenv;
 
     // Manager Bean 등록
     @Bean
@@ -97,9 +89,9 @@ public class WebSecurityConfig {
 
         config.setAllowCredentials(true); // 자격 증명 허용
         config.addAllowedOrigin("http://localhost:3000"); // 로컬 개발용
-        config.addAllowedOrigin(SUBDOMAIN_URL); // 프론트엔드 서브도메인
-        config.addAllowedOrigin(DOMAIN_URL); // 프론트엔드 도메인
-        config.addAllowedOrigin(ELB_DNS_FRONT); // 로드밸런서 DNS
+        config.addAllowedOrigin(dotenv.get("SUBDOMAIN_URL")); // 프론트엔드 서브도메인
+        config.addAllowedOrigin(dotenv.get("DOMAIN_URL")); // 프론트엔드 도메인
+        config.addAllowedOrigin(dotenv.get("ELB_DNS_FRONT")); // 로드밸런서 DNS
         config.addAllowedHeader("*"); // 모든 헤더 허용
         config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
         config.addExposedHeader(JwtUtil.AUTHORIZATION_HEADER); // Authorization 헤더 노출

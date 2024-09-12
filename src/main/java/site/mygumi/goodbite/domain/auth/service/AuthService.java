@@ -3,13 +3,13 @@ package site.mygumi.goodbite.domain.auth.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -35,12 +35,7 @@ public class AuthService {
     private final RestTemplate restTemplate;
     private final CustomerRepository customerRepository;
     private final OwnerRepository ownerRepository;
-
-    @Value("${KAKAO_API_KEY}")
-    private String kakaoApiKey;
-
-    @Value("${DOMAIN_URL}")
-    private String domainUrl;
+    private final Dotenv dotenv;
 
     public void updateAccessToken(HttpServletRequest request,
         HttpServletResponse response) throws UnsupportedEncodingException {
@@ -114,8 +109,8 @@ public class AuthService {
         // HTTP Body
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", kakaoApiKey);
-        body.add("redirect_uri", domainUrl + "/kakao/callback");
+        body.add("client_id", dotenv.get("KAKAO_API_KEY"));
+        body.add("redirect_uri", dotenv.get("DOMAIN_URL") + "/kakao/callback");
         body.add("code", code);
 
         RequestEntity<MultiValueMap<String, String>> requestEntity = RequestEntity

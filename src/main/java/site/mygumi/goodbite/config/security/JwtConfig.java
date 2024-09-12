@@ -1,24 +1,23 @@
 package site.mygumi.goodbite.config.security;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import java.security.Key;
 import java.util.Base64;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@RequiredArgsConstructor
 public class JwtConfig {
 
     public static Key key;
-
-    // 환경변수 넣어주기 위한 config class
-    @Value("${JWT_SECRET_KEY}") // BASE64 encoded
-    private String SECRET_KEY;
+    private final Dotenv dotenv;
 
     @PostConstruct
     public void init() {
-        byte[] bytes = Base64.getDecoder().decode(SECRET_KEY);
+        byte[] bytes = Base64.getDecoder().decode(dotenv.get("JWT_SECRET_KEY"));
         key = Keys.hmacShaKeyFor(bytes);
     }
 }

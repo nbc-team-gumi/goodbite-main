@@ -21,7 +21,6 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import site.mygumi.goodbite.exception.s3.S3ErrorCode;
@@ -37,9 +36,7 @@ import site.mygumi.goodbite.exception.s3.detail.S3InvalidS3UrlException;
 public class S3Service {
 
     private final AmazonS3 amazonS3;
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucketName;
+    private final String s3BucketName;
 
     // S3에 저장된 이미지 객체의 public url 반환
     public String upload(MultipartFile image) {
@@ -93,7 +90,7 @@ public class S3Service {
 
         try {
             PutObjectRequest putObjectRequest =
-                new PutObjectRequest(bucketName, s3FileName, byteArrayInputStream, metadata)
+                new PutObjectRequest(s3BucketName, s3FileName, byteArrayInputStream, metadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead);
 
             //실제로 S3에 이미지 데이터를 넣음
@@ -105,14 +102,14 @@ public class S3Service {
             is.close();
         }
 
-        return amazonS3.getUrl(bucketName, s3FileName).toString();
+        return amazonS3.getUrl(s3BucketName, s3FileName).toString();
     }
 
     // S3에서 이미지 제거
     public void deleteImageFromS3(String imageAddress) {
         String key = getKeyFromImageAddress(imageAddress);
         try {
-            amazonS3.deleteObject(new DeleteObjectRequest(bucketName, key));
+            amazonS3.deleteObject(new DeleteObjectRequest(s3BucketName, key));
         } catch (Exception e) {
             throw new S3FileDeleteFailedException(S3ErrorCode.FILE_DELETE_FAILED);
         }
@@ -122,7 +119,7 @@ public class S3Service {
         try {
             URL url = (new URI(imageAddress)).toURL();
             String decodingKey = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8);
-            String bucketPrefix = "/" + bucketName + "/";
+            String bucketPrefix = "/" + s3BucketName + "/";
             if (decodingKey.startsWith(bucketPrefix)) {
                 return decodingKey.substring(bucketPrefix.length());
             } else {

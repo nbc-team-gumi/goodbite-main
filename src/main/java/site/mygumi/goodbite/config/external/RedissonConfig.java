@@ -1,24 +1,24 @@
 package site.mygumi.goodbite.config.external;
 
+import io.github.cdimascio.dotenv.Dotenv;
+import lombok.RequiredArgsConstructor;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 
 @Configuration
+@RequiredArgsConstructor
 public class RedissonConfig {
 
-    @Autowired
-    private Environment env;
+    private final Dotenv dotenv;
 
     @Bean
     public RedissonClient redissonClient() {
-        String redisAddress = env.getProperty("spring.data.redis.host");
-        //String redisPassword = env.getProperty("spring.data.redis.password");
-        String redisPort = env.getProperty("spring.data.redis.port");
+        String redisAddress = dotenv.get("REDIS_SERVER");
+        //String redisPassword = dotenv.get("REDIS_PASSWORD");
+        String redisPort = dotenv.get("REDIS_PORT");
 
         Config config = new Config();
         config.useSingleServer().setAddress("redis://" + redisAddress + ":" + redisPort);

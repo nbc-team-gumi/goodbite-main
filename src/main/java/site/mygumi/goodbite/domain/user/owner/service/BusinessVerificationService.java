@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -21,33 +21,23 @@ import site.mygumi.goodbite.security.util.ApiKeyEncoder;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class BusinessVerificationService {
 
     // 클래스 내부에서 사용할 의존성을 정의
     private final RestTemplate restTemplate;
-    private final String apiKey;
-    private final String apiUrl;
+    private final String publicDataApiKey;
+    private final String publicDataApiUrl;
     private final ObjectMapper objectMapper;
-
-    // 생성자 통해 의존성 주입
-    public BusinessVerificationService(RestTemplate restTemplate,
-        ObjectMapper objectMapper,
-        @Value("${publicdata.api.key}") String apiKey,
-        @Value("${publicdata.api.url}") String apiUrl) {
-        this.restTemplate = restTemplate;
-        this.objectMapper = objectMapper;
-        this.apiKey = apiKey;
-        this.apiUrl = apiUrl;
-    }
 
     // 사업자 번호 검증 메서드 정의
     public boolean verifyBusinessNumber(String businessNumber) {
         try {
             // ApiKeyEncoder.encodeApiKey를 이용해 API 키 인코딩
-            String encodedApiKey = ApiKeyEncoder.encodeApiKey(apiKey);
+            String encodedApiKey = ApiKeyEncoder.encodeApiKey(publicDataApiKey);
 
             // API요청 URL 생성
-            String url = String.format("%s?serviceKey=%s", apiUrl, encodedApiKey);
+            String url = String.format("%s?serviceKey=%s", publicDataApiUrl, encodedApiKey);
 
             // URL을 URI 객체로 변환
             URI uri = new URI(url);

@@ -1,20 +1,17 @@
 package site.mygumi.goodbite.domain.waiting.repository;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting;
 import site.mygumi.goodbite.exception.waiting.WaitingErrorCode;
 import site.mygumi.goodbite.exception.waiting.WaitingException;
 import site.mygumi.goodbite.exception.waiting.detail.WaitingCanNotDuplicatedException;
 import site.mygumi.goodbite.exception.waiting.detail.WaitingNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-public interface WaitingRepository extends JpaRepository<Waiting, Long> {
+public interface WaitingRepository extends JpaRepository<Waiting, Long>, WaitingRepositoryCustom {
 
     // 삭제된 것 까지 조회함. 주의
     default Waiting findByIdOrThrow(Long waitingId) {
@@ -26,22 +23,6 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
         return findByIdAndDeletedAtIsNull(waitingId)
             .orElseThrow(() -> new WaitingException(WaitingErrorCode.WAITING_NOT_FOUND));
     }
-
-    @Query("SELECT w FROM Waiting w WHERE w.restaurant.id = :restaurantId AND w.customer.id = :customerId AND w.deletedAt IS NULL")
-    Optional<Waiting> findByRestaurantIdAndCustomerId(Long restaurantId, Long customerId);
-
-    @Query("SELECT w FROM Waiting w WHERE w.restaurant.id = :restaurantId AND w.deletedAt IS NULL")
-    ArrayList<Waiting> findAllByRestaurantIdDeletedAtIsNull(
-        Long restaurantId);
-
-    @Query("SELECT w FROM Waiting w WHERE w.customer.id = :customerId")
-    ArrayList<Waiting> findALLByCustomerId(Long customerId);
-
-    @Query("SELECT MAX(w.waitingOrder) FROM Waiting w WHERE w.restaurant.id = :restaurant_id AND w.deletedAt IS NULL")
-    Long findMaxWaitingOrderByRestaurantId(@Param("restaurant_id") Long restaurant_id);
-
-    @Query("SELECT w FROM Waiting w WHERE w.restaurant.id = :restaurantId AND w.deletedAt IS NULL")
-    Page<Waiting> findPageByRestaurantId(Long restaurantId, Pageable pageable);
 
     default void validateByRestaurantIdAndCustomerId(Long restaurantId, Long customerId) {
         findByRestaurantIdAndCustomerId(restaurantId, customerId).ifPresent(_waiting -> {
@@ -57,13 +38,9 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
         return waitings;
     }
 
-    @Query("SELECT w FROM Waiting w WHERE w.id = :waitingId AND w.deletedAt IS NULL")
-    Optional<Waiting> findByIdAndDeletedAtIsNull(@Param("waitingId") Long waitingId);
+    ArrayList<Waiting> findALLByCustomerId(Long customerId);
 
     Page<Waiting> findPageByCustomerId(Long customerId, Pageable pageable);
-
-    @Query("SELECT w FROM Waiting w WHERE w.restaurant.id = :restaurantId AND w.customer.id = :customerId AND w.status = 'SEATED'")
-    Optional<Waiting> findStatusByRestaurantIdAndCustomerId(Long restaurantId, Long customerId);
 
     List<Waiting> findAllByRestaurantId(Long restaurantId);
 }

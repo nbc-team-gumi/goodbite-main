@@ -2,27 +2,27 @@ package site.mygumi.goodbite.domain.restaurant.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import site.mygumi.goodbite.domain.restaurant.entity.QRestaurant;
-import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
-import site.mygumi.goodbite.domain.restaurant.enums.Category;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import site.mygumi.goodbite.domain.restaurant.entity.QRestaurant;
+import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
+import site.mygumi.goodbite.domain.restaurant.enums.Category;
 
 @RequiredArgsConstructor
 public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCustom {
 
+    private static final QRestaurant qRestaurant = QRestaurant.restaurant;
     private final JPAQueryFactory queryFactory;
 
+    @Override
     public Page<Restaurant> findPageByFilters(String sido, String sigungu, Category category,
         Double rating, Pageable pageable) {
 
-        QRestaurant restaurant = QRestaurant.restaurant;
-
         List<Restaurant> restaurants = queryFactory
-            .selectFrom(restaurant)
+            .selectFrom(qRestaurant)
             .where(
                 eqSido(sido),
                 eqSigungu(sigungu),
@@ -34,7 +34,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
             .fetch();
 
         long total = queryFactory
-            .selectFrom(restaurant)
+            .selectFrom(qRestaurant)
             .where(
                 allOf(
                     eqSido(sido),

@@ -5,7 +5,7 @@ plugins {
 //    id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10' // QueryDSL 플러그인
 }
 
-group = 'com.sparta'
+group = 'site.mygumi'
 version = '0.0.1-SNAPSHOT'
 
 java {

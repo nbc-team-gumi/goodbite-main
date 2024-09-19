@@ -90,7 +90,7 @@ public class WaitingService {
     // 해당 메서드 동작 시, 가게의 id가 들어간 orders가 하나씩 줄게 된다.
     // restaurant id에 맞는 Waiting들의 order를 하나씩 줄인다.
     @Transactional
-    public void reduceAllWaitingOrders(UserCredentials user, Long restaurantId) {
+    public void decrementAllWaitingOrders(UserCredentials user, Long restaurantId) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
 

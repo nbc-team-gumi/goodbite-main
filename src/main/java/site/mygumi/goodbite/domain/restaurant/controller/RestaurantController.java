@@ -1,31 +1,5 @@
 package site.mygumi.goodbite.domain.restaurant.controller;
 
-import site.mygumi.goodbite.domain.user.entity.EmailUserDetails;
-import site.mygumi.goodbite.common.response.DataResponseDto;
-import site.mygumi.goodbite.common.response.MessageResponseDto;
-import site.mygumi.goodbite.common.response.ResponseUtil;
-import site.mygumi.goodbite.domain.menu.dto.MenuResponseDto;
-import site.mygumi.goodbite.domain.menu.entity.Menu;
-import site.mygumi.goodbite.domain.menu.service.MenuService;
-import site.mygumi.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
-import site.mygumi.goodbite.domain.operatinghour.service.OperatingHourService;
-import site.mygumi.goodbite.domain.reservation.dto.ReservationResponseDto;
-import site.mygumi.goodbite.domain.reservation.entity.Reservation;
-import site.mygumi.goodbite.domain.reservation.service.ReservationService;
-import site.mygumi.goodbite.domain.restaurant.dto.RestaurantIdResponseDto;
-import site.mygumi.goodbite.domain.restaurant.dto.RestaurantRequestDto;
-import site.mygumi.goodbite.domain.restaurant.dto.RestaurantResponseDto;
-import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
-import site.mygumi.goodbite.domain.restaurant.enums.Category;
-import site.mygumi.goodbite.domain.restaurant.service.RestaurantService;
-import site.mygumi.goodbite.domain.review.dto.ReviewResponseDto;
-import site.mygumi.goodbite.domain.review.entity.Review;
-import site.mygumi.goodbite.domain.review.service.ReservationReviewServiceImpl;
-import site.mygumi.goodbite.domain.review.service.TotalReviewService;
-import site.mygumi.goodbite.domain.review.service.WaitingReviewServiceImpl;
-import site.mygumi.goodbite.domain.waiting.dto.WaitingResponseDto;
-import site.mygumi.goodbite.domain.waiting.entity.Waiting;
-import site.mygumi.goodbite.domain.waiting.service.WaitingService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -48,6 +22,32 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import site.mygumi.goodbite.common.response.DataResponseDto;
+import site.mygumi.goodbite.common.response.MessageResponseDto;
+import site.mygumi.goodbite.common.response.ResponseUtil;
+import site.mygumi.goodbite.domain.menu.dto.MenuResponseDto;
+import site.mygumi.goodbite.domain.menu.entity.Menu;
+import site.mygumi.goodbite.domain.menu.service.MenuService;
+import site.mygumi.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
+import site.mygumi.goodbite.domain.operatinghour.service.OperatingHourService;
+import site.mygumi.goodbite.domain.reservation.dto.ReservationResponseDto;
+import site.mygumi.goodbite.domain.reservation.entity.Reservation;
+import site.mygumi.goodbite.domain.reservation.service.ReservationService;
+import site.mygumi.goodbite.domain.restaurant.dto.RestaurantIdResponseDto;
+import site.mygumi.goodbite.domain.restaurant.dto.RestaurantRequestDto;
+import site.mygumi.goodbite.domain.restaurant.dto.RestaurantResponseDto;
+import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
+import site.mygumi.goodbite.domain.restaurant.enums.Category;
+import site.mygumi.goodbite.domain.restaurant.service.RestaurantService;
+import site.mygumi.goodbite.domain.review.dto.ReviewResponseDto;
+import site.mygumi.goodbite.domain.review.entity.Review;
+import site.mygumi.goodbite.domain.review.service.ReservationReviewServiceImpl;
+import site.mygumi.goodbite.domain.review.service.TotalReviewService;
+import site.mygumi.goodbite.domain.review.service.WaitingReviewServiceImpl;
+import site.mygumi.goodbite.domain.user.entity.EmailUserDetails;
+import site.mygumi.goodbite.domain.waiting.dto.WaitingResponseDto;
+import site.mygumi.goodbite.domain.waiting.entity.Waiting;
+import site.mygumi.goodbite.domain.waiting.service.WaitingService;
 
 @RestController
 @RequestMapping("/restaurants")
@@ -195,10 +195,10 @@ public class RestaurantController {
     // 가게 주인용 가게 전체 하나씩 웨이팅 줄이기 메서드 호출
     @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
     @PutMapping("/{restaurantId}/waitings")
-    public ResponseEntity<MessageResponseDto> reduceAllWaitingOrders(
+    public ResponseEntity<MessageResponseDto> decrementAllWaitingOrders(
         @PathVariable Long restaurantId, @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        waitingService.reduceAllWaitingOrders(userDetails.getUser(), restaurantId);
+        waitingService.decrementAllWaitingOrders(userDetails.getUser(), restaurantId);
         return ResponseUtil.updateOk();
     }
 

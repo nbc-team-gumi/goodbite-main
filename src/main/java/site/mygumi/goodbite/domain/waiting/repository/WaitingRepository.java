@@ -30,7 +30,7 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long>, Waiting
         });
     }
 
-    default ArrayList<Waiting> findALLByRestaurantIdOrThrow(Long restaurantId) {
+    default ArrayList<Waiting> findAllByRestaurantIdOrThrow(Long restaurantId) {
         ArrayList<Waiting> waitings = findAllByRestaurantIdDeletedAtIsNull(restaurantId);
         if (waitings.isEmpty()) {
             throw new WaitingNotFoundException(WaitingErrorCode.WAITING_NOT_FOUND);
@@ -38,7 +38,7 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long>, Waiting
         return waitings;
     }
 
-    ArrayList<Waiting> findALLByCustomerId(Long customerId);
+    ArrayList<Waiting> findAllByCustomerId(Long customerId);
 
     Page<Waiting> findPageByCustomerId(Long customerId, Pageable pageable);
 

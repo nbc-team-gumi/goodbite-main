@@ -1,6 +1,12 @@
 package site.mygumi.goodbite.domain.user.customer.service;
 
-import site.mygumi.goodbite.domain.user.entity.UserCredentials;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import site.mygumi.goodbite.domain.reservation.entity.Reservation;
+import site.mygumi.goodbite.domain.reservation.repository.ReservationRepository;
 import site.mygumi.goodbite.domain.user.customer.dto.CustomerResponseDto;
 import site.mygumi.goodbite.domain.user.customer.dto.CustomerSignupRequestDto;
 import site.mygumi.goodbite.domain.user.customer.dto.UpdateNicknameRequestDto;
@@ -8,8 +14,7 @@ import site.mygumi.goodbite.domain.user.customer.dto.UpdatePasswordRequestDto;
 import site.mygumi.goodbite.domain.user.customer.dto.UpdatePhoneNumberRequestDto;
 import site.mygumi.goodbite.domain.user.customer.entity.Customer;
 import site.mygumi.goodbite.domain.user.customer.repository.CustomerRepository;
-import site.mygumi.goodbite.domain.reservation.entity.Reservation;
-import site.mygumi.goodbite.domain.reservation.repository.ReservationRepository;
+import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting;
 import site.mygumi.goodbite.domain.waiting.repository.WaitingRepository;
 import site.mygumi.goodbite.exception.customer.CustomerErrorCode;
@@ -17,11 +22,6 @@ import site.mygumi.goodbite.exception.customer.detail.CustomerAlreadyDeletedExce
 import site.mygumi.goodbite.exception.user.UserErrorCode;
 import site.mygumi.goodbite.exception.user.detail.PasswordMismatchException;
 import site.mygumi.goodbite.exception.user.detail.SamePasswordException;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -120,7 +120,7 @@ public class CustomerService {
         customer.deactivate();
 
         //사용자의 웨이팅을 하드 딜리트 함
-        List<Waiting> waitingList = waitingRepository.findALLByCustomerId(user.getId());
+        List<Waiting> waitingList = waitingRepository.findAllByCustomerId(user.getId());
         waitingRepository.deleteAll(waitingList);
 
         List<Reservation> reservationList = reservationRepository.findAllByCustomerId(user.getId());

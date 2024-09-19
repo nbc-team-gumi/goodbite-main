@@ -100,7 +100,7 @@ public class WaitingService {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
 
-        List<Waiting> waitingList = waitingRepository.findALLByRestaurantIdOrThrow(restaurantId);
+        List<Waiting> waitingList = waitingRepository.findAllByRestaurantIdOrThrow(restaurantId);
 
         List<Waiting> waitingArrayList = new ArrayList<>();
         for (Waiting waiting : waitingList) {

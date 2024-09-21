@@ -1,7 +1,9 @@
 package site.mygumi.goodbite.domain.review.service;
 
-import site.mygumi.goodbite.domain.user.entity.UserCredentials;
-import site.mygumi.goodbite.domain.user.customer.entity.Customer;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import site.mygumi.goodbite.domain.reservation.entity.Reservation;
 import site.mygumi.goodbite.domain.reservation.repository.ReservationRepository;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
@@ -11,14 +13,12 @@ import site.mygumi.goodbite.domain.review.dto.ReviewResponseDto;
 import site.mygumi.goodbite.domain.review.dto.UpdateReviewRequestDto;
 import site.mygumi.goodbite.domain.review.entity.ReservationReview;
 import site.mygumi.goodbite.domain.review.repository.ReservationReviewRepository;
+import site.mygumi.goodbite.domain.user.customer.entity.Customer;
+import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.exception.auth.AuthErrorCode;
-import site.mygumi.goodbite.exception.auth.AuthException;
+import site.mygumi.goodbite.exception.auth.detail.UnauthorizedException;
 import site.mygumi.goodbite.exception.review.ReviewErrorCode;
 import site.mygumi.goodbite.exception.review.detail.CanNotSubmitReviewException;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -43,7 +43,7 @@ public class ReservationReviewServiceImpl implements
         }
 
         if (!reservation.getCustomer().getId().equals(user.getId())) {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+            throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
         }
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
@@ -99,7 +99,7 @@ public class ReservationReviewServiceImpl implements
         ReservationReview reservationReview = reservationReviewRepository.findByIdOrThrow(reviewId);
 
         if (!reservationReview.getCustomer().getId().equals(customerId)) {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+            throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
         }
 
         return reservationReview;

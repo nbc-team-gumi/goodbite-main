@@ -1,7 +1,9 @@
 package site.mygumi.goodbite.domain.review.service;
 
-import site.mygumi.goodbite.domain.user.entity.UserCredentials;
-import site.mygumi.goodbite.domain.user.customer.entity.Customer;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import site.mygumi.goodbite.domain.restaurant.repository.RestaurantRepository;
 import site.mygumi.goodbite.domain.review.dto.CreateWaitingReviewRequestDto;
@@ -9,16 +11,14 @@ import site.mygumi.goodbite.domain.review.dto.ReviewResponseDto;
 import site.mygumi.goodbite.domain.review.dto.UpdateReviewRequestDto;
 import site.mygumi.goodbite.domain.review.entity.WaitingReview;
 import site.mygumi.goodbite.domain.review.repository.WaitingReviewRepository;
+import site.mygumi.goodbite.domain.user.customer.entity.Customer;
+import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting;
 import site.mygumi.goodbite.domain.waiting.repository.WaitingRepository;
 import site.mygumi.goodbite.exception.auth.AuthErrorCode;
-import site.mygumi.goodbite.exception.auth.AuthException;
+import site.mygumi.goodbite.exception.auth.detail.UnauthorizedException;
 import site.mygumi.goodbite.exception.review.ReviewErrorCode;
 import site.mygumi.goodbite.exception.review.detail.CanNotSubmitReviewException;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -39,7 +39,7 @@ public class WaitingReviewServiceImpl implements
             createWaitingReviewRequestDto.getWaitingId());
 
         if (!waiting.getCustomer().getId().equals(user.getId())) {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+            throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
         }
 
         if (!waiting.canSubmitReview()) {
@@ -101,7 +101,7 @@ public class WaitingReviewServiceImpl implements
         WaitingReview waitingReview = waitingReviewRepository.findByIdOrThrow(reviewId);
 
         if (!waitingReview.getCustomer().getId().equals(customerId)) {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+            throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
         }
 
         return waitingReview;

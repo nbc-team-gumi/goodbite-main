@@ -28,9 +28,9 @@ import site.mygumi.goodbite.domain.waiting.entity.Waiting;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting.WaitingStatus;
 import site.mygumi.goodbite.domain.waiting.repository.WaitingRepository;
 import site.mygumi.goodbite.exception.auth.AuthErrorCode;
-import site.mygumi.goodbite.exception.auth.AuthException;
+import site.mygumi.goodbite.exception.auth.detail.UnauthorizedException;
 import site.mygumi.goodbite.exception.customer.CustomerErrorCode;
-import site.mygumi.goodbite.exception.customer.CustomerException;
+import site.mygumi.goodbite.exception.customer.detail.CustomerNotFoundException;
 import site.mygumi.goodbite.exception.waiting.WaitingErrorCode;
 import site.mygumi.goodbite.exception.waiting.WaitingException;
 import site.mygumi.goodbite.exception.waiting.detail.WaitingNotFoundException;
@@ -97,7 +97,7 @@ public class WaitingService {
         Owner owner = ownerRepository.findByIdOrThrow(restaurant.getOwner().getId());
 
         if (!user.getEmail().equals(owner.getEmail())) {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+            throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
         }
 
         List<Waiting> waitingList = waitingRepository.findAllByRestaurantIdOrThrow(restaurantId);
@@ -175,11 +175,11 @@ public class WaitingService {
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
 
         Owner owner = ownerRepository.findById(restaurant.getOwner().getId())
-            .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED));
+            .orElseThrow(() -> new UnauthorizedException(AuthErrorCode.UNAUTHORIZED));
 
         // api 요청한 유저가 해당 레스토랑의 '오너'와 같지 않다면
         if (!user.getEmail().equals(owner.getEmail())) {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+            throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
         }
 
         Page<Waiting> waitingPage = waitingRepository.findPageByRestaurantId(restaurantId,
@@ -268,19 +268,19 @@ public class WaitingService {
             waiting.getRestaurant().getId());
 
         Customer customer = customerRepository.findById(waiting.getCustomer().getId())
-            .orElseThrow(() -> new CustomerException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
+            .orElseThrow(() -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
 
         Owner owner = ownerRepository.findById(restaurant.getOwner().getId())
-            .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED));
+            .orElseThrow(() -> new UnauthorizedException(AuthErrorCode.UNAUTHORIZED));
 
         // api 요청한 유저가 해당 레스토랑의 '오너'와 같던가 혹은 웨이팅 등록한 '손님'과 같던가
         if (user.getClass().equals(Owner.class) && !user.getEmail()
             .equals(owner.getEmail())) {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+            throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
         }
         if (user.getClass().equals(Customer.class) && !user.getEmail()
             .equals(customer.getEmail())) {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+            throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
         }
 
         List<Waiting> waitingList = waitingRepository.findAllByRestaurantIdDeletedAtIsNull(

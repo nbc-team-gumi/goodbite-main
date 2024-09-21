@@ -2,9 +2,15 @@ package site.mygumi.goodbite.domain.reservation.service;
 
 import static site.mygumi.goodbite.domain.reservation.entity.Reservation.RESERVATION_DURATION_HOUR;
 
-import site.mygumi.goodbite.domain.user.entity.UserCredentials;
-import site.mygumi.goodbite.domain.user.customer.entity.Customer;
-import site.mygumi.goodbite.domain.user.customer.repository.CustomerRepository;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import site.mygumi.goodbite.domain.menu.entity.Menu;
 import site.mygumi.goodbite.domain.menu.repository.MenuRepository;
 import site.mygumi.goodbite.domain.operatinghour.entity.OperatingHour;
@@ -18,21 +24,16 @@ import site.mygumi.goodbite.domain.reservation.entity.ReservationStatus;
 import site.mygumi.goodbite.domain.reservation.repository.ReservationRepository;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import site.mygumi.goodbite.domain.restaurant.repository.RestaurantRepository;
+import site.mygumi.goodbite.domain.user.customer.entity.Customer;
+import site.mygumi.goodbite.domain.user.customer.repository.CustomerRepository;
+import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.exception.auth.AuthErrorCode;
 import site.mygumi.goodbite.exception.auth.AuthException;
+import site.mygumi.goodbite.exception.auth.detail.UnauthorizedException;
 import site.mygumi.goodbite.exception.reservation.ReservationErrorCode;
 import site.mygumi.goodbite.exception.reservation.detail.DuplicateReservationException;
 import site.mygumi.goodbite.exception.reservation.detail.InvalidReservationTimeException;
 import site.mygumi.goodbite.exception.reservation.detail.MaxCapacityExceededException;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -260,12 +261,12 @@ public class ReservationService {
      */
     private void validateReservationOwnership(Reservation reservation, UserCredentials user) {
         if (user.isCustomer() && !reservation.getCustomer().getId().equals(user.getId())) {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+            throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
         }
 
         if (user.isOwner() && !reservation.getRestaurant().getOwner().getId()
             .equals(user.getId())) {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+            throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
         }
     }
 
@@ -278,7 +279,7 @@ public class ReservationService {
      */
     private void validateRestaurantOwnership(Restaurant restaurant, UserCredentials user) {
         if (!restaurant.getOwner().getId().equals(user.getId())) {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+            throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
         }
     }
 

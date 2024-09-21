@@ -17,7 +17,7 @@ import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.domain.user.owner.entity.Owner;
 import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
 import site.mygumi.goodbite.exception.auth.AuthErrorCode;
-import site.mygumi.goodbite.exception.auth.AuthException;
+import site.mygumi.goodbite.exception.auth.detail.UnauthorizedException;
 import site.mygumi.goodbite.exception.restaurant.RestaurantErrorCode;
 import site.mygumi.goodbite.exception.restaurant.detail.RestaurantCreateFailedException;
 import site.mygumi.goodbite.exception.restaurant.detail.RestaurantUpdateFailedException;
@@ -114,7 +114,7 @@ public class RestaurantService {
 
     private void validateRestaurantOwnership(Owner owner, Restaurant restaurant) {
         if (!restaurant.getOwner().getId().equals(owner.getId())) {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+            throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
         }
     }
 }

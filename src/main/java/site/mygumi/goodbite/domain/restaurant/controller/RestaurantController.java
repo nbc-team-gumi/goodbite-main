@@ -116,12 +116,12 @@ public class RestaurantController {
     @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
     @GetMapping("/{restaurantId}/waitings")
     public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getAllWaitingsByRestaurantId(
-        @AuthenticationPrincipal EmailUserDetails userDetails,
         @PathVariable Long restaurantId,
+        @AuthenticationPrincipal EmailUserDetails userDetails,
         @PageableDefault(size = Waiting.DEFAULT_PAGE_SIZE) Pageable pageable) {
 
         return ResponseUtil.createOk(
-            waitingService.getWaitingsByRestaurantId(userDetails.getUser(), restaurantId,
+            waitingService.getWaitingsByRestaurantId(restaurantId, userDetails.getUser(),
                 pageable));
     }
 

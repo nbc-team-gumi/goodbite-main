@@ -80,7 +80,7 @@ public class WaitingService {
     @Transactional(readOnly = true)
     public WaitingResponseDto getWaiting(Long waitingId, UserCredentials user) {
 
-        validateWaitingRequest(user, waitingId);
+        validateWaitingRequest(waitingId, user);
 
         Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
         return WaitingResponseDto.of(waiting);
@@ -128,8 +128,7 @@ public class WaitingService {
     @Transactional
     public void decrementWaitingOrder(Long waitingId, UserCredentials user) {
 
-        validateWaitingRequest(user, waitingId);
-
+        validateWaitingRequest(waitingId, user);
         reduceWaitingOrders(waitingId, "reduce");
     }
 
@@ -139,7 +138,7 @@ public class WaitingService {
     public WaitingResponseDto updateWaiting(Long waitingId,
         UpdateWaitingRequestDto updateWaitingRequestDto, UserCredentials user) {
 
-        validateWaitingRequest(user, waitingId);
+        validateWaitingRequest(waitingId, user);
 
         Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
 
@@ -153,7 +152,7 @@ public class WaitingService {
     @Transactional
     public void deleteWaiting(Long waitingId, UserCredentials user) {
 
-        validateWaitingRequest(user, waitingId);
+        validateWaitingRequest(waitingId, user);
 
         reduceWaitingOrders(waitingId, "delete");
     }
@@ -169,10 +168,9 @@ public class WaitingService {
         return 0L;
     }
 
-    // 페이지 네이션 말고 list로 하면 무슨 장점이 있을까요?
     @Transactional(readOnly = true)
-    public Page<WaitingResponseDto> getWaitingsByRestaurantId(UserCredentials user,
-        Long restaurantId, Pageable pageable) {
+    public Page<WaitingResponseDto> getWaitingsByRestaurantId(Long restaurantId,
+        UserCredentials user, Pageable pageable) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
 
@@ -262,7 +260,7 @@ public class WaitingService {
     }
 
 
-    private void validateWaitingRequest(UserCredentials user, Long waitingId) {
+    private void validateWaitingRequest(Long waitingId, UserCredentials user) {
 
         Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
 

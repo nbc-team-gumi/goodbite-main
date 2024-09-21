@@ -184,7 +184,7 @@ public class WaitingService {
             pageable);
 
         List<WaitingResponseDto> waitingResponseDtos = waitingPage.stream()
-            .map(this::convertToDto).toList();
+            .map(WaitingResponseDto::from).toList();
         return new PageImpl<>(waitingResponseDtos, pageable, waitingPage.getTotalElements());
     }
 
@@ -202,12 +202,8 @@ public class WaitingService {
             sortedPageable);
 
         List<WaitingResponseDto> waitingResponseDtos = waitingPage.stream()
-            .map(this::convertToDto).toList();
+            .map(WaitingResponseDto::from).toList();
         return new PageImpl<>(waitingResponseDtos, sortedPageable, waitingPage.getTotalElements());
-    }
-
-    private WaitingResponseDto convertToDto(Waiting waiting) {
-        return WaitingResponseDto.from(waiting);
     }
 
     private void reduceWaitingOrders(Long waitingId, String type) {

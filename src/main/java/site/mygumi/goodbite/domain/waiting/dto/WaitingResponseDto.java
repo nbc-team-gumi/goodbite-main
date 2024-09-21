@@ -17,7 +17,7 @@ public record WaitingResponseDto(
     LocalDateTime createAt,
     LocalDateTime deletedAt) {
 
-    public static WaitingResponseDto of(Waiting waiting) {
+    public static WaitingResponseDto from(Waiting waiting) {
         return new WaitingResponseDto(
             waiting.getId(),
             waiting.getRestaurant().getId(),

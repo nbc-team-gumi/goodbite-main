@@ -29,8 +29,6 @@ import site.mygumi.goodbite.domain.waiting.entity.Waiting.WaitingStatus;
 import site.mygumi.goodbite.domain.waiting.repository.WaitingRepository;
 import site.mygumi.goodbite.exception.auth.AuthErrorCode;
 import site.mygumi.goodbite.exception.auth.detail.UnauthorizedException;
-import site.mygumi.goodbite.exception.customer.CustomerErrorCode;
-import site.mygumi.goodbite.exception.customer.detail.CustomerNotFoundException;
 import site.mygumi.goodbite.exception.waiting.WaitingErrorCode;
 import site.mygumi.goodbite.exception.waiting.WaitingException;
 import site.mygumi.goodbite.exception.waiting.detail.WaitingNotFoundException;
@@ -73,7 +71,7 @@ public class WaitingService {
         String message = "새로운 웨이팅이 등록되었습니다.";
         notificationController.notifyOwner(restaurant.getId().toString(), message);
 
-        return WaitingResponseDto.of(waiting);
+        return WaitingResponseDto.from(waiting);
     }
 
     // 단일 조회용 메서드
@@ -83,7 +81,7 @@ public class WaitingService {
         validateWaitingRequest(waitingId, user);
 
         Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
-        return WaitingResponseDto.of(waiting);
+        return WaitingResponseDto.from(waiting);
     }
 
     // 가게 주인용 api
@@ -145,7 +143,7 @@ public class WaitingService {
         waiting.update(updateWaitingRequestDto.getPartySize(), updateWaitingRequestDto.getDemand());
 
         waitingRepository.save(waiting);
-        return WaitingResponseDto.of(waiting);
+        return WaitingResponseDto.from(waiting);
     }
 
     // 취소 메서드
@@ -209,7 +207,7 @@ public class WaitingService {
     }
 
     private WaitingResponseDto convertToDto(Waiting waiting) {
-        return WaitingResponseDto.of(waiting);
+        return WaitingResponseDto.from(waiting);
     }
 
     private void reduceWaitingOrders(Long waitingId, String type) {
@@ -267,25 +265,21 @@ public class WaitingService {
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
             waiting.getRestaurant().getId());
 
-        Customer customer = customerRepository.findById(waiting.getCustomer().getId())
-            .orElseThrow(() -> new CustomerNotFoundException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
+        Customer customer = customerRepository.findByIdOrThrow(waiting.getCustomer().getId());
 
-        Owner owner = ownerRepository.findById(restaurant.getOwner().getId())
-            .orElseThrow(() -> new UnauthorizedException(AuthErrorCode.UNAUTHORIZED));
+        Owner owner = ownerRepository.findByIdOrThrow(restaurant.getOwner().getId());
 
         // api 요청한 유저가 해당 레스토랑의 '오너'와 같던가 혹은 웨이팅 등록한 '손님'과 같던가
-        if (user.getClass().equals(Owner.class) && !user.getEmail()
-            .equals(owner.getEmail())) {
+        if (user.getClass().equals(Owner.class) && !user.getId().equals(owner.getId())) {
             throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
         }
-        if (user.getClass().equals(Customer.class) && !user.getEmail()
-            .equals(customer.getEmail())) {
+        if (user.getClass().equals(Customer.class) && !user.getId().equals(customer.getId())) {
             throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
         }
 
-        List<Waiting> waitingList = waitingRepository.findAllByRestaurantIdDeletedAtIsNull(
+        List<Waiting> waitings = waitingRepository.findAllByRestaurantIdDeletedAtIsNull(
             restaurant.getId());
-        if (waitingList.isEmpty()) {
+        if (waitings.isEmpty()) {
             throw new WaitingException(WaitingErrorCode.WAITING_NOT_FOUND);
         }
     }

@@ -78,7 +78,7 @@ public class WaitingService {
     @Transactional(readOnly = true)
     public WaitingResponseDto getWaiting(Long waitingId, UserCredentials user) {
 
-        validateWaitingRequest(waitingId, user);
+        validateWaitingOwnership(waitingId, user);
 
         Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
         return WaitingResponseDto.from(waiting);
@@ -126,7 +126,7 @@ public class WaitingService {
     @Transactional
     public void decrementWaitingOrder(Long waitingId, UserCredentials user) {
 
-        validateWaitingRequest(waitingId, user);
+        validateWaitingOwnership(waitingId, user);
         reduceWaitingOrders(waitingId, "reduce");
     }
 
@@ -136,7 +136,7 @@ public class WaitingService {
     public WaitingResponseDto updateWaiting(Long waitingId,
         UpdateWaitingRequestDto updateWaitingRequestDto, UserCredentials user) {
 
-        validateWaitingRequest(waitingId, user);
+        validateWaitingOwnership(waitingId, user);
 
         Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
 
@@ -150,7 +150,7 @@ public class WaitingService {
     @Transactional
     public void deleteWaiting(Long waitingId, UserCredentials user) {
 
-        validateWaitingRequest(waitingId, user);
+        validateWaitingOwnership(waitingId, user);
 
         reduceWaitingOrders(waitingId, "delete");
     }
@@ -254,27 +254,39 @@ public class WaitingService {
     }
 
 
-    private void validateWaitingRequest(Long waitingId, UserCredentials user) {
-
+    private void validateWaitingOwnership(Long waitingId, UserCredentials user) {
         Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
-
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
             waiting.getRestaurant().getId());
 
+        // Customer 또는 Owner 검증
+        if (user instanceof Customer) {
+            validateCustomerWaitingOwnership(waiting, (Customer) user);
+        } else if (user instanceof Owner) {
+            validateOwnerWaitingOwnership(restaurant, (Owner) user);
+        }
+
+        // 대기 목록 검증
+        validateRestaurantWaitings(restaurant.getId());
+    }
+
+    private void validateCustomerWaitingOwnership(Waiting waiting, Customer user) {
         Customer customer = customerRepository.findByIdOrThrow(waiting.getCustomer().getId());
+        if (!user.getId().equals(customer.getId())) {
+            throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
+        }
+    }
 
+    private void validateOwnerWaitingOwnership(Restaurant restaurant, Owner user) {
         Owner owner = ownerRepository.findByIdOrThrow(restaurant.getOwner().getId());
-
-        // api 요청한 유저가 해당 레스토랑의 '오너'와 같던가 혹은 웨이팅 등록한 '손님'과 같던가
-        if (user.getClass().equals(Owner.class) && !user.getId().equals(owner.getId())) {
+        if (!user.getId().equals(owner.getId())) {
             throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
         }
-        if (user.getClass().equals(Customer.class) && !user.getId().equals(customer.getId())) {
-            throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
-        }
+    }
 
+    private void validateRestaurantWaitings(Long restaurantId) {
         List<Waiting> waitings = waitingRepository.findAllByRestaurantIdDeletedAtIsNull(
-            restaurant.getId());
+            restaurantId);
         if (waitings.isEmpty()) {
             throw new WaitingException(WaitingErrorCode.WAITING_NOT_FOUND);
         }

@@ -48,7 +48,7 @@ public class WaitingController {
     // 손님이 보는 웨이팅 목록 조회
     @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping
-    public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getWaitingList(
+    public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getWaitings(
         @AuthenticationPrincipal EmailUserDetails userDetails,
         @PageableDefault(size = Waiting.DEFAULT_PAGE_SIZE) Pageable pageable) {
 

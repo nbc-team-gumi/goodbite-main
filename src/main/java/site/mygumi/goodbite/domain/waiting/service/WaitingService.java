@@ -1,6 +1,5 @@
 package site.mygumi.goodbite.domain.waiting.service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -10,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.mygumi.goodbite.aspect.lock.RedisLock;
@@ -98,25 +98,16 @@ public class WaitingService {
         }
 
         List<Waiting> waitings = waitingRepository.findAllByRestaurantIdOrThrow(restaurantId);
-
-        List<Waiting> waitingArrayList = new ArrayList<>();
         for (Waiting waiting : waitings) {
-            waiting.decrementWaitingOrder();
             if (waiting.getWaitingOrder() == 0) {
-
-                //--------------
-                // 알람 메서드 위치
-                //--------------
-                String message = "손님, 가게로 입장해 주세요.";
-                notificationController.notifyCustomer(waiting.getId().toString(), message);
-//                waitingRepository.delete(waiting);
-                waiting.delete(LocalDateTime.now(), WaitingStatus.SEATED);
+                notifyCustomerOfSeating(waiting);
+                waiting.seat();
             } else {
-                waitingArrayList.add(waiting);
+                waiting.decrementWaitingOrder();
             }
-
         }
-        waitingRepository.saveAll(waitingArrayList);
+
+        waitingRepository.saveAll(waitings);
     }
 
     // 웨이팅 하나만 삭제하고 뒤 웨이팅 숫자 하나씩 감소
@@ -203,6 +194,11 @@ public class WaitingService {
         return new PageImpl<>(waitingResponseDtos, sortedPageable, waitingPage.getTotalElements());
     }
 
+    @Async
+    protected void notifyCustomerOfSeating(Waiting waiting) {
+        notificationController.notifyCustomer(waiting.getId().toString(), "가게로 입장해 주세요.");
+    }
+
     private void reduceWaitingOrders(Long waitingId, String type) {
         Waiting waitingOne = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
 
@@ -225,16 +221,15 @@ public class WaitingService {
 
                 if (type.equals("delete")) {
                     message = "웨이팅이 취소되었습니다.";
-                    waitingStatus = WaitingStatus.CANCELLED;
                     notificationController.notifyOwner(waiting.getRestaurant().getId().toString(),
                         message);
+                    waiting.cancel();
                 } else if (type.equals("reduce")) {
                     message = "손님, 가게로 입장해 주세요.";
-                    waitingStatus = WaitingStatus.SEATED;
+                    waiting.seat();
                 }
 
                 notificationController.notifyCustomer(waitingId.toString(), message);
-                waiting.delete(LocalDateTime.now(), waitingStatus);
 
                 flag = true;
             } else if (flag) {

@@ -194,11 +194,11 @@ public class RestaurantController {
 
     // 가게 주인용 가게 전체 하나씩 웨이팅 줄이기 메서드 호출
     @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
-    @PutMapping("/{restaurantId}/waitings")
-    public ResponseEntity<MessageResponseDto> decrementAllWaitingOrders(
+    @PutMapping("/{restaurantId}/admittance")
+    public ResponseEntity<MessageResponseDto> admitWaitingCustomer(
         @PathVariable Long restaurantId, @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        waitingService.decrementAllWaitingOrders(restaurantId, userDetails.getUser());
+        waitingService.admitWaitingCustomer(restaurantId, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 

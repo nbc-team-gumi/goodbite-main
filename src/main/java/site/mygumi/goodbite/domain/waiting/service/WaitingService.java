@@ -87,20 +87,20 @@ public class WaitingService {
     // 해당 메서드 동작 시, 가게의 id가 들어간 orders가 하나씩 줄게 된다.
     // restaurant id에 맞는 Waiting들의 order를 하나씩 줄인다.
     @Transactional
-    public void decrementAllWaitingOrders(Long restaurantId, UserCredentials user) {
+    public void admitWaitingCustomer(Long restaurantId, UserCredentials user) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
 
         Owner owner = ownerRepository.findByIdOrThrow(restaurant.getOwner().getId());
 
-        if (!user.getEmail().equals(owner.getEmail())) {
+        if (!user.getId().equals(owner.getId())) {
             throw new UnauthorizedException(AuthErrorCode.UNAUTHORIZED);
         }
 
-        List<Waiting> waitingList = waitingRepository.findAllByRestaurantIdOrThrow(restaurantId);
+        List<Waiting> waitings = waitingRepository.findAllByRestaurantIdOrThrow(restaurantId);
 
         List<Waiting> waitingArrayList = new ArrayList<>();
-        for (Waiting waiting : waitingList) {
+        for (Waiting waiting : waitings) {
             waiting.decrementWaitingOrder();
             if (waiting.getWaitingOrder() == 0) {
 
@@ -116,8 +116,6 @@ public class WaitingService {
             }
 
         }
-        // 쿼리가 계속 나감...
-        // 한꺼번에 범위로 줄일 수 있음
         waitingRepository.saveAll(waitingArrayList);
     }
 

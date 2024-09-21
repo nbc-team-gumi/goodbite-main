@@ -25,7 +25,7 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long>, Waiting
     }
 
     default void validateByRestaurantIdAndCustomerId(Long restaurantId, Long customerId) {
-        findByRestaurantIdAndCustomerId(restaurantId, customerId).ifPresent(_waiting -> {
+        findByRestaurantIdAndCustomerId(restaurantId, customerId).ifPresent(ignored -> {
             throw new WaitingCanNotDuplicatedException(WaitingErrorCode.WAITING_DUPLICATED);
         });
     }

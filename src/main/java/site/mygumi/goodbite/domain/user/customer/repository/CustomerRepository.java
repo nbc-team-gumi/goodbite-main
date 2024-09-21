@@ -1,13 +1,13 @@
 package site.mygumi.goodbite.domain.user.customer.repository;
 
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 import site.mygumi.goodbite.domain.user.customer.entity.Customer;
 import site.mygumi.goodbite.exception.customer.CustomerErrorCode;
 import site.mygumi.goodbite.exception.customer.detail.CustomerNotFoundException;
 import site.mygumi.goodbite.exception.customer.detail.DuplicateEmailException;
 import site.mygumi.goodbite.exception.customer.detail.DuplicateNicknameException;
 import site.mygumi.goodbite.exception.customer.detail.DuplicatePhoneNumberException;
-import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
@@ -25,19 +25,19 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     }
 
     default void validateDuplicateNickname(String nickname) {
-        findByNickname(nickname).ifPresent(_customer -> {
+        findByNickname(nickname).ifPresent(ignored -> {
             throw new DuplicateNicknameException(CustomerErrorCode.DUPLICATE_NICKNAME);
         });
     }
 
     default void validateDuplicateEmail(String email) {
-        findByEmail(email).ifPresent(_customer -> {
+        findByEmail(email).ifPresent(ignored -> {
             throw new DuplicateEmailException(CustomerErrorCode.DUPLICATE_EMAIL);
         });
     }
 
     default void validateDuplicatePhoneNumber(String phoneNumber) {
-        findByPhoneNumber(phoneNumber).ifPresent(_customer -> {
+        findByPhoneNumber(phoneNumber).ifPresent(ignored -> {
             throw new DuplicatePhoneNumberException(CustomerErrorCode.DUPLICATE_PHONE_NUMBER);
         });
     }

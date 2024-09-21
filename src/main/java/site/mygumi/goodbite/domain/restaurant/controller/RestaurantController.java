@@ -198,7 +198,7 @@ public class RestaurantController {
     public ResponseEntity<MessageResponseDto> decrementAllWaitingOrders(
         @PathVariable Long restaurantId, @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        waitingService.decrementAllWaitingOrders(userDetails.getUser(), restaurantId);
+        waitingService.decrementAllWaitingOrders(restaurantId, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 

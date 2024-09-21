@@ -55,14 +55,15 @@ public class WaitingService {
         waitingRepository.validateByRestaurantIdAndCustomerId(restaurant.getId(),
             customer.getId());
 
-        Waiting waiting = new Waiting(
-            restaurant,
-            customer,
-            findLastOrderNumber(restaurant.getId()) + 1,
-            WaitingStatus.WAITING, // 생성 시 무조건 Waiting
-            createWaitingRequestDto.getPartySize(),
-            createWaitingRequestDto.getWaitingType(),
-            createWaitingRequestDto.getDemand());
+        Waiting waiting = Waiting.builder()
+            .restaurant(restaurant)
+            .customer(customer)
+            .waitingOrder(findLastOrderNumber(restaurant.getId()) + 1)
+            .status(WaitingStatus.WAITING)
+            .partySize(createWaitingRequestDto.getPartySize())
+            .waitingType(createWaitingRequestDto.getWaitingType())
+            .demand(createWaitingRequestDto.getDemand())
+            .build();
 
         waitingRepository.save(waiting);
 

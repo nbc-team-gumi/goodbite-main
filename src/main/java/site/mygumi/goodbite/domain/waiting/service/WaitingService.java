@@ -55,12 +55,10 @@ public class WaitingService {
         waitingRepository.validateByRestaurantIdAndCustomerId(restaurant.getId(),
             customer.getId());
 
-        Long LastOrderNumber = findLastOrderNumber(restaurant.getId());
-
         Waiting waiting = new Waiting(
             restaurant,
             customer,
-            LastOrderNumber + 1,
+            findLastOrderNumber(restaurant.getId()) + 1,
             WaitingStatus.WAITING, // 생성 시 무조건 Waiting
             createWaitingRequestDto.getPartySize(),
             createWaitingRequestDto.getWaitingType(),

@@ -13,6 +13,7 @@
 ## <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> 프로젝트 소개
 
 가게에서 손님의 대기 순번을 관리하고, 차례가 되었을 때 그 손님들에게 알려줄 수 있는 시스템을 개발합니다.
+
 이 시스템은 손님들이 대기 시간을 효율적으로 관리할 수 있도록 도와주며, 가게 운영자와 관리자에게도 편리한 도구를 제공합니다.
 손님은 대기 순번을 실시간으로 확인할 수 있으며, 자신의 차례가 다가오면 알림을 받게 됩니다.
 가게 측에서는 손님의 대기 순번을 체계적으로 관리하고, 손님들에게 원활한 서비스를 제공할 수 있습니다.
@@ -39,8 +40,8 @@
 
 For building and running the application you need:
 
-- JDK 21: Amazon Corretto 21.0.4
-- Gradle 8.8
+- JDK 21: Amazon Corretto 21.0.4 recommended
+- Gradle 8.8 recommended
 
 ## Environment arguments
 

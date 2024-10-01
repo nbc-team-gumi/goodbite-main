@@ -42,3 +42,6 @@ out/
 *.base64
 *.p12
 .keystore
+
+### .env ###
+.env

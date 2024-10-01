@@ -2,9 +2,10 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.2'
     id 'io.spring.dependency-management' version '1.1.6'
+//    id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10' // QueryDSL 플러그인
 }
 
-group = 'com.sparta'
+group = 'site.mygumi'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -30,10 +31,6 @@ dependencies {
     // Spring Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
-    // Thymeleaf
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-
     // Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
@@ -45,8 +42,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     // Mysql
-    implementation 'mysql:mysql-connector-java:8.0.33'
-    runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'mysql:mysql-connector-java:8.0.33'
 
     // JWT
     compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
@@ -60,10 +56,12 @@ dependencies {
 
     // 웹소켓 통신을 위한 의존성 추가
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    runtimeOnly 'mysql:mysql-connector-java'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // QueryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 
     // Redisson - Redis
     implementation 'org.redisson:redisson:3.16.4'
@@ -73,8 +71,15 @@ dependencies {
 
     // AWS
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+    // env
+    implementation 'io.github.cdimascio:java-dotenv:5.2.2'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+clean {
+    delete file('src/main/generated')
 }

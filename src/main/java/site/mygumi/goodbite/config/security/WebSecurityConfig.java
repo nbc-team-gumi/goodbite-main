@@ -32,6 +32,15 @@ import site.mygumi.goodbite.security.handler.GlobalAccessDeniedHandler;
 import site.mygumi.goodbite.security.handler.GlobalAuthenticationEntryPoint;
 import site.mygumi.goodbite.security.util.JwtUtil;
 
+/**
+ * Spring Security 설정을 관리하는 구성 클래스입니다.
+ * <p>
+ * 이 클래스는 인증 및 인가, CORS, CSRF, JWT 필터 등을 포함하여 애플리케이션 보안 구성을 정의하며, {@link @EnableMethodSecurity}와
+ * {@link @EnableWebSecurity} 어노테이션을 통해 메서드 수준 보안과 웹 보안을 활성화합니다.
+ * </p>
+ *
+ * @author a-white-bit
+ */
 @Configuration
 @RequiredArgsConstructor
 @EnableMethodSecurity // @PreAuthorize 애너테이션 활성화
@@ -46,42 +55,77 @@ public class WebSecurityConfig {
     private final EmailAuthenticationProvider authenticationProvider;
     private final Dotenv dotenv;
 
-    // Manager Bean 등록
+    /**
+     * AuthenticationManager 빈을 생성하여 인증 구성에 사용합니다.
+     *
+     * @return 설정된 {@code AuthenticationManager} 객체
+     * @throws Exception 인증 매니저 생성 중 발생하는 예외
+     */
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    // loadUserByEmail 사용을 위한 EmailAuthenticationProvider 설정
+    /**
+     * EmailAuthenticationProvider를 사용한 인증 설정을 구성합니다.
+     *
+     * @param auth {@code AuthenticationManagerBuilder} 객체
+     * @throws Exception 인증 설정 중 발생하는 예외
+     */
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authenticationProvider);
     }
 
-    // PasswordEncoder 필요
+    /**
+     * 비밀번호 인코딩을 위한 PasswordEncoder 빈을 생성합니다.
+     *
+     * @return {@link BCryptPasswordEncoder} 객체
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Validator 유효성 검증
+    /**
+     * Validator 유효성 검증을 위한 Validator 빈을 생성합니다.
+     *
+     * @return {@link Validator} 객체
+     */
     @Bean
     public Validator validator() {
         return Validation.buildDefaultValidatorFactory().getValidator();
     }
 
-    // JWT 인증 필터 Bean 등록
+    /**
+     * JWT 인증 필터를 생성하여 인증 설정에 사용합니다.
+     *
+     * @return {@code JwtAuthenticationFilter} 객체
+     * @throws Exception 필터 생성 중 발생하는 예외
+     */
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
         return new JwtAuthenticationFilter(authenticationManager(), userDetailsService,
             validator());
     }
 
-    // JWT 인가 필터 Bean 등록
+    /**
+     * JWT 인가 필터를 생성하여 인가 설정에 사용합니다.
+     *
+     * @return {@code JwtAuthorizationFilter} 객체
+     */
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
         return new JwtAuthorizationFilter(userDetailsService);
     }
 
+    /**
+     * CORS 설정을 위한 CorsFilter 빈을 생성합니다.
+     * <p>
+     * 자격 증명, 허용 도메인, 허용 헤더 및 HTTP 메소드 설정을 포함하여 CORS를 구성합니다.
+     * </p>
+     *
+     * @return 설정된 {@code CorsFilter} 객체
+     */
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -102,13 +146,23 @@ public class WebSecurityConfig {
         return new CorsFilter(source);
     }
 
-    // 로그아웃 핸들러 Bean 등록
+    /**
+     * 로그아웃 성공 시 처리할 핸들러를 설정합니다.
+     *
+     * @return {@code LogoutSuccessHandler} 객체
+     */
     @Bean
     public LogoutSuccessHandler logoutSuccessHandler() {
         return new EmailLogoutSuccessHandler();
     }
 
-    // 시큐리티 필터 체인 설정 Bean 등록
+    /**
+     * Spring Security 필터 체인을 설정하고 구성합니다.
+     *
+     * @param http HTTP 보안 설정을 위한 {@code HttpSecurity} 객체
+     * @return 설정된 {@code SecurityFilterChain} 객체
+     * @throws Exception 보안 설정 중 발생하는 예외
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 

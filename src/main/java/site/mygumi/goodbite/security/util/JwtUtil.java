@@ -16,7 +16,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import site.mygumi.goodbite.config.security.JwtConfig;
 
-// Util Class, static class
+/**
+ * JWT 생성, 검증 및 추출과 관련된 유틸리티 클래스입니다.
+ * <p>
+ * 이 클래스는 정적 메서드를 통해 JWT 토큰을 생성, 헤더 및 쿠키에 추가/삭제, 유효성 검증 및 사용자 정보 추출 등의 기능을 제공합니다. Access Token과
+ * Refresh Token 생성 및 관리에 필요한 다양한 메서드를 포함하고 있습니다.
+ * </p>
+ *
+ * <p>사용 예시:
+ * <pre>
+ * String accessToken = JwtUtil.createAccessToken(email, authority);
+ * JwtUtil.addJwtToHeader(accessToken, response);
+ * </pre>
+ * </p>
+ *
+ * @author a-whit-bit
+ */
 @Slf4j(topic = "JwtUtil")
 public final class JwtUtil {
 
@@ -30,19 +45,37 @@ public final class JwtUtil {
     private JwtUtil() {
     }
 
-    // 액세스 토큰 생성
-    // Prefix: Bearer
+    /**
+     * Access Token을 생성합니다. Bearer prefix를 포함합니다.
+     *
+     * @param email     사용자 이메일
+     * @param authority 사용자 권한
+     * @return 생성된 Access Token 문자열
+     */
     public static String createAccessToken(String email, String authority) {
         return BEARER_PREFIX + createToken(email, authority, 1000L * 60 * 60); // 1시간
     }
 
-    // 리프레시 토큰 생성
-    // Prefix: 없음
+    /**
+     * Refresh Token을 생성합니다. Bearer prefix를 포함하지 않습니다.
+     *
+     * @param email     사용자 이메일
+     * @param authority 사용자 권한
+     * @return 생성된 Refresh Token 문자열
+     */
     public static String createRefreshToken(String email, String authority) {
         return createToken(email, authority, 1000L * 60 * 60 * 24 * 7); // 7일
     }
 
-    // JWT Header 에 저장
+    /**
+     * JWT를 HTTP 응답 헤더에 추가합니다.
+     * <p>Access Token의 경우, UTF-8로 URL 인코딩한 후 `Authorization` 헤더에 추가됩니다.
+     * Refresh Token은 `Refresh` 헤더에 추가됩니다.</p>
+     *
+     * @param token 추가할 JWT 토큰
+     * @param res   응답 객체
+     * @throws UnsupportedEncodingException 인코딩 예외
+     */
     public static void addJwtToHeader(String token, HttpServletResponse res)
         throws UnsupportedEncodingException {
         try {
@@ -65,7 +98,12 @@ public final class JwtUtil {
         }
     }
 
-    // JWT Cookie 에 저장
+    /**
+     * JWT를 HTTP 쿠키에 추가합니다.
+     *
+     * @param token 추가할 JWT 토큰
+     * @param res   응답 객체
+     */
     public static void addJwtToCookie(String token, HttpServletResponse res) {
         try {
             Cookie cookie;
@@ -104,7 +142,12 @@ public final class JwtUtil {
         }
     }
 
-    // JWT 위변조, 만료 검증
+    /**
+     * JWT가 유효한지 검증합니다.
+     *
+     * @param token 검증할 JWT 토큰
+     * @return 유효할 경우 true, 유효하지 않을 경우 false
+     */
     public static boolean isTokenValid(String token) {
         try {
             return isTokenValidOrExpired(token);
@@ -113,7 +156,13 @@ public final class JwtUtil {
         }
     }
 
-    // JWT 위변조 검증, 만료시 ExpiredJwtException throw
+    /**
+     * JWT가 유효한지 검증하고, 만료 시 예외를 던집니다.
+     *
+     * @param token 검증할 JWT 토큰
+     * @return 유효할 경우 true, 유효하지 않을 경우 false
+     * @throws ExpiredJwtException 토큰 만료 예외
+     */
     public static boolean isTokenValidOrExpired(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(JwtConfig.key).build().parseClaimsJws(token);
@@ -132,7 +181,12 @@ public final class JwtUtil {
         return false;
     }
 
-    // JWT에서 사용자 정보(Claims)에서 email 가져오기
+    /**
+     * JWT에서 사용자 이메일을 추출합니다.
+     *
+     * @param token 사용자 이메일을 추출할 JWT 토큰
+     * @return 사용자 이메일
+     */
     public static String getEmailFromToken(String token) {
         // 토큰에서 사용자 정보 뽑는 방법
         // getBody() -> Claims : 토큰에 여러 클레임(key-value) 존재
@@ -141,7 +195,12 @@ public final class JwtUtil {
             .getBody().getSubject();
     }
 
-    // JWT에서 사용자 정보(Claims)에서 authority 가져오기
+    /**
+     * JWT에서 사용자 권한을 추출합니다.
+     *
+     * @param token 사용자 권한을 추출할 JWT 토큰
+     * @return 사용자 권한
+     */
     public static String getAuthorityFromToken(String token) {
         // 토큰에서 사용자 정보 뽑는 방법
         // getBody() -> Claims : 토큰에 여러 클레임(key-value) 존재
@@ -149,7 +208,12 @@ public final class JwtUtil {
             .getBody().get(AUTHORIZATION_KEY, String.class);
     }
 
-    // HttpServletRequest 에서 Cookie Value : Access Token 가져오기
+    /**
+     * HTTP 요청에서 Access Token을 가져옵니다.
+     *
+     * @param req 서블릿 요청 객체
+     * @return Access Token 문자열, 존재하지 않을 경우 null
+     */
     public static String getAccessTokenFromRequest(HttpServletRequest req) {
         // 헤더에서 REFRESH_HEADER 정보를 가져옴
         String accessToken = req.getHeader(AUTHORIZATION_HEADER);
@@ -180,7 +244,12 @@ public final class JwtUtil {
 //        return null;
     }
 
-    // HttpServletRequest 에서 Cookie Value : Refresh Token 가져오기
+    /**
+     * HTTP 요청에서 Refresh Token을 가져옵니다.
+     *
+     * @param req 서블릿 요청 객체
+     * @return Refresh Token 문자열, 존재하지 않을 경우 null
+     */
     public static String getRefreshTokenFromRequest(HttpServletRequest req) {
         // 헤더에서 REFRESH_HEADER 정보를 가져옴
         String refreshToken = req.getHeader(REFRESH_HEADER);
@@ -211,7 +280,12 @@ public final class JwtUtil {
 //        return null;
     }
 
-    // JWT 추출 (Bearer 제거)
+    /**
+     * Bearer Prefix를 제거한 JWT를 반환합니다.
+     *
+     * @param token Bearer Prefix가 포함된 JWT 토큰
+     * @return Bearer Prefix가 제거된 JWT 토큰
+     */
     public static String substringToken(String token) {
         // PREFIX (Bearer)가 일치해야 하고, 일치한다면 제거
         if (isAccessToken(token)) {
@@ -222,12 +296,21 @@ public final class JwtUtil {
         }
     }
 
-    // 액세스 토큰 확인 (Bearer)
+    /**
+     * 토큰이 Access Token인지 확인합니다.
+     *
+     * @param token 확인할 토큰
+     * @return Access Token일 경우 true, 그렇지 않으면 false
+     */
     public static Boolean isAccessToken(String token) {
         return StringUtils.hasText(token) && token.startsWith(BEARER_PREFIX);
     }
 
-    // 액세스 토큰 쿠키 삭제
+    /**
+     * 응답에서 Access Token 쿠키를 삭제합니다.
+     *
+     * @param res 응답 객체
+     */
     public static void deleteAccessTokenFromCookie(HttpServletResponse res) {
         Cookie cookie = new Cookie(AUTHORIZATION_HEADER, null);
         cookie.setPath("/");
@@ -235,7 +318,11 @@ public final class JwtUtil {
         res.addCookie(cookie);
     }
 
-    // 리프레시 토큰 쿠키 삭제
+    /**
+     * 응답에서 Refresh Token 쿠키를 삭제합니다.
+     *
+     * @param res 응답 객체
+     */
     public static void deleteRefreshTokenFromCookie(HttpServletResponse res) {
         Cookie cookie = new Cookie(REFRESH_HEADER, null);
         cookie.setPath("/");
@@ -243,6 +330,14 @@ public final class JwtUtil {
         res.addCookie(cookie);
     }
 
+    /**
+     * 주어진 정보로 JWT를 생성합니다.
+     *
+     * @param email      사용자 이메일
+     * @param authority  사용자 권한
+     * @param expiration 만료 시간
+     * @return 생성된 JWT 문자열
+     */
     private static String createToken(String email, String authority, Long expiration) {
         Date date = new Date();
 

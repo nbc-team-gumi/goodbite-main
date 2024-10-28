@@ -5,6 +5,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
+/**
+ * 사용자 로그인 요청 DTO 입니다.
+ */
 @Getter
 public class LoginRequestDto {
 

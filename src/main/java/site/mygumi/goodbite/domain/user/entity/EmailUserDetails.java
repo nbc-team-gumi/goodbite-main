@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * 이 클래스는 스프링 시큐리티에서 사용됩니다. 사용자 인증-인가에 필요한 정보를 구성합니다. 사용자 이메일, 닉네임, 패스워드, 역할로 구성되어 있습니다.
+ *
+ * @author a-white-bit
  */
 @Slf4j(topic = "EmailUserDetails")
 @Getter

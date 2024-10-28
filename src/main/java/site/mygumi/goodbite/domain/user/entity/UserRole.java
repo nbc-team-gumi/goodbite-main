@@ -7,6 +7,8 @@ import lombok.Getter;
  * <p>
  * CUSTOMER: 손님, OWNER: 가게/식당 주인, ADMIN: 관리자
  * </p>
+ *
+ * @author a-white-bit
  */
 @Getter
 public enum UserRole {

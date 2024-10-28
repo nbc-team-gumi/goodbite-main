@@ -29,6 +29,8 @@ import site.mygumi.goodbite.security.util.JwtUtil;
 
 /**
  * 사용자의 인증 인가 처리 요청을 수행하는 클래스입니다. 이 클래스는 토큰 리프레시, 카카오 콜백 처리 등의 메서드를 포함하고 있습니다.
+ *
+ * @author a-white-bit
  */
 @Slf4j(topic = "AuthService")
 @Service

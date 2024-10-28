@@ -5,6 +5,7 @@ package site.mygumi.goodbite.domain.auth.dto;
  *
  * @param nickname 사용자 카카오 닉네임
  * @param email    사용자 카카오 이메일
+ * @author a-white-bit
  */
 public record KakaoUserResponseDto(String nickname, String email) {
 

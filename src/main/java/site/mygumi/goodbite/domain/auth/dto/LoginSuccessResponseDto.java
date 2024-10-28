@@ -5,6 +5,7 @@ package site.mygumi.goodbite.domain.auth.dto;
  *
  * @param message 성공 메시지
  * @param role    사용자 역할: customer / owner
+ * @author a-white-bit
  */
 public record LoginSuccessResponseDto(String message, String role) {
 

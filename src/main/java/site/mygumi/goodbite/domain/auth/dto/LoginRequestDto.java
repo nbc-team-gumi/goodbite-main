@@ -7,6 +7,8 @@ import lombok.Getter;
 
 /**
  * 사용자 로그인 요청 DTO 입니다.
+ *
+ * @author a-white-bit
  */
 @Getter
 public class LoginRequestDto {

@@ -36,6 +36,11 @@ import site.mygumi.goodbite.exception.waiting.WaitingErrorCode;
 import site.mygumi.goodbite.exception.waiting.WaitingException;
 import site.mygumi.goodbite.exception.waiting.detail.WaitingNotFoundException;
 
+/**
+ * 대기 관련 비즈니스 로직을 처리하는 서비스 클래스입니다. 대기 생성, 조회, 수정, 삭제 등 대기 상태와 관련된 다양한 기능을 제공합니다.
+ *
+ * @author sillysillyman
+ */
 @Service
 @RequiredArgsConstructor
 public class WaitingService {
@@ -47,6 +52,13 @@ public class WaitingService {
     private final OwnerRepository ownerRepository;
     private final NotificationController notificationController;
 
+    /**
+     * 새로운 대기 요청을 생성합니다.
+     *
+     * @param user                  대기 요청을 생성하는 사용자의 인증 정보
+     * @param postWaitingRequestDto 대기 요청 정보를 담은 DTO
+     * @return 생성된 대기 정보를 담은 DTO
+     */
     @RedisLock(key = "createWaitingLock")
     @Transactional
     public WaitingResponseDto createWaiting(UserCredentials user,
@@ -79,7 +91,13 @@ public class WaitingService {
         return WaitingResponseDto.of(waiting);
     }
 
-    // 단일 조회용 메서드
+    /**
+     * 특정 ID의 대기 정보를 조회합니다.
+     *
+     * @param user      대기 정보를 조회하는 사용자의 인증 정보
+     * @param waitingId 조회할 대기의 ID
+     * @return 조회된 대기 정보를 담은 DTO
+     */
     @Transactional(readOnly = true)
     public WaitingResponseDto getWaiting(UserCredentials user, Long waitingId) {
 
@@ -89,9 +107,13 @@ public class WaitingService {
         return WaitingResponseDto.of(waiting);
     }
 
-    // 가게 주인용 api
-    // 해당 메서드 동작 시, 가게의 id가 들어간 orders가 하나씩 줄게 된다.
-    // restaurant id에 맞는 Waiting들의 order를 하나씩 줄인다.
+    /**
+     * 특정 레스토랑의 모든 대기 순서를 하나씩 줄입니다.
+     *
+     * @param user         요청하는 사용자의 인증 정보
+     * @param restaurantId 대기 순서를 줄일 레스토랑의 ID
+     * @throws AuthException 사용자가 해당 작업에 권한이 없는 경우 발생합니다.
+     */
     @Transactional
     public void reduceAllWaitingOrders(UserCredentials user, Long restaurantId) {
 
@@ -127,7 +149,12 @@ public class WaitingService {
         waitingRepository.saveAll(waitingArrayList);
     }
 
-    // 웨이팅 하나만 삭제하고 뒤 웨이팅 숫자 하나씩 감소
+    /**
+     * 특정 대기 요청을 삭제하고 뒤의 대기 순서를 줄입니다.
+     *
+     * @param user      요청하는 사용자의 인증 정보
+     * @param waitingId 삭제할 대기의 ID
+     */
     @Transactional
     public void reduceOneWaitingOrders(UserCredentials user, Long waitingId) {
 
@@ -136,8 +163,14 @@ public class WaitingService {
         reduceWaitingOrders(waitingId, "reduce");
     }
 
-    // 가게용 api
-    // 예약 인원수와 요청사항만 변경 가능함 ( 추후 합의를 통해 ?건 이하의 순서일 때는 수정하지 못하도록 로직 수정 필요)
+    /**
+     * 특정 대기 요청을 업데이트합니다.
+     *
+     * @param user                    요청하는 사용자의 인증 정보
+     * @param waitingId               업데이트할 대기의 ID
+     * @param updateWaitingRequestDto 대기 요청 업데이트 정보를 담은 DTO
+     * @return 업데이트된 대기 정보를 담은 DTO
+     */
     @Transactional
     public WaitingResponseDto updateWaiting(UserCredentials user, Long waitingId,
         UpdateWaitingRequestDto updateWaitingRequestDto) {
@@ -152,7 +185,12 @@ public class WaitingService {
         return WaitingResponseDto.of(waiting);
     }
 
-    // 취소 메서드
+    /**
+     * 특정 대기 요청을 취소합니다.
+     *
+     * @param user      요청하는 사용자의 인증 정보
+     * @param waitingId 취소할 대기의 ID
+     */
     @Transactional
     public void deleteWaiting(UserCredentials user, Long waitingId) {
 
@@ -161,6 +199,12 @@ public class WaitingService {
         reduceWaitingOrders(waitingId, "delete");
     }
 
+    /**
+     * 특정 레스토랑의 마지막 대기 순서 번호를 반환합니다.
+     *
+     * @param restaurantId 레스토랑의 ID
+     * @return 마지막 대기 순서 번호
+     */
     @Transactional(readOnly = true)
     public Long findLastOrderNumber(Long restaurantId) {
         if (!waitingRepository.findAllByRestaurantIdDeletedAtIsNull(restaurantId).isEmpty()) {
@@ -172,7 +216,14 @@ public class WaitingService {
         return 0L;
     }
 
-    // 페이지 네이션 말고 list로 하면 무슨 장점이 있을까요?
+    /**
+     * 특정 레스토랑의 대기 요청을 페이지네이션하여 조회합니다.
+     *
+     * @param user         요청하는 사용자의 인증 정보
+     * @param restaurantId 레스토랑의 ID
+     * @param pageable     페이지 정보
+     * @return 페이지네이션된 대기 정보
+     */
     @Transactional(readOnly = true)
     public Page<WaitingResponseDto> getWaitingsByRestaurantId(UserCredentials user,
         Long restaurantId, Pageable pageable) {
@@ -195,6 +246,13 @@ public class WaitingService {
         return new PageImpl<>(waitingResponseDtos, pageable, waitingPage.getTotalElements());
     }
 
+    /**
+     * 사용자가 작성한 대기 요청을 페이지네이션하여 조회합니다.
+     *
+     * @param user     요청하는 사용자의 인증 정보
+     * @param pageable 페이지 정보
+     * @return 페이지네이션된 대기 정보
+     */
     @Transactional(readOnly = true)
     public Page<WaitingResponseDto> getWaitings(UserCredentials user, Pageable pageable) {
 
@@ -213,10 +271,24 @@ public class WaitingService {
         return new PageImpl<>(waitingResponseDtos, sortedPageable, waitingPage.getTotalElements());
     }
 
+    /**
+     * Waiting 엔티티를 WaitingResponseDto로 변환합니다.
+     *
+     * @param waiting 변환할 Waiting 엔티티
+     * @return 변환된 WaitingResponseDto
+     */
     private WaitingResponseDto convertToDto(Waiting waiting) {
         return WaitingResponseDto.of(waiting);
     }
 
+    /**
+     * 특정 대기를 삭제하거나 순서를 감소시키고, 그 이후 대기의 순서를 조정합니다. 'delete' 타입일 경우 대기를 취소하고, 'reduce' 타입일 경우 대기를 완료
+     * 처리합니다.
+     *
+     * @param waitingId 처리할 대기의 ID
+     * @param type      'delete'는 대기 취소, 'reduce'는 대기 완료를 의미
+     * @throws WaitingNotFoundException 지정된 ID의 대기가 존재하지 않을 경우 발생합니다.
+     */
     private void reduceWaitingOrders(Long waitingId, String type) {
         Waiting waitingOne = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
 
@@ -265,6 +337,15 @@ public class WaitingService {
     }
 
 
+    /**
+     * 특정 대기에 대한 요청이 유효한지 확인합니다. 요청하는 사용자가 해당 대기의 손님이거나 해당 대기가 속한 레스토랑의 소유자인지 검증합니다.
+     *
+     * @param user      요청하는 사용자의 인증 정보
+     * @param waitingId 검증할 대기의 ID
+     * @throws AuthException     사용자가 해당 작업에 권한이 없는 경우 발생합니다.
+     * @throws WaitingException  해당 레스토랑에 유효한 대기가 존재하지 않을 경우 발생합니다.
+     * @throws CustomerException 대기 등록한 손님 정보가 존재하지 않을 경우 발생합니다.
+     */
     private void validateWaitingRequest(UserCredentials user, Long waitingId) {
 
         Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);

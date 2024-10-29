@@ -6,6 +6,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * 사업자 번호 유효성 검증 요청을 위한 DTO 클래스입니다.
+ * <p>하나 이상의 사업자 번호를 담아 외부 API에 전달하는 데 사용됩니다.</p>
+ *
+ * <b>주요 필드:</b>
+ * <ul>
+ *   <li>b_no: 사업자 번호 목록</li>
+ * </ul>
+ *
+ * @author Kang Hyun Ji / Qwen
+ */
 @Getter
 @Setter
 @NoArgsConstructor

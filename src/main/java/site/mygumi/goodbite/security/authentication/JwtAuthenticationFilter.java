@@ -27,6 +27,15 @@ import site.mygumi.goodbite.domain.user.entity.EmailUserDetails;
 import site.mygumi.goodbite.domain.user.entity.UserRole;
 import site.mygumi.goodbite.security.util.JwtUtil;
 
+/**
+ * JWT 인증을 처리하는 커스텀 필터 클래스입니다.
+ * <p>
+ * 이 클래스는 사용자가 로그인을 시도할 때 인증을 수행하고, 성공 시 JWT 액세스 토큰과 리프레시 토큰을 생성하여 응답 헤더에 추가합니다. 유효성 검증 및 로그인 실패 시
+ * 오류 메시지와 상태 코드도 반환합니다.
+ * </p>
+ *
+ * @author a-white-bit
+ */
 // JWT 인증 필터
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -34,6 +43,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final EmailUserDetailsService userDetailsService;
     private final Validator validator;
 
+    /**
+     * JwtAuthenticationFilter 생성자
+     *
+     * @param authenticationManager 인증 관리자
+     * @param userDetailsService    사용자 상세 정보 서비스
+     * @param validator             요청 DTO 검증기
+     */
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager,
         EmailUserDetailsService userDetailsService, Validator validator) {
         super.setAuthenticationManager(authenticationManager);
@@ -44,6 +60,17 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         setFilterProcessesUrl("/users/login");
     }
 
+    /**
+     * 인증을 시도하고, 사용자 자격 증명을 검증하여 {@link Authentication} 객체를 반환합니다.
+     * <p>
+     * 로그인 요청 DTO를 검증하고, {@code EmailUserDetailsService}를 통해 사용자 정보를 조회한 후 인증 토큰을 생성하여 인증을 시도합니다.
+     * </p>
+     *
+     * @param request  HTTP 요청 객체
+     * @param response HTTP 응답 객체
+     * @return 인증 성공 시 인증 객체, 실패 시 {@code null}
+     * @throws AuthenticationException 인증 실패 시 발생하는 예외
+     */
     @Override
     public Authentication attemptAuthentication(
         HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -89,7 +116,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
     }
 
-    // 로그인 요청 유효성 검증(Validation)
+    /**
+     * 로그인 요청 DTO의 유효성을 검증합니다.
+     *
+     * @param requestDto 검증할 {@link LoginRequestDto} 객체
+     * @return 유효하지 않은 필드가 있을 경우 오류 메시지, 유효한 경우 빈 문자열
+     */
     private String validateDto(LoginRequestDto requestDto) {
         Set<ConstraintViolation<LoginRequestDto>> violations = validator.validate(requestDto);
         if (!violations.isEmpty()) {
@@ -102,6 +134,16 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         return "";
     }
 
+    /**
+     * 인증 성공 시 호출되며, JWT 액세스 토큰과 리프레시 토큰을 생성하여 응답 헤더에 추가합니다.
+     *
+     * @param request    HTTP 요청 객체
+     * @param response   HTTP 응답 객체
+     * @param chain      필터 체인 객체
+     * @param authResult 인증 성공 결과 객체
+     * @throws IOException      입출력 예외
+     * @throws ServletException 서블릿 예외
+     */
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
         HttpServletResponse response, FilterChain chain, Authentication authResult)
@@ -124,7 +166,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         ResponseUtil.servletApi(response, HttpStatus.OK.value(), responseDto);
     }
 
-
+    /**
+     * 인증 실패 시 호출되며, 실패 메시지와 상태 코드를 응답으로 전송합니다.
+     *
+     * @param request  HTTP 요청 객체
+     * @param response HTTP 응답 객체
+     * @param failed   인증 실패 예외 객체
+     * @throws IOException      입출력 예외
+     * @throws ServletException 서블릿 예외
+     */
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request,
         HttpServletResponse response, AuthenticationException failed)

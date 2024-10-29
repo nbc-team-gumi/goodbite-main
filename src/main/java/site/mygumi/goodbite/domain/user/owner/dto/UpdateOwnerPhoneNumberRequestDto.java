@@ -4,6 +4,16 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
+
+/**
+ * 전화번호 수정 요청을 위한 DTO 클래스입니다.
+ * <p>사업자 회원의 전화번호를 수정할 때 사용됩니다.</p>
+ *
+ * <b>유효성 조건:</b>
+ * <ul>
+ *   <li>전화번호 형식: 010-0000-0000과 같은 형식이어야 함</li>
+ * </ul>
+ */
 @Getter
 public class UpdateOwnerPhoneNumberRequestDto {
 

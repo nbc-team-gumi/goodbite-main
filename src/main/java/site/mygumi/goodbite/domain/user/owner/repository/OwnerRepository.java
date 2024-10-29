@@ -1,14 +1,14 @@
 package site.mygumi.goodbite.domain.user.owner.repository;
 
-import site.mygumi.goodbite.domain.user.owner.entity.Owner;
-import site.mygumi.goodbite.exception.owner.OwnerErrorCode;
-import site.mygumi.goodbite.exception.owner.detail.DuplicateBusinessNumberException;
-import site.mygumi.goodbite.exception.owner.detail.DuplicateEmailException;
-import site.mygumi.goodbite.exception.owner.detail.DuplicateNicknameException;
-import site.mygumi.goodbite.exception.owner.detail.DuplicatePhoneNumberException;
-import site.mygumi.goodbite.exception.owner.detail.OwnerNotFoundException;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import site.mygumi.goodbite.domain.user.owner.entity.Owner;
+import site.mygumi.goodbite.domain.user.owner.exception.OwnerErrorCode;
+import site.mygumi.goodbite.domain.user.owner.exception.detail.DuplicateBusinessNumberException;
+import site.mygumi.goodbite.domain.user.owner.exception.detail.DuplicateEmailException;
+import site.mygumi.goodbite.domain.user.owner.exception.detail.DuplicateNicknameException;
+import site.mygumi.goodbite.domain.user.owner.exception.detail.DuplicatePhoneNumberException;
+import site.mygumi.goodbite.domain.user.owner.exception.detail.OwnerNotFoundException;
 
 public interface OwnerRepository extends JpaRepository<Owner, Long> {
 

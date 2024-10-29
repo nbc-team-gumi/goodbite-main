@@ -23,12 +23,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import site.mygumi.goodbite.exception.s3.S3ErrorCode;
-import site.mygumi.goodbite.exception.s3.detail.S3EmptyFileException;
-import site.mygumi.goodbite.exception.s3.detail.S3FileDeleteFailedException;
-import site.mygumi.goodbite.exception.s3.detail.S3FileUploadFailedException;
-import site.mygumi.goodbite.exception.s3.detail.S3InvalidFileExtensionException;
-import site.mygumi.goodbite.exception.s3.detail.S3InvalidS3UrlException;
+import site.mygumi.goodbite.common.external.s3.exception.S3ErrorCode;
+import site.mygumi.goodbite.common.external.s3.exception.detail.S3EmptyFileException;
+import site.mygumi.goodbite.common.external.s3.exception.detail.S3FileDeleteFailedException;
+import site.mygumi.goodbite.common.external.s3.exception.detail.S3FileUploadFailedException;
+import site.mygumi.goodbite.common.external.s3.exception.detail.S3InvalidFileExtensionException;
+import site.mygumi.goodbite.common.external.s3.exception.detail.S3InvalidS3UrlException;
 
 @Slf4j
 @RequiredArgsConstructor

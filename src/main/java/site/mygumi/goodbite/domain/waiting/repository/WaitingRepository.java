@@ -1,10 +1,5 @@
 package site.mygumi.goodbite.domain.waiting.repository;
 
-import site.mygumi.goodbite.domain.waiting.entity.Waiting;
-import site.mygumi.goodbite.exception.waiting.WaitingErrorCode;
-import site.mygumi.goodbite.exception.waiting.WaitingException;
-import site.mygumi.goodbite.exception.waiting.detail.WaitingCanNotDuplicatedException;
-import site.mygumi.goodbite.exception.waiting.detail.WaitingNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import site.mygumi.goodbite.domain.waiting.entity.Waiting;
+import site.mygumi.goodbite.domain.waiting.exception.WaitingErrorCode;
+import site.mygumi.goodbite.domain.waiting.exception.WaitingException;
+import site.mygumi.goodbite.domain.waiting.exception.detail.WaitingCanNotDuplicatedException;
+import site.mygumi.goodbite.domain.waiting.exception.detail.WaitingNotFoundException;
 
 public interface WaitingRepository extends JpaRepository<Waiting, Long> {
 

@@ -1,10 +1,10 @@
 package site.mygumi.goodbite.domain.restaurant.repository;
 
-import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
-import site.mygumi.goodbite.exception.restaurant.RestaurantErrorCode;
-import site.mygumi.goodbite.exception.restaurant.detail.RestaurantNotFoundException;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
+import site.mygumi.goodbite.domain.restaurant.exception.RestaurantErrorCode;
+import site.mygumi.goodbite.domain.restaurant.exception.detail.RestaurantNotFoundException;
 
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long>,
     RestaurantRepositoryCustom {

@@ -20,6 +20,9 @@ import site.mygumi.goodbite.domain.review.entity.WaitingReview;
 import site.mygumi.goodbite.domain.review.repository.ReservationReviewRepository;
 import site.mygumi.goodbite.domain.review.repository.WaitingReviewRepository;
 import site.mygumi.goodbite.domain.user.entity.UserCredentials;
+import site.mygumi.goodbite.domain.user.exception.UserErrorCode;
+import site.mygumi.goodbite.domain.user.exception.detail.PasswordMismatchException;
+import site.mygumi.goodbite.domain.user.exception.detail.SamePasswordException;
 import site.mygumi.goodbite.domain.user.owner.dto.OwnerResponseDto;
 import site.mygumi.goodbite.domain.user.owner.dto.OwnerSignUpRequestDto;
 import site.mygumi.goodbite.domain.user.owner.dto.UpdateBusinessNumberRequestDto;
@@ -28,15 +31,12 @@ import site.mygumi.goodbite.domain.user.owner.dto.UpdateOwnerPasswordRequestDto;
 import site.mygumi.goodbite.domain.user.owner.dto.UpdateOwnerPhoneNumberRequestDto;
 import site.mygumi.goodbite.domain.user.owner.entity.Owner;
 import site.mygumi.goodbite.domain.user.owner.entity.OwnerStatus;
+import site.mygumi.goodbite.domain.user.owner.exception.OwnerErrorCode;
+import site.mygumi.goodbite.domain.user.owner.exception.detail.InvalidBusinessNumberException;
+import site.mygumi.goodbite.domain.user.owner.exception.detail.OwnerAlreadyDeletedException;
 import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting;
 import site.mygumi.goodbite.domain.waiting.repository.WaitingRepository;
-import site.mygumi.goodbite.exception.owner.OwnerErrorCode;
-import site.mygumi.goodbite.exception.owner.detail.InvalidBusinessNumberException;
-import site.mygumi.goodbite.exception.owner.detail.OwnerAlreadyDeletedException;
-import site.mygumi.goodbite.exception.user.UserErrorCode;
-import site.mygumi.goodbite.exception.user.detail.PasswordMismatchException;
-import site.mygumi.goodbite.exception.user.detail.SamePasswordException;
 
 /**
  * 사업자 관련 서비스 클래스입니다.

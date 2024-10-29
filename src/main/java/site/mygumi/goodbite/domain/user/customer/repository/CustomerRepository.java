@@ -1,13 +1,13 @@
 package site.mygumi.goodbite.domain.user.customer.repository;
 
-import site.mygumi.goodbite.domain.user.customer.entity.Customer;
-import site.mygumi.goodbite.exception.customer.CustomerErrorCode;
-import site.mygumi.goodbite.exception.customer.detail.CustomerNotFoundException;
-import site.mygumi.goodbite.exception.customer.detail.DuplicateEmailException;
-import site.mygumi.goodbite.exception.customer.detail.DuplicateNicknameException;
-import site.mygumi.goodbite.exception.customer.detail.DuplicatePhoneNumberException;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import site.mygumi.goodbite.domain.user.customer.entity.Customer;
+import site.mygumi.goodbite.domain.user.customer.exception.CustomerErrorCode;
+import site.mygumi.goodbite.domain.user.customer.exception.detail.CustomerNotFoundException;
+import site.mygumi.goodbite.domain.user.customer.exception.detail.DuplicateEmailException;
+import site.mygumi.goodbite.domain.user.customer.exception.detail.DuplicateNicknameException;
+import site.mygumi.goodbite.domain.user.customer.exception.detail.DuplicatePhoneNumberException;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 

@@ -5,20 +5,20 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import site.mygumi.goodbite.auth.exception.AuthErrorCode;
+import site.mygumi.goodbite.auth.exception.AuthException;
 import site.mygumi.goodbite.domain.operatinghour.dto.CreateOperatingHourRequestDto;
 import site.mygumi.goodbite.domain.operatinghour.dto.OperatingHourResponseDto;
 import site.mygumi.goodbite.domain.operatinghour.dto.UpdateOperatingHourRequestDto;
 import site.mygumi.goodbite.domain.operatinghour.entity.OperatingHour;
+import site.mygumi.goodbite.domain.operatinghour.exception.OperatingHourErrorCode;
+import site.mygumi.goodbite.domain.operatinghour.exception.detail.OperatingHourDuplicatedException;
 import site.mygumi.goodbite.domain.operatinghour.repository.OperatingHourRepository;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import site.mygumi.goodbite.domain.restaurant.repository.RestaurantRepository;
 import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.domain.user.owner.entity.Owner;
 import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
-import site.mygumi.goodbite.exception.auth.AuthErrorCode;
-import site.mygumi.goodbite.exception.auth.AuthException;
-import site.mygumi.goodbite.exception.operatinghour.OperatingHourErrorCode;
-import site.mygumi.goodbite.exception.operatinghour.detail.OperatingHourDuplicatedException;
 
 
 /**

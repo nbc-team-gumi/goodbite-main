@@ -6,21 +6,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import site.mygumi.goodbite.auth.exception.AuthErrorCode;
+import site.mygumi.goodbite.auth.exception.AuthException;
 import site.mygumi.goodbite.common.external.s3.service.S3Service;
 import site.mygumi.goodbite.domain.restaurant.dto.RestaurantIdResponseDto;
 import site.mygumi.goodbite.domain.restaurant.dto.RestaurantRequestDto;
 import site.mygumi.goodbite.domain.restaurant.dto.RestaurantResponseDto;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import site.mygumi.goodbite.domain.restaurant.enums.Category;
+import site.mygumi.goodbite.domain.restaurant.exception.RestaurantErrorCode;
+import site.mygumi.goodbite.domain.restaurant.exception.detail.RestaurantCreateFailedException;
+import site.mygumi.goodbite.domain.restaurant.exception.detail.RestaurantUpdateFailedException;
 import site.mygumi.goodbite.domain.restaurant.repository.RestaurantRepository;
 import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.domain.user.owner.entity.Owner;
 import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
-import site.mygumi.goodbite.exception.auth.AuthErrorCode;
-import site.mygumi.goodbite.exception.auth.AuthException;
-import site.mygumi.goodbite.exception.restaurant.RestaurantErrorCode;
-import site.mygumi.goodbite.exception.restaurant.detail.RestaurantCreateFailedException;
-import site.mygumi.goodbite.exception.restaurant.detail.RestaurantUpdateFailedException;
 
 /**
  * 레스토랑 관련 비즈니스 로직을 처리하는 서비스 클래스입니다. 레스토랑 생성, 조회, 수정, 삭제 기능을 제공합니다.

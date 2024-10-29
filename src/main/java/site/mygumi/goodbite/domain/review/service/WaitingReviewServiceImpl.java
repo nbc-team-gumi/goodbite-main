@@ -4,21 +4,21 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import site.mygumi.goodbite.auth.exception.AuthErrorCode;
+import site.mygumi.goodbite.auth.exception.AuthException;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import site.mygumi.goodbite.domain.restaurant.repository.RestaurantRepository;
 import site.mygumi.goodbite.domain.review.dto.CreateWaitingReviewRequestDto;
 import site.mygumi.goodbite.domain.review.dto.ReviewResponseDto;
 import site.mygumi.goodbite.domain.review.dto.UpdateReviewRequestDto;
 import site.mygumi.goodbite.domain.review.entity.WaitingReview;
+import site.mygumi.goodbite.domain.review.exception.ReviewErrorCode;
+import site.mygumi.goodbite.domain.review.exception.detail.CanNotSubmitReviewException;
 import site.mygumi.goodbite.domain.review.repository.WaitingReviewRepository;
 import site.mygumi.goodbite.domain.user.customer.entity.Customer;
 import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting;
 import site.mygumi.goodbite.domain.waiting.repository.WaitingRepository;
-import site.mygumi.goodbite.exception.auth.AuthErrorCode;
-import site.mygumi.goodbite.exception.auth.AuthException;
-import site.mygumi.goodbite.exception.review.ReviewErrorCode;
-import site.mygumi.goodbite.exception.review.detail.CanNotSubmitReviewException;
 
 /**
  * 대기 리뷰 관련 비즈니스 로직을 처리하는 서비스 구현 클래스입니다. 리뷰 생성, 조회, 수정, 삭제 기능을 제공합니다.

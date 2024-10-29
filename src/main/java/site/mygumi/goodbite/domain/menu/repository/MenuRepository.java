@@ -1,12 +1,12 @@
 package site.mygumi.goodbite.domain.menu.repository;
 
-import site.mygumi.goodbite.domain.menu.entity.Menu;
-import site.mygumi.goodbite.exception.menu.MenuErrorCode;
-import site.mygumi.goodbite.exception.menu.detail.MenuNotFoundException;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import site.mygumi.goodbite.domain.menu.entity.Menu;
+import site.mygumi.goodbite.domain.menu.exception.MenuErrorCode;
+import site.mygumi.goodbite.domain.menu.exception.detail.MenuNotFoundException;
 
 public interface MenuRepository extends JpaRepository<Menu, Long> {
 

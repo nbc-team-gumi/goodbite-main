@@ -2,9 +2,17 @@ package site.mygumi.goodbite.domain.reservation.service;
 
 import static site.mygumi.goodbite.domain.reservation.entity.Reservation.RESERVATION_DURATION_HOUR;
 
-import site.mygumi.goodbite.domain.user.entity.UserCredentials;
-import site.mygumi.goodbite.domain.user.customer.entity.Customer;
-import site.mygumi.goodbite.domain.user.customer.repository.CustomerRepository;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import site.mygumi.goodbite.auth.exception.AuthErrorCode;
+import site.mygumi.goodbite.auth.exception.AuthException;
 import site.mygumi.goodbite.domain.menu.entity.Menu;
 import site.mygumi.goodbite.domain.menu.repository.MenuRepository;
 import site.mygumi.goodbite.domain.operatinghour.entity.OperatingHour;
@@ -15,24 +23,16 @@ import site.mygumi.goodbite.domain.reservation.dto.ReservationResponseDto;
 import site.mygumi.goodbite.domain.reservation.entity.Reservation;
 import site.mygumi.goodbite.domain.reservation.entity.ReservationMenu;
 import site.mygumi.goodbite.domain.reservation.entity.ReservationStatus;
+import site.mygumi.goodbite.domain.reservation.exception.ReservationErrorCode;
+import site.mygumi.goodbite.domain.reservation.exception.detail.DuplicateReservationException;
+import site.mygumi.goodbite.domain.reservation.exception.detail.InvalidReservationTimeException;
+import site.mygumi.goodbite.domain.reservation.exception.detail.MaxCapacityExceededException;
 import site.mygumi.goodbite.domain.reservation.repository.ReservationRepository;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import site.mygumi.goodbite.domain.restaurant.repository.RestaurantRepository;
-import site.mygumi.goodbite.exception.auth.AuthErrorCode;
-import site.mygumi.goodbite.exception.auth.AuthException;
-import site.mygumi.goodbite.exception.reservation.ReservationErrorCode;
-import site.mygumi.goodbite.exception.reservation.detail.DuplicateReservationException;
-import site.mygumi.goodbite.exception.reservation.detail.InvalidReservationTimeException;
-import site.mygumi.goodbite.exception.reservation.detail.MaxCapacityExceededException;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import site.mygumi.goodbite.domain.user.customer.entity.Customer;
+import site.mygumi.goodbite.domain.user.customer.repository.CustomerRepository;
+import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 
 @RequiredArgsConstructor
 @Service

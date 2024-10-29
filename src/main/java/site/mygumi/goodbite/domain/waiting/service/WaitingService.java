@@ -13,11 +13,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import site.mygumi.goodbite.aspect.lock.RedisLock;
+import site.mygumi.goodbite.auth.exception.AuthErrorCode;
+import site.mygumi.goodbite.auth.exception.AuthException;
+import site.mygumi.goodbite.common.aspect.lock.RedisLock;
 import site.mygumi.goodbite.domain.notification.controller.NotificationController;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import site.mygumi.goodbite.domain.restaurant.repository.RestaurantRepository;
 import site.mygumi.goodbite.domain.user.customer.entity.Customer;
+import site.mygumi.goodbite.domain.user.customer.exception.CustomerErrorCode;
+import site.mygumi.goodbite.domain.user.customer.exception.CustomerException;
 import site.mygumi.goodbite.domain.user.customer.repository.CustomerRepository;
 import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.domain.user.owner.entity.Owner;
@@ -27,14 +31,10 @@ import site.mygumi.goodbite.domain.waiting.dto.UpdateWaitingRequestDto;
 import site.mygumi.goodbite.domain.waiting.dto.WaitingResponseDto;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting.WaitingStatus;
+import site.mygumi.goodbite.domain.waiting.exception.WaitingErrorCode;
+import site.mygumi.goodbite.domain.waiting.exception.WaitingException;
+import site.mygumi.goodbite.domain.waiting.exception.detail.WaitingNotFoundException;
 import site.mygumi.goodbite.domain.waiting.repository.WaitingRepository;
-import site.mygumi.goodbite.exception.auth.AuthErrorCode;
-import site.mygumi.goodbite.exception.auth.AuthException;
-import site.mygumi.goodbite.exception.customer.CustomerErrorCode;
-import site.mygumi.goodbite.exception.customer.CustomerException;
-import site.mygumi.goodbite.exception.waiting.WaitingErrorCode;
-import site.mygumi.goodbite.exception.waiting.WaitingException;
-import site.mygumi.goodbite.exception.waiting.detail.WaitingNotFoundException;
 
 /**
  * 대기 관련 비즈니스 로직을 처리하는 서비스 클래스입니다. 대기 생성, 조회, 수정, 삭제 등 대기 상태와 관련된 다양한 기능을 제공합니다.

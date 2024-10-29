@@ -15,9 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import site.mygumi.goodbite.auth.security.util.ApiKeyEncoder;
 import site.mygumi.goodbite.domain.user.owner.dto.BusinessValidationRequestDto;
 import site.mygumi.goodbite.domain.user.owner.dto.BusinessValidationResponseDto;
-import site.mygumi.goodbite.security.util.ApiKeyEncoder;
 
 /**
  * 사업자 등록번호를 검증하는 서비스 클래스입니다.

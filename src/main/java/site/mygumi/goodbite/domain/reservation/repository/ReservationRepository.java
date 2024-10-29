@@ -1,14 +1,14 @@
 package site.mygumi.goodbite.domain.reservation.repository;
 
-import site.mygumi.goodbite.domain.reservation.entity.Reservation;
-import site.mygumi.goodbite.domain.reservation.entity.ReservationStatus;
-import site.mygumi.goodbite.exception.reservation.ReservationErrorCode;
-import site.mygumi.goodbite.exception.reservation.detail.ReservationNotFoundException;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import site.mygumi.goodbite.domain.reservation.entity.Reservation;
+import site.mygumi.goodbite.domain.reservation.entity.ReservationStatus;
+import site.mygumi.goodbite.domain.reservation.exception.ReservationErrorCode;
+import site.mygumi.goodbite.domain.reservation.exception.detail.ReservationNotFoundException;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 

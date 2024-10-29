@@ -13,15 +13,15 @@ import site.mygumi.goodbite.domain.user.customer.dto.UpdateNicknameRequestDto;
 import site.mygumi.goodbite.domain.user.customer.dto.UpdatePasswordRequestDto;
 import site.mygumi.goodbite.domain.user.customer.dto.UpdatePhoneNumberRequestDto;
 import site.mygumi.goodbite.domain.user.customer.entity.Customer;
+import site.mygumi.goodbite.domain.user.customer.exception.CustomerErrorCode;
+import site.mygumi.goodbite.domain.user.customer.exception.detail.CustomerAlreadyDeletedException;
 import site.mygumi.goodbite.domain.user.customer.repository.CustomerRepository;
 import site.mygumi.goodbite.domain.user.entity.UserCredentials;
+import site.mygumi.goodbite.domain.user.exception.UserErrorCode;
+import site.mygumi.goodbite.domain.user.exception.detail.PasswordMismatchException;
+import site.mygumi.goodbite.domain.user.exception.detail.SamePasswordException;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting;
 import site.mygumi.goodbite.domain.waiting.repository.WaitingRepository;
-import site.mygumi.goodbite.exception.customer.CustomerErrorCode;
-import site.mygumi.goodbite.exception.customer.detail.CustomerAlreadyDeletedException;
-import site.mygumi.goodbite.exception.user.UserErrorCode;
-import site.mygumi.goodbite.exception.user.detail.PasswordMismatchException;
-import site.mygumi.goodbite.exception.user.detail.SamePasswordException;
 
 /**
  * 고객 관련 서비스 클래스입니다.

@@ -27,6 +27,11 @@ import site.mygumi.goodbite.exception.auth.AuthErrorCode;
 import site.mygumi.goodbite.exception.auth.detail.InvalidRefreshTokenException;
 import site.mygumi.goodbite.security.util.JwtUtil;
 
+/**
+ * 사용자의 인증 인가 처리 요청을 수행하는 클래스입니다. 이 클래스는 토큰 리프레시, 카카오 콜백 처리 등의 메서드를 포함하고 있습니다.
+ *
+ * @author a-white-bit
+ */
 @Slf4j(topic = "AuthService")
 @Service
 @RequiredArgsConstructor
@@ -37,14 +42,19 @@ public class AuthService {
     private final OwnerRepository ownerRepository;
     private final Dotenv dotenv;
 
+    /**
+     * 사용자 리프레시 토큰이 유효한지 검증하고 액세스 토큰을 재발급합니다. 만료되거나, 존재하지 않는 경우 토큰 재발급이 불가능합니다.
+     *
+     * @param request  서블릿 요청 객체
+     * @param response 서블릿 응답 객체
+     * @throws UnsupportedEncodingException 토큰 문자열이 인코딩 불가능한 경우
+     * @throws InvalidRefreshTokenException 리프레시 토큰 유효 검증 실패
+     */
     public void updateAccessToken(HttpServletRequest request,
         HttpServletResponse response) throws UnsupportedEncodingException {
         String refreshToken = JwtUtil.getRefreshTokenFromRequest(request);
 
-        // 리프레시 토큰이 만료되거나 존재하지 않습니다.
-        // 액세스 토큰 재발급 불가
-        // 재로그인 요청
-
+        // 유효성 검증
         if (refreshToken == null || !JwtUtil.isTokenValid(refreshToken)) {
             if (refreshToken != null) {
                 JwtUtil.deleteAccessTokenFromCookie(response);
@@ -61,9 +71,20 @@ public class AuthService {
         JwtUtil.addJwtToHeader(newAccessToken, response);
     }
 
+    /**
+     * 카카오 서버로부터 받은 인가 코드를 전달 후 인증 처리 및 JWT 반환합니다.
+     *
+     * @param code     카카오 로그인 API 요청 코드
+     * @param isOwner  true: owner, false: customer
+     * @param response 서블릿 응답 객체
+     * @return 사용자 카카오 닉네임, 이메일
+     * @throws JsonProcessingException      직렬화/역직렬화 등의 JSON 처리 발생 예외
+     * @throws UnsupportedEncodingException 토큰 문자열이 인코딩 불가능한 경우
+     */
     public KakaoUserResponseDto kakaoLogin(String code, Boolean isOwner,
         HttpServletResponse response)
         throws JsonProcessingException, UnsupportedEncodingException {
+
         // 카카오 액세스 토큰 요청
         String kakaoAccessToken = getToken(code);
 
@@ -91,8 +112,15 @@ public class AuthService {
         return userResponseDto;
     }
 
+    /**
+     * 카카오 서버로부터 받은 인가 코드로 액세스 토큰을 생성합니다. 구성해야하는 HTTP 구성 정보는 https://developers.kakao.com/ 에서 확인할 수
+     * 있습니다.
+     *
+     * @param code 카카오 로그인 API 요청 코드
+     * @return 카카오 로그인 액세스 토큰
+     * @throws JsonProcessingException 직렬화/역직렬화 등의 JSON 처리 발생 예외
+     */
     private String getToken(String code) throws JsonProcessingException {
-        // 구성해야하는 HTTP 구성 정보는 https://developers.kakao.com/ 에서 확인
 
         // 요청 URL
         URI uri = UriComponentsBuilder
@@ -129,8 +157,16 @@ public class AuthService {
         return jsonNode.get("access_token").asText();
     }
 
+    /**
+     * 카카오 로그인 액세스 토큰으로 카카오 서버에게 사용자 정보를 요청합니다.
+     *
+     * @param accessToken 카카오 로그인 액세스 토큰
+     * @return 사용자 카카오 닉네임, 이메일
+     * @throws JsonProcessingException 직렬화/역직렬화 등의 JSON 처리 발생 예외
+     */
     private KakaoUserResponseDto getKakaoUserInfo(String accessToken)
         throws JsonProcessingException {
+
         // 요청 URL
         URI uri = UriComponentsBuilder
             .fromUriString("https://kapi.kakao.com")

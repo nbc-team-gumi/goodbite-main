@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ dev ]
+    branches: [ no-dotenv ]
 
 env:
   DOCKER_IMAGE_TAG_NAME: good-bite

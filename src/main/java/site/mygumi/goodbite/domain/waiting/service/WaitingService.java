@@ -241,7 +241,7 @@ public class WaitingService {
             pageable);
 
         List<WaitingResponseDto> waitingResponseDtos = waitingPage.stream()
-            .map(this::convertToDto).toList();
+            .map(WaitingResponseDto::from).toList();
         return new PageImpl<>(waitingResponseDtos, pageable, waitingPage.getTotalElements());
     }
 
@@ -266,18 +266,8 @@ public class WaitingService {
             sortedPageable);
 
         List<WaitingResponseDto> waitingResponseDtos = waitingPage.stream()
-            .map(this::convertToDto).toList();
+            .map(WaitingResponseDto::from).toList();
         return new PageImpl<>(waitingResponseDtos, sortedPageable, waitingPage.getTotalElements());
-    }
-
-    /**
-     * Waiting 엔티티를 WaitingResponseDto로 변환합니다.
-     *
-     * @param waiting 변환할 Waiting 엔티티
-     * @return 변환된 WaitingResponseDto
-     */
-    private WaitingResponseDto convertToDto(Waiting waiting) {
-        return WaitingResponseDto.from(waiting);
     }
 
     /**

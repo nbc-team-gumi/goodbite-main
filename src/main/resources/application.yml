@@ -9,7 +9,7 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
-        use_sql_comments: trueF
+        use_sql_comments: true
         dialect: org.hibernate.dialect.MySQLDialect
     open-in-view: false
   
@@ -36,5 +36,3 @@ server:
 logging:
   level:
     root: INFO
-    org.springframework: INFO
-    com.sparta.goodbite.aspect: DEBUG

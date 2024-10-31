@@ -15,22 +15,53 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import site.mygumi.goodbite.auth.security.util.ApiKeyEncoder;
 import site.mygumi.goodbite.domain.user.owner.dto.BusinessValidationRequestDto;
 import site.mygumi.goodbite.domain.user.owner.dto.BusinessValidationResponseDto;
-import site.mygumi.goodbite.security.util.ApiKeyEncoder;
 
+/**
+ * 사업자 등록번호를 검증하는 서비스 클래스입니다.
+ * <p>
+ * 사업자 등록번호를 외부 API를 통해 검증하며, API 요청과 응답 처리를 담당합니다.
+ * </p>
+ * <b>주요 기능:</b>
+ * <ul>
+ *   <li>API 요청 URL 생성 및 HTTP 요청</li>
+ *   <li>API 응답 파싱 및 유효성 확인</li>
+ * </ul>
+ *
+ * @author Kang Hyun Ji / Qwen
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BusinessVerificationService {
 
     // 클래스 내부에서 사용할 의존성을 정의
+    /**
+     * 외부 API 호출을 위한 RestTemplate 인스턴스
+     */
     private final RestTemplate restTemplate;
+    /**
+     * 외부 API에 접근하기 위한 공개 API 키
+     */
     private final String publicDataApiKey;
+    /**
+     * 외부 API의 URL
+     */
     private final String publicDataApiUrl;
+    /**
+     * JSON 직렬화 및 역직렬화를 위한 ObjectMapper 인스턴스
+     */
     private final ObjectMapper objectMapper;
 
-    // 사업자 번호 검증 메서드 정의
+    /**
+     * 주어진 사업자 번호의 유효성을 검증하는 메서드입니다.
+     * <p>외부 API에 HTTP 요청을 보내고, 응답 상태와 사업자 상태 코드를 확인하여 유효성을 판단합니다.</p>
+     *
+     * @param businessNumber 검증할 사업자 번호
+     * @return 사업자 번호가 유효하면 true, 그렇지 않으면 false
+     */
     public boolean verifyBusinessNumber(String businessNumber) {
         try {
             // ApiKeyEncoder.encodeApiKey를 이용해 API 키 인코딩

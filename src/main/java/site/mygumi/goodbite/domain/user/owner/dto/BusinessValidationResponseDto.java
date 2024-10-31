@@ -5,10 +5,21 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-/*
-- API 응답이 중첩된 구조를 가지고 있어서 DTO 내에 static 클래스를 사용하여 이러한 중첩 구조를 표현하여 API 응답의 계층 구조를 명확히 나타냄
-- 내부 클래스는 해당 DTO 내에서만 사용됨
-- BusinessData클래스는 BusinessValidationResponseDto의 일부임을 나타내기 위해
+/**
+ * 사업자 번호 유효성 검증 API 응답을 처리하기 위한 DTO 클래스입니다.
+ * <p>
+ * API 응답 구조가 중첩된 형태이므로 내부에 `BusinessData` 클래스를 정의하여 중첩된 응답 데이터를 처리하고 계층 구조를 명확히 표현합니다.
+ * </p>
+ *
+ * <b>주요 필드:</b>
+ * <ul>
+ *   <li>statusCode: 응답 상태 코드</li>
+ *   <li>matchCount: 일치하는 사업자 번호의 개수</li>
+ *   <li>requestCount: 요청된 사업자 번호의 개수</li>
+ *   <li>data: 사업자 정보 데이터를 담고 있는 리스트</li>
+ * </ul>
+ *
+ * @author Kang Hyun Ji / Qwen
  */
 @Getter
 @Setter

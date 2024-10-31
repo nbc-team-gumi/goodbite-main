@@ -1,17 +1,5 @@
 package site.mygumi.goodbite.domain.user.owner.controller;
 
-import site.mygumi.goodbite.domain.user.owner.dto.OwnerResponseDto;
-import site.mygumi.goodbite.domain.user.owner.dto.OwnerSignUpRequestDto;
-import site.mygumi.goodbite.domain.user.owner.dto.UpdateBusinessNumberRequestDto;
-import site.mygumi.goodbite.domain.user.owner.dto.UpdateOwnerNicknameRequestDto;
-import site.mygumi.goodbite.domain.user.owner.dto.UpdateOwnerPasswordRequestDto;
-import site.mygumi.goodbite.domain.user.owner.dto.UpdateOwnerPhoneNumberRequestDto;
-import site.mygumi.goodbite.domain.user.owner.service.BusinessVerificationService;
-import site.mygumi.goodbite.domain.user.owner.service.OwnerService;
-import site.mygumi.goodbite.domain.user.entity.EmailUserDetails;
-import site.mygumi.goodbite.common.response.DataResponseDto;
-import site.mygumi.goodbite.common.response.MessageResponseDto;
-import site.mygumi.goodbite.common.response.ResponseUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +11,34 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import site.mygumi.goodbite.common.response.DataResponseDto;
+import site.mygumi.goodbite.common.response.MessageResponseDto;
+import site.mygumi.goodbite.common.response.ResponseUtil;
+import site.mygumi.goodbite.domain.user.entity.EmailUserDetails;
+import site.mygumi.goodbite.domain.user.owner.dto.OwnerResponseDto;
+import site.mygumi.goodbite.domain.user.owner.dto.OwnerSignUpRequestDto;
+import site.mygumi.goodbite.domain.user.owner.dto.UpdateBusinessNumberRequestDto;
+import site.mygumi.goodbite.domain.user.owner.dto.UpdateOwnerNicknameRequestDto;
+import site.mygumi.goodbite.domain.user.owner.dto.UpdateOwnerPasswordRequestDto;
+import site.mygumi.goodbite.domain.user.owner.dto.UpdateOwnerPhoneNumberRequestDto;
+import site.mygumi.goodbite.domain.user.owner.service.BusinessVerificationService;
+import site.mygumi.goodbite.domain.user.owner.service.OwnerService;
 
+/**
+ * 사업자 회원 관련 API를 제공하는 컨트롤러입니다.
+ * <p>
+ * 회원가입, 회원정보 조회 및 수정, 회원 탈퇴 등의 작업을 처리합니다.
+ * </p>
+ *
+ * <b>주요 기능:</b>
+ * <ul>
+ *   <li>사업자 회원가입</li>
+ *   <li>회원 정보 조회 및 수정 (닉네임, 전화번호, 사업자번호, 비밀번호)</li>
+ *   <li>회원 탈퇴</li>
+ * </ul>
+ *
+ * @author Kang Hyun Ji / Qwen
+ */
 @RestController
 @RequestMapping("/owners")
 @RequiredArgsConstructor
@@ -35,8 +50,9 @@ public class OwnerController {
 
     /**
      * 회원가입 API
+     * <p>요청된 회원가입 정보를 처리하여 신규 사업자를 등록합니다.</p>
      *
-     * @param requestDto 회원가입 내용
+     * @param requestDto 회원가입 요청 데이터를 담은 DTO
      * @return 성공 메시지를 담은 ResponseEntity
      */
     @PostMapping("/signup")
@@ -87,9 +103,11 @@ public class OwnerController {
 
 
     /**
-     * 회원정보조회 API
+     * 회원정보 조회 API
+     * <p>인증된 사용자의 회원 정보를 조회합니다.</p>
      *
-     * @return ResponseEntity
+     * @param userDetails 인증된 사용자 정보를 담고 있는 객체
+     * @return 회원 정보를 담은 ResponseEntity
      */
     @GetMapping
     public ResponseEntity<DataResponseDto<OwnerResponseDto>> getOwner(
@@ -99,9 +117,11 @@ public class OwnerController {
     }
 
     /**
-     * 회원정보수정(닉네임) API
+     * 회원정보 수정 (닉네임) API
+     * <p>요청된 새로운 닉네임으로 사용자 정보를 수정합니다.</p>
      *
-     * @param requestDto 새로운 닉네임을 담은 DTO
+     * @param requestDto  새로운 닉네임을 담은 DTO
+     * @param userDetails 인증된 사용자 정보를 담고 있는 객체
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
     @PatchMapping("/nickname")
@@ -113,9 +133,11 @@ public class OwnerController {
     }
 
     /**
-     * 회원정보수정(전화번호) API
+     * 회원정보 수정 (전화번호) API
+     * <p>요청된 새로운 전화번호로 사용자 정보를 수정합니다.</p>
      *
-     * @param requestDto 새로운 전화번호를 담은 DTO
+     * @param requestDto  새로운 전화번호를 담은 DTO
+     * @param userDetails 인증된 사용자 정보를 담고 있는 객체
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
     @PatchMapping("/phone-number")
@@ -127,9 +149,11 @@ public class OwnerController {
     }
 
     /**
-     * 회원정보수정(사업자번호) API
+     * 회원정보 수정 (사업자번호) API
+     * <p>요청된 새로운 사업자번호로 사용자 정보를 수정합니다.</p>
      *
-     * @param requestDto 새로운 사업자번호을 담은 DTO
+     * @param requestDto  새로운 사업자번호를 담은 DTO
+     * @param userDetails 인증된 사용자 정보를 담고 있는 객체
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
     @PatchMapping("/business-number")
@@ -141,9 +165,11 @@ public class OwnerController {
     }
 
     /**
-     * 회원정보수정(비밀번호) API
+     * 회원정보 수정 (비밀번호) API
+     * <p>요청된 새로운 비밀번호로 사용자 비밀번호를 수정합니다.</p>
      *
-     * @param requestDto 새로운 비밀번호를 담은 DTO
+     * @param requestDto  새로운 비밀번호를 담은 DTO
+     * @param userDetails 인증된 사용자 정보를 담고 있는 객체
      * @return 업데이트 성공 메시지를 담은 ResponseEntity
      */
     @PatchMapping("/password")
@@ -155,8 +181,10 @@ public class OwnerController {
     }
 
     /**
-     * 회원탈퇴 API
+     * 회원 탈퇴 API
+     * <p>인증된 사용자의 계정을 탈퇴 처리합니다.</p>
      *
+     * @param userDetails 인증된 사용자 정보를 담고 있는 객체
      * @return 성공 메시지를 담은 ResponseEntity
      */
     @DeleteMapping

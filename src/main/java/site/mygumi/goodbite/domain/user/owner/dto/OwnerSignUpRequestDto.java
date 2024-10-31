@@ -6,6 +6,19 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
+/**
+ * 사업자 회원가입 요청을 위한 DTO 클래스입니다.
+ * <p>사업자 회원가입 시 필요한 정보(이메일, 닉네임, 비밀번호, 전화번호, 사업자번호)를 포함하며, 각 필드는 유효성 검사를 거칩니다.</p>
+ *
+ * <b>유효성 조건:</b>
+ * <ul>
+ *   <li>이메일: 유효한 이메일 형식이어야 합니다.</li>
+ *   <li>닉네임: 2자 이상 20자 이하, 숫자만으로 구성될 수 없습니다.</li>
+ *   <li>비밀번호: 8~15자 길이로 알파벳 대소문자, 숫자, 특수문자를 포함해야 합니다.</li>
+ *   <li>전화번호: "010-0000-0000"과 같은 형식을 가져야 합니다.</li>
+ *   <li>사업자번호: 10자리 숫자여야 합니다.</li>
+ * </ul>
+ */
 @Getter
 public class OwnerSignUpRequestDto {
 

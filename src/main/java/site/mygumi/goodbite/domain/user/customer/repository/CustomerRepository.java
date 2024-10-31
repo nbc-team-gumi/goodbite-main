@@ -3,11 +3,11 @@ package site.mygumi.goodbite.domain.user.customer.repository;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import site.mygumi.goodbite.domain.user.customer.entity.Customer;
-import site.mygumi.goodbite.exception.customer.CustomerErrorCode;
-import site.mygumi.goodbite.exception.customer.detail.CustomerNotFoundException;
-import site.mygumi.goodbite.exception.customer.detail.DuplicateEmailException;
-import site.mygumi.goodbite.exception.customer.detail.DuplicateNicknameException;
-import site.mygumi.goodbite.exception.customer.detail.DuplicatePhoneNumberException;
+import site.mygumi.goodbite.domain.user.customer.exception.CustomerErrorCode;
+import site.mygumi.goodbite.domain.user.customer.exception.detail.CustomerNotFoundException;
+import site.mygumi.goodbite.domain.user.customer.exception.detail.DuplicateEmailException;
+import site.mygumi.goodbite.domain.user.customer.exception.detail.DuplicateNicknameException;
+import site.mygumi.goodbite.domain.user.customer.exception.detail.DuplicatePhoneNumberException;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
@@ -25,19 +25,19 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     }
 
     default void validateDuplicateNickname(String nickname) {
-        findByNickname(nickname).ifPresent(ignored -> {
+        findByNickname(nickname).ifPresent(_customer -> {
             throw new DuplicateNicknameException(CustomerErrorCode.DUPLICATE_NICKNAME);
         });
     }
 
     default void validateDuplicateEmail(String email) {
-        findByEmail(email).ifPresent(ignored -> {
+        findByEmail(email).ifPresent(_customer -> {
             throw new DuplicateEmailException(CustomerErrorCode.DUPLICATE_EMAIL);
         });
     }
 
     default void validateDuplicatePhoneNumber(String phoneNumber) {
-        findByPhoneNumber(phoneNumber).ifPresent(ignored -> {
+        findByPhoneNumber(phoneNumber).ifPresent(_customer -> {
             throw new DuplicatePhoneNumberException(CustomerErrorCode.DUPLICATE_PHONE_NUMBER);
         });
     }

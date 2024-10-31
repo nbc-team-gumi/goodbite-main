@@ -20,6 +20,9 @@ import site.mygumi.goodbite.domain.review.entity.WaitingReview;
 import site.mygumi.goodbite.domain.review.repository.ReservationReviewRepository;
 import site.mygumi.goodbite.domain.review.repository.WaitingReviewRepository;
 import site.mygumi.goodbite.domain.user.entity.UserCredentials;
+import site.mygumi.goodbite.domain.user.exception.UserErrorCode;
+import site.mygumi.goodbite.domain.user.exception.detail.PasswordMismatchException;
+import site.mygumi.goodbite.domain.user.exception.detail.SamePasswordException;
 import site.mygumi.goodbite.domain.user.owner.dto.OwnerResponseDto;
 import site.mygumi.goodbite.domain.user.owner.dto.OwnerSignUpRequestDto;
 import site.mygumi.goodbite.domain.user.owner.dto.UpdateBusinessNumberRequestDto;
@@ -28,16 +31,28 @@ import site.mygumi.goodbite.domain.user.owner.dto.UpdateOwnerPasswordRequestDto;
 import site.mygumi.goodbite.domain.user.owner.dto.UpdateOwnerPhoneNumberRequestDto;
 import site.mygumi.goodbite.domain.user.owner.entity.Owner;
 import site.mygumi.goodbite.domain.user.owner.entity.OwnerStatus;
+import site.mygumi.goodbite.domain.user.owner.exception.OwnerErrorCode;
+import site.mygumi.goodbite.domain.user.owner.exception.detail.InvalidBusinessNumberException;
+import site.mygumi.goodbite.domain.user.owner.exception.detail.OwnerAlreadyDeletedException;
 import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting;
 import site.mygumi.goodbite.domain.waiting.repository.WaitingRepository;
-import site.mygumi.goodbite.exception.owner.OwnerErrorCode;
-import site.mygumi.goodbite.exception.owner.detail.InvalidBusinessNumberException;
-import site.mygumi.goodbite.exception.owner.detail.OwnerAlreadyDeletedException;
-import site.mygumi.goodbite.exception.user.UserErrorCode;
-import site.mygumi.goodbite.exception.user.detail.PasswordMismatchException;
-import site.mygumi.goodbite.exception.user.detail.SamePasswordException;
 
+/**
+ * 사업자 관련 서비스 클래스입니다.
+ * <p>
+ * 사업자 회원가입, 조회, 정보 수정(닉네임, 전화번호, 사업자번호, 비밀번호), 탈퇴 등을 담당하며, {@link OwnerRepository}를 통해 데이터베이스와
+ * 상호작용하여 각 작업을 처리합니다.
+ * </p>
+ * <b>주요 기능:</b>
+ * <ul>
+ *   <li>사업자 회원가입 및 사업자번호 유효성 검사</li>
+ *   <li>사업자 정보 조회 및 정보 수정</li>
+ *   <li>사업자 탈퇴 및 관련 데이터 삭제</li>
+ * </ul>
+ *
+ * @author Kang Hyun Ji / Qwen
+ */
 @Service
 @RequiredArgsConstructor
 public class OwnerService {
@@ -54,7 +69,13 @@ public class OwnerService {
     private final WaitingReviewRepository waitingReviewRepository;
     private final S3Service s3Service;
 
-    //가입
+    /**
+     * 사업자 회원가입 메서드입니다.
+     * <p>사업자 등록번호 유효성 검사와 중복 필드 검증을 거친 후, 암호화된 비밀번호로 회원 정보를 저장합니다.</p>
+     *
+     * @param requestDto 사업자 가입 요청 데이터를 담은 DTO
+     * @throws InvalidBusinessNumberException 사업자 등록번호가 유효하지 않을 때 발생
+     */
     @Transactional
     public void signup(OwnerSignUpRequestDto requestDto) {
         validateDuplicateFields(requestDto.getNickname(), requestDto.getEmail(),
@@ -88,14 +109,24 @@ public class OwnerService {
     }
 
 
-    //조회
+    /**
+     * 사업자 정보를 조회하는 메서드입니다.
+     *
+     * @param user 인증된 사용자 정보
+     * @return 조회된 사업자 정보를 담은 {@link OwnerResponseDto}
+     */
     @Transactional(readOnly = true)
     public OwnerResponseDto getOwner(UserCredentials user) {
         Owner owner = (Owner) user;
         return OwnerResponseDto.from(ownerRepository.findByIdOrThrow(owner.getId()));
     }
 
-    // 수정-닉네임
+    /**
+     * 닉네임을 수정하는 메서드입니다.
+     *
+     * @param requestDto 새로운 닉네임을 담은 DTO
+     * @param user       인증된 사용자 정보
+     */
     @Transactional
     public void updateNickname(UpdateOwnerNicknameRequestDto requestDto,
         UserCredentials user) {
@@ -106,7 +137,12 @@ public class OwnerService {
         ownerRepository.save(owner);
     }
 
-    //수정-전화번호
+    /**
+     * 전화번호를 수정하는 메서드입니다.
+     *
+     * @param requestDto 새로운 전화번호를 담은 DTO
+     * @param user       인증된 사용자 정보
+     */
     @Transactional
     public void updatePhoneNumber(UpdateOwnerPhoneNumberRequestDto requestDto,
         UserCredentials user) {
@@ -118,7 +154,14 @@ public class OwnerService {
     }
 
 
-    // 수정-사업자번호
+    /**
+     * 사업자 등록번호를 수정하는 메서드입니다.
+     * <p>등록번호 유효성 검사와 중복 여부 검증을 통해 인증된 사업자 상태로 업데이트합니다.</p>
+     *
+     * @param requestDto 새로운 사업자 등록번호를 담은 DTO
+     * @param user       인증된 사용자 정보
+     * @throws InvalidBusinessNumberException 유효하지 않은 사업자 등록번호일 때 발생
+     */
     @Transactional
     public void updateBusinessNumber(UpdateBusinessNumberRequestDto requestDto,
         UserCredentials user) {
@@ -147,7 +190,15 @@ public class OwnerService {
 
     }
 
-    // 수정-비밀번호
+    /**
+     * 비밀번호를 수정하는 메서드입니다.
+     * <p>현재 비밀번호 확인 후 새 비밀번호를 암호화하여 저장합니다.</p>
+     *
+     * @param requestDto 현재 비밀번호와 새 비밀번호를 담은 DTO
+     * @param user       인증된 사용자 정보
+     * @throws PasswordMismatchException 현재 비밀번호가 일치하지 않는 경우 발생
+     * @throws SamePasswordException     새 비밀번호가 기존 비밀번호와 동일한 경우 발생
+     */
     @Transactional
     public void updatePassword(
         UpdateOwnerPasswordRequestDto requestDto, UserCredentials user) {
@@ -172,7 +223,13 @@ public class OwnerService {
         ownerRepository.save(owner);
     }
 
-    //삭제
+    /**
+     * 사업자 계정을 삭제하는 메서드입니다.
+     * <p>계정의 소프트 삭제 처리 및 연관된 레스토랑과 관련 데이터를 모두 삭제합니다.</p>
+     *
+     * @param user 인증된 사용자 정보
+     * @throws OwnerAlreadyDeletedException 이미 삭제된 사용자일 때 발생
+     */
     @Transactional
     public void deleteOwner(UserCredentials user) {
         Owner owner = (Owner) user;
@@ -223,7 +280,14 @@ public class OwnerService {
         }
     }
 
-    // 중복 필드 검증 메서드
+    /**
+     * 가입 시 닉네임, 이메일, 전화번호, 사업자번호 중복 여부를 검증하는 메서드입니다.
+     *
+     * @param nickname       닉네임
+     * @param email          이메일
+     * @param phoneNumber    전화번호
+     * @param businessNumber 사업자번호
+     */
     private void validateDuplicateFields(String nickname, String email, String phoneNumber,
         String businessNumber) {
         ownerRepository.validateDuplicateNickname(nickname);

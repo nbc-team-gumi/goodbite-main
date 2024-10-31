@@ -1,6 +1,5 @@
 package site.mygumi.goodbite.domain.waiting.service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,7 +25,7 @@ import site.mygumi.goodbite.domain.user.customer.repository.CustomerRepository;
 import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.domain.user.owner.entity.Owner;
 import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
-import site.mygumi.goodbite.domain.waiting.dto.PostWaitingRequestDto;
+import site.mygumi.goodbite.domain.waiting.dto.CreateWaitingRequestDto;
 import site.mygumi.goodbite.domain.waiting.dto.UpdateWaitingRequestDto;
 import site.mygumi.goodbite.domain.waiting.dto.WaitingResponseDto;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting;
@@ -55,17 +54,17 @@ public class WaitingService {
     /**
      * 새로운 대기 요청을 생성합니다.
      *
-     * @param user                  대기 요청을 생성하는 사용자의 인증 정보
-     * @param postWaitingRequestDto 대기 요청 정보를 담은 DTO
+     * @param createWaitingRequestDto 대기 요청 정보를 담은 DTO
+     * @param user                    대기 요청을 생성하는 사용자의 인증 정보
      * @return 생성된 대기 정보를 담은 DTO
      */
     @RedisLock(key = "createWaitingLock")
     @Transactional
-    public WaitingResponseDto createWaiting(UserCredentials user,
-        PostWaitingRequestDto postWaitingRequestDto) {
+    public WaitingResponseDto createWaiting(CreateWaitingRequestDto createWaitingRequestDto,
+        UserCredentials user) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
-            postWaitingRequestDto.getRestaurantId());
+            createWaitingRequestDto.getRestaurantId());
 
         Customer customer = customerRepository.findByIdOrThrow(user.getId());
 
@@ -79,43 +78,43 @@ public class WaitingService {
             customer,
             LastOrderNumber + 1,
             WaitingStatus.WAITING, // 생성 시 무조건 Waiting
-            postWaitingRequestDto.getPartySize(),
-            postWaitingRequestDto.getWaitingType(),
-            postWaitingRequestDto.getDemand());
+            createWaitingRequestDto.getPartySize(),
+            createWaitingRequestDto.getWaitingType(),
+            createWaitingRequestDto.getDemand());
 
         waitingRepository.save(waiting);
 
         String message = "새로운 웨이팅이 등록되었습니다.";
         notificationController.notifyOwner(restaurant.getId().toString(), message);
 
-        return WaitingResponseDto.of(waiting);
+        return WaitingResponseDto.from(waiting);
     }
 
     /**
      * 특정 ID의 대기 정보를 조회합니다.
      *
-     * @param user      대기 정보를 조회하는 사용자의 인증 정보
      * @param waitingId 조회할 대기의 ID
+     * @param user      대기 정보를 조회하는 사용자의 인증 정보
      * @return 조회된 대기 정보를 담은 DTO
      */
     @Transactional(readOnly = true)
-    public WaitingResponseDto getWaiting(UserCredentials user, Long waitingId) {
+    public WaitingResponseDto getWaiting(Long waitingId, UserCredentials user) {
 
         validateWaitingRequest(user, waitingId);
 
         Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
-        return WaitingResponseDto.of(waiting);
+        return WaitingResponseDto.from(waiting);
     }
 
     /**
      * 특정 레스토랑의 모든 대기 순서를 하나씩 줄입니다.
      *
-     * @param user         요청하는 사용자의 인증 정보
      * @param restaurantId 대기 순서를 줄일 레스토랑의 ID
+     * @param user         요청하는 사용자의 인증 정보
      * @throws AuthException 사용자가 해당 작업에 권한이 없는 경우 발생합니다.
      */
     @Transactional
-    public void reduceAllWaitingOrders(UserCredentials user, Long restaurantId) {
+    public void reduceAllWaitingOrders(Long restaurantId, UserCredentials user) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
 
@@ -129,7 +128,7 @@ public class WaitingService {
 
         List<Waiting> waitingArrayList = new ArrayList<>();
         for (Waiting waiting : waitingList) {
-            waiting.reduceWaitingOrder();
+            waiting.decrementWaitingOrder();
             if (waiting.getWaitingOrder() == 0) {
 
                 //--------------
@@ -138,7 +137,7 @@ public class WaitingService {
                 String message = "손님, 가게로 입장해 주세요.";
                 notificationController.notifyCustomer(waiting.getId().toString(), message);
 //                waitingRepository.delete(waiting);
-                waiting.delete(LocalDateTime.now(), WaitingStatus.SEATED);
+                waiting.seat();
             } else {
                 waitingArrayList.add(waiting);
             }
@@ -152,11 +151,11 @@ public class WaitingService {
     /**
      * 특정 대기 요청을 삭제하고 뒤의 대기 순서를 줄입니다.
      *
-     * @param user      요청하는 사용자의 인증 정보
      * @param waitingId 삭제할 대기의 ID
+     * @param user      요청하는 사용자의 인증 정보
      */
     @Transactional
-    public void reduceOneWaitingOrders(UserCredentials user, Long waitingId) {
+    public void decrementWaitingOrder(Long waitingId, UserCredentials user) {
 
         validateWaitingRequest(user, waitingId);
 
@@ -172,8 +171,8 @@ public class WaitingService {
      * @return 업데이트된 대기 정보를 담은 DTO
      */
     @Transactional
-    public WaitingResponseDto updateWaiting(UserCredentials user, Long waitingId,
-        UpdateWaitingRequestDto updateWaitingRequestDto) {
+    public WaitingResponseDto updateWaiting(Long waitingId,
+        UpdateWaitingRequestDto updateWaitingRequestDto, UserCredentials user) {
 
         validateWaitingRequest(user, waitingId);
 
@@ -182,7 +181,7 @@ public class WaitingService {
         waiting.update(updateWaitingRequestDto.getPartySize(), updateWaitingRequestDto.getDemand());
 
         waitingRepository.save(waiting);
-        return WaitingResponseDto.of(waiting);
+        return WaitingResponseDto.from(waiting);
     }
 
     /**
@@ -192,7 +191,7 @@ public class WaitingService {
      * @param waitingId 취소할 대기의 ID
      */
     @Transactional
-    public void deleteWaiting(UserCredentials user, Long waitingId) {
+    public void deleteWaiting(Long waitingId, UserCredentials user) {
 
         validateWaitingRequest(user, waitingId);
 
@@ -278,7 +277,7 @@ public class WaitingService {
      * @return 변환된 WaitingResponseDto
      */
     private WaitingResponseDto convertToDto(Waiting waiting) {
-        return WaitingResponseDto.of(waiting);
+        return WaitingResponseDto.from(waiting);
     }
 
     /**
@@ -320,11 +319,11 @@ public class WaitingService {
                 }
 
                 notificationController.notifyCustomer(waitingId.toString(), message);
-                waiting.delete(LocalDateTime.now(), waitingStatus);
+                waiting.seat();
 
                 flag = true;
             } else if (flag) {
-                waiting.reduceWaitingOrder();
+                waiting.decrementWaitingOrder();
                 waitingArrayList.add(waiting);
             }
         }

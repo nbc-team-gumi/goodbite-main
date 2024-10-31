@@ -12,7 +12,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 import site.mygumi.goodbite.common.aspect.lock.exception.LockErrorCode;
 import site.mygumi.goodbite.common.aspect.lock.exception.LockException;
-import site.mygumi.goodbite.domain.waiting.dto.PostWaitingRequestDto;
+import site.mygumi.goodbite.domain.waiting.dto.CreateWaitingRequestDto;
 
 /**
  * Redis를 이용한 분산 락을 처리하는 Aspect 클래스입니다.
@@ -44,7 +44,7 @@ public class RedisLockAspect {
     /**
      * {@link RedisLock} 어노테이션이 적용된 메서드 호출 전후에 분산 락을 관리하는 어드바이스입니다.
      * <p>
-     * 이 메서드는 {@link PostWaitingRequestDto} 파라미터로부터 추출한 restaurant ID를 기준으로 락을 획득합니다. 대기 시간 동안 락을
+     * 이 메서드는 {@link CreateWaitingRequestDto} 파라미터로부터 추출한 restaurant ID를 기준으로 락을 획득합니다. 대기 시간 동안 락을
      * 획득하지 못하면 {@link LockException}을 발생시킵니다.
      * </p>
      *
@@ -64,8 +64,8 @@ public class RedisLockAspect {
         String restaurantId = "";
 
         for (Object arg : args) {
-            if (arg instanceof PostWaitingRequestDto) {
-                restaurantId = String.valueOf(((PostWaitingRequestDto) arg).getRestaurantId());
+            if (arg instanceof CreateWaitingRequestDto) {
+                restaurantId = String.valueOf(((CreateWaitingRequestDto) arg).getRestaurantId());
                 break;
             }
         }

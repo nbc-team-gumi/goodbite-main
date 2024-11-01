@@ -224,8 +224,8 @@ public class WaitingService {
      * @return 페이지네이션된 대기 정보
      */
     @Transactional(readOnly = true)
-    public Page<WaitingResponseDto> getWaitingsByRestaurantId(UserCredentials user,
-        Long restaurantId, Pageable pageable) {
+    public Page<WaitingResponseDto> getWaitingsByRestaurantId(Long restaurantId,
+        UserCredentials user, Pageable pageable) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
 

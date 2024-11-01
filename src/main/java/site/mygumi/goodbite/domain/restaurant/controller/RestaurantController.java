@@ -198,7 +198,7 @@ public class RestaurantController {
     public ResponseEntity<MessageResponseDto> admitWaitingCustomer(
         @PathVariable Long restaurantId, @AuthenticationPrincipal EmailUserDetails userDetails) {
 
-        waitingService.admitWaitingCustomer(restaurantId, userDetails.getUser());
+        waitingService.reduceAllWaitingOrders(restaurantId, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 

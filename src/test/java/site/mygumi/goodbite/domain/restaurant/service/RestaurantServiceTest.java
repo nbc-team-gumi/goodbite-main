@@ -25,16 +25,16 @@ import site.mygumi.goodbite.domain.user.owner.repository.OwnerRepository;
 public class RestaurantServiceTest {
 
     @InjectMocks
-    RestaurantService restaurantService;
+    private RestaurantService restaurantService;
 
     @Mock
-    RestaurantRepository restaurantRepository;
+    private RestaurantRepository restaurantRepository;
 
     @Mock
-    OwnerRepository ownerRepository;
+    private OwnerRepository ownerRepository;
 
     @Mock
-    S3Service s3Service;
+    private S3Service s3Service;
 
     @Test
     @DisplayName("레스토랑 생성 성공")

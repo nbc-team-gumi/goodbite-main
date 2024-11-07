@@ -79,7 +79,7 @@ public class WaitingRepositoryCustomImpl implements WaitingRepositoryCustom {
         Waiting waiting = queryFactory.selectFrom(qWaiting)
             .where(qWaiting.restaurant.id.eq(restaurantId)
                 .and(qWaiting.customer.id.eq(customerId))
-                .and(qWaiting.status.eq(WaitingStatus.SEATED)))
+                .and(qWaiting.status.eq(WaitingStatus.ENTERED)))
             .fetchOne();
         return Optional.ofNullable(waiting);
     }

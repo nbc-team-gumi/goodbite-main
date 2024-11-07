@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting.WaitingStatus;
-import site.mygumi.goodbite.domain.waiting.entity.Waiting.WaitingType;
 
 @Getter
 public class CreateWaitingRequestDto {
@@ -20,8 +19,6 @@ public class CreateWaitingRequestDto {
     @Max(value = 10, message = "웨이팅 인원이 11명 이상일 시, 가게로 문의주세요.")
     @NotNull(message = "웨이팅 인원을 입력해 주세요")
     private Long partySize;
-
-    private WaitingType waitingType;
 
     @Size(min = 0, max = 50, message = "웨이팅 요구사항은 50자 이내로 기입 가능합니다.")
     private String demand;

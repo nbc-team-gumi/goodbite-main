@@ -46,22 +46,16 @@ public class Waiting extends ExtendedTimestamped {
 
     private Long partySize;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private WaitingType waitingType;
-
     private String demand;
 
     @Builder
     public Waiting(Restaurant restaurant, Customer customer, Long waitingOrder,
-        WaitingStatus status, Long partySize, WaitingType waitingType,
-        String demand) {
+        WaitingStatus status, Long partySize, String demand) {
         this.restaurant = restaurant;
         this.customer = customer;
         this.waitingOrder = waitingOrder;
         this.status = status;
         this.partySize = partySize;
-        this.waitingType = waitingType;
         this.demand = demand;
     }
 
@@ -96,11 +90,5 @@ public class Waiting extends ExtendedTimestamped {
         WAITING,
         SEATED,
         CANCELLED
-    }
-
-    public enum WaitingType {
-
-        OFFLINE,
-        ONLINE
     }
 }

@@ -79,7 +79,6 @@ public class WaitingService {
             LastOrderNumber + 1,
             WaitingStatus.WAITING, // 생성 시 무조건 Waiting
             createWaitingRequestDto.getPartySize(),
-            createWaitingRequestDto.getWaitingType(),
             createWaitingRequestDto.getDemand());
 
         waitingRepository.save(waiting);

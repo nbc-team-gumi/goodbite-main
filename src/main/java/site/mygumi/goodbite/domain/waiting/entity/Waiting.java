@@ -38,7 +38,12 @@ public class Waiting extends ExtendedTimestamped {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    private Long waitingOrder;
+//    private Long waitingOrder;
+
+    @Column(nullable = false)
+    private Integer waitingNumber;      // 고유한 웨이팅 번호 (계속 증가)
+
+    private Integer waitingOrder;       // 실제 대기 순서 (1부터 시작)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -49,10 +54,12 @@ public class Waiting extends ExtendedTimestamped {
     private String demand;
 
     @Builder
-    public Waiting(Restaurant restaurant, Customer customer, Long waitingOrder,
+    public Waiting(Restaurant restaurant, Customer customer, Integer waitingNumber,
+        Integer waitingOrder,
         WaitingStatus status, Long partySize, String demand) {
         this.restaurant = restaurant;
         this.customer = customer;
+        this.waitingNumber = waitingNumber;
         this.waitingOrder = waitingOrder;
         this.status = status;
         this.partySize = partySize;

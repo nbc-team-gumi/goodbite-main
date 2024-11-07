@@ -9,13 +9,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.mygumi.goodbite.auth.exception.AuthErrorCode;
 import site.mygumi.goodbite.auth.exception.AuthException;
 import site.mygumi.goodbite.common.aspect.lock.RedisLock;
-import site.mygumi.goodbite.domain.notification.controller.NotificationController;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import site.mygumi.goodbite.domain.restaurant.repository.RestaurantRepository;
 import site.mygumi.goodbite.domain.user.customer.entity.Customer;
@@ -47,9 +45,8 @@ public class WaitingService {
     private final WaitingRepository waitingRepository;
     private final RestaurantRepository restaurantRepository;
     private final CustomerRepository customerRepository;
-    private final SimpMessagingTemplate messagingTemplate;
     private final OwnerRepository ownerRepository;
-    private final NotificationController notificationController;
+    private final WaitingDailyCounterService waitingDailyCounterService;
 
     /**
      * 새로운 대기 요청을 생성합니다.
@@ -60,31 +57,30 @@ public class WaitingService {
      */
     @RedisLock(key = "createWaitingLock")
     @Transactional
-    public WaitingResponseDto createWaiting(CreateWaitingRequestDto createWaitingRequestDto,
-        UserCredentials user) {
-
+    public WaitingResponseDto createWaiting(
+        CreateWaitingRequestDto createWaitingRequestDto,
+        UserCredentials user
+    ) {
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(
-            createWaitingRequestDto.getRestaurantId());
+            createWaitingRequestDto.getRestaurantId()
+        );
 
         Customer customer = customerRepository.findByIdOrThrow(user.getId());
 
-        waitingRepository.validateByRestaurantIdAndCustomerId(restaurant.getId(),
-            customer.getId());
+        waitingRepository.validateNoDuplicateWaiting(restaurant.getId(), customer.getId());
 
-        Long LastOrderNumber = findLastOrderNumber(restaurant.getId());
+        Integer waitingNumber = waitingDailyCounterService.issueWaitingNumber(restaurant.getId());
 
-        Waiting waiting = new Waiting(
-            restaurant,
-            customer,
-            LastOrderNumber + 1,
-            WaitingStatus.WAITING, // 생성 시 무조건 Waiting
-            createWaitingRequestDto.getPartySize(),
-            createWaitingRequestDto.getDemand());
+        Waiting waiting = Waiting.builder()
+            .restaurant(restaurant)
+            .customer(customer)
+            .waitingNumber(waitingNumber)
+            .status(WaitingStatus.WAITING)
+            .partySize(createWaitingRequestDto.getPartySize())
+            .demand(createWaitingRequestDto.getDemand())
+            .build();
 
         waitingRepository.save(waiting);
-
-        String message = "새로운 웨이팅이 등록되었습니다.";
-        notificationController.notifyOwner(restaurant.getId().toString(), message);
 
         return WaitingResponseDto.from(waiting);
     }
@@ -136,7 +132,7 @@ public class WaitingService {
                 String message = "손님, 가게로 입장해 주세요.";
                 notificationController.notifyCustomer(waiting.getId().toString(), message);
 //                waitingRepository.delete(waiting);
-                waiting.seat();
+                waiting.enter();
             } else {
                 waitingArrayList.add(waiting);
             }
@@ -203,16 +199,16 @@ public class WaitingService {
      * @param restaurantId 레스토랑의 ID
      * @return 마지막 대기 순서 번호
      */
-    @Transactional(readOnly = true)
-    public Long findLastOrderNumber(Long restaurantId) {
-        if (!waitingRepository.findAllByRestaurantIdDeletedAtIsNull(restaurantId).isEmpty()) {
-            // 해당하는 레스토랑에 예약이 하나라도 존재한다면
-            return waitingRepository.findMaxWaitingOrderByRestaurantId(
-                restaurantId);
-        }
-        // 해당하는 레스토랑에 예약이 하나도 없다
-        return 0L;
-    }
+//    @Transactional(readOnly = true)
+//    public Long findLastOrderNumber(Long restaurantId) {
+//        if (!waitingRepository.findAllByRestaurantIdDeletedAtIsNull(restaurantId).isEmpty()) {
+//            // 해당하는 레스토랑에 예약이 하나라도 존재한다면
+//            return waitingRepository.findMaxWaitingOrderByRestaurantId(
+//                restaurantId);
+//        }
+//        // 해당하는 레스토랑에 예약이 하나도 없다
+//        return 0L;
+//    }
 
     /**
      * 특정 레스토랑의 대기 요청을 페이지네이션하여 조회합니다.
@@ -304,11 +300,11 @@ public class WaitingService {
                         message);
                 } else if (type.equals("reduce")) {
                     message = "손님, 가게로 입장해 주세요.";
-                    waitingStatus = WaitingStatus.SEATED;
+                    waitingStatus = WaitingStatus.ENTERED;
                 }
 
                 notificationController.notifyCustomer(waitingId.toString(), message);
-                waiting.seat();
+                waiting.enter();
 
                 flag = true;
             } else if (flag) {

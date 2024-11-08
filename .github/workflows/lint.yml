@@ -1,0 +1,27 @@
+name: Java Lint Check
+
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened ] # 처음 생성시점(opened), 커밋 추가/변경 시점(synchronize), 닫힌 PR 재오픈 시점(reopened)
+    branches-ignore: # main, dev를 제외한 모든 브랜치
+      - main
+      - dev
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '21'
+
+      - name: Install dependencies
+        run: ./gradlew build -x test
+
+      - name: Run Checkstyle
+        run: ./gradlew checkstyleMain

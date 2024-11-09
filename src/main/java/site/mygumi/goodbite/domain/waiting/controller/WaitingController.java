@@ -85,6 +85,34 @@ public class WaitingController {
                 userDetails.getUser()));
     }
 
+    @PreAuthorize("hasRole('OWNER')")
+    @PatchMapping("/{waitingId}/entrance")
+    public ResponseEntity<MessageResponseDto> enterWaiting(
+        @PathVariable Long waitingId,
+        @AuthenticationPrincipal EmailUserDetails userDetails
+    ) {
+        return ResponseUtil.updateOk();
+    }
+
+    @PreAuthorize("hasRole('OWNER')")
+    @PatchMapping("/{waitingId}/no-show")
+    public ResponseEntity<MessageResponseDto> noShowWaiting(
+        @PathVariable Long waitingId,
+        @AuthenticationPrincipal EmailUserDetails userDetails
+    ) {
+        return ResponseUtil.updateOk();
+    }
+
+    @PreAuthorize("hasRole('CUSTOMER')")
+    @PatchMapping("/{waitingId}/cancellation")
+    public ResponseEntity<MessageResponseDto> cancelWaiting(
+        @PathVariable Long waitingId,
+        @AuthenticationPrincipal EmailUserDetails userDetails
+    ) {
+        return ResponseUtil.updateOk();
+    }
+
+
     // 웨이팅 취소
     @DeleteMapping("/{waitingId}")
     public ResponseEntity<MessageResponseDto> deleteWaiting(

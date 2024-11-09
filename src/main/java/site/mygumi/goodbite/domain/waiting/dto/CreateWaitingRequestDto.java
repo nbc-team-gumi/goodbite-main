@@ -5,15 +5,12 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
-import site.mygumi.goodbite.domain.waiting.entity.Waiting.WaitingStatus;
 
 @Getter
 public class CreateWaitingRequestDto {
 
     @NotNull(message = "레스토랑 Id를 입력하세요")
     private Long restaurantId;
-
-    private WaitingStatus waitingStatus;
 
     @Min(value = 1, message = "웨이팅 인원 수는 0명일 수 없습니다.")
     @Max(value = 10, message = "웨이팅 인원이 11명 이상일 시, 가게로 문의주세요.")

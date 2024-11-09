@@ -77,6 +77,11 @@ public class Waiting extends ExtendedTimestamped {
         this.status = WaitingStatus.ENTERED;
     }
 
+    public void noShow() {
+        this.deletedAt = LocalDateTime.now();
+        this.status = WaitingStatus.NO_SHOW;
+    }
+
     public void cancel() {
         this.deletedAt = LocalDateTime.now();
         this.status = WaitingStatus.CANCELLED;
@@ -88,7 +93,6 @@ public class Waiting extends ExtendedTimestamped {
     }
 
     public enum WaitingStatus {
-
         WAITING,
         ENTERED,
         CANCELLED,

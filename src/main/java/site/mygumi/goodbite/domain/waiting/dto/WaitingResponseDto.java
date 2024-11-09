@@ -10,10 +10,9 @@ public record WaitingResponseDto(
     String restaurantName,
     WaitingStatus waitingStatus,
     Integer waitingNumber,
-    Integer waitingOrder,
     String demand,
     Long customerId,
-    String customerNickname,
+    String nickname,
     Long partySize,
     LocalDateTime createAt,
     LocalDateTime deletedAt) {
@@ -25,12 +24,12 @@ public record WaitingResponseDto(
             waiting.getRestaurant().getName(),
             waiting.getStatus(),
             waiting.getWaitingNumber(),
-            waiting.getWaitingOrder(),
             waiting.getDemand(),
             waiting.getCustomer().getId(),
             waiting.getCustomer().getNickname(),
             waiting.getPartySize(),
             waiting.getCreatedAt(),
-            waiting.getDeletedAt());
+            waiting.getDeletedAt()
+        );
     }
 }

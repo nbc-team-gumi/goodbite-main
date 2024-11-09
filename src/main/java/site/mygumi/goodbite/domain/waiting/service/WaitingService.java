@@ -248,7 +248,7 @@ public class WaitingService {
      * @return 페이지네이션된 대기 정보
      */
     @Transactional(readOnly = true)
-    public Page<WaitingResponseDto> getWaitings(UserCredentials user, Pageable pageable) {
+    public Page<WaitingResponseDto> getMyWaitings(UserCredentials user, Pageable pageable) {
 
         // 기존 pageable에 최신순 정렬을 추가
         Pageable sortedPageable = PageRequest.of(

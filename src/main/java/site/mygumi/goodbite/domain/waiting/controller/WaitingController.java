@@ -37,8 +37,8 @@ public class WaitingController {
     @PostMapping
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> createWaiting(
         @Valid @RequestBody CreateWaitingRequestDto createWaitingRequestDto,
-        @AuthenticationPrincipal EmailUserDetails userDetails) {
-
+        @AuthenticationPrincipal EmailUserDetails userDetails
+    ) {
         return ResponseUtil.createOk(
             waitingService.createWaiting(createWaitingRequestDto, userDetails.getUser()));
     }
@@ -48,16 +48,17 @@ public class WaitingController {
     @GetMapping("/me")
     public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getMyWaitings(
         @AuthenticationPrincipal EmailUserDetails userDetails,
-        @PageableDefault(size = Waiting.DEFAULT_PAGE_SIZE) Pageable pageable) {
-
+        @PageableDefault(size = Waiting.DEFAULT_PAGE_SIZE) Pageable pageable
+    ) {
         return ResponseUtil.createOk(waitingService.getMyWaitings(userDetails.getUser(), pageable));
     }
 
     // 웨이팅 단일 조회
     @GetMapping("/{waitingId}")
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> getWaiting(
-        @PathVariable Long waitingId, @AuthenticationPrincipal EmailUserDetails userDetails) {
-
+        @PathVariable Long waitingId,
+        @AuthenticationPrincipal EmailUserDetails userDetails
+    ) {
         return ResponseUtil.findOk(waitingService.getWaiting(waitingId, userDetails.getUser()));
     }
 
@@ -66,11 +67,15 @@ public class WaitingController {
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> updateWaiting(
         @PathVariable Long waitingId,
         @Valid @RequestBody UpdateWaitingRequestDto updateWaitingRequestDto,
-        @AuthenticationPrincipal EmailUserDetails userDetails) {
-
+        @AuthenticationPrincipal EmailUserDetails userDetails
+    ) {
         return ResponseUtil.updateOk(
-            waitingService.updateWaiting(waitingId, updateWaitingRequestDto,
-                userDetails.getUser()));
+            waitingService.updateWaiting(
+                waitingId,
+                updateWaitingRequestDto,
+                userDetails.getUser()
+            )
+        );
     }
 
     @PreAuthorize("hasRole('OWNER')")

@@ -107,8 +107,11 @@ public class WaitingService {
      * @return 업데이트된 대기 정보를 담은 DTO
      */
     @Transactional
-    public WaitingResponseDto updateWaiting(Long waitingId,
-        UpdateWaitingRequestDto updateWaitingRequestDto, UserCredentials user) {
+    public WaitingResponseDto updateWaiting(
+        Long waitingId,
+        UpdateWaitingRequestDto updateWaitingRequestDto,
+        UserCredentials user
+    ) {
 
         validateWaitingRequest(user, waitingId);
 
@@ -129,24 +132,31 @@ public class WaitingService {
      * @return 페이지네이션된 대기 정보
      */
     @Transactional(readOnly = true)
-    public Page<WaitingResponseDto> getWaitingsByRestaurantId(Long restaurantId,
-        UserCredentials user, Pageable pageable) {
+    public Page<WaitingResponseDto> getWaitingsByRestaurantId(
+        Long restaurantId,
+        UserCredentials user,
+        Pageable pageable
+    ) {
 
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
 
-        Owner owner = ownerRepository.findById(restaurant.getOwner().getId())
-            .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED));
+        Owner owner = ownerRepository.findById(restaurant.getOwner().getId()).orElseThrow(() ->
+            new AuthException(AuthErrorCode.UNAUTHORIZED)
+        );
 
         // api 요청한 유저가 해당 레스토랑의 '오너'와 같지 않다면
         if (!user.getEmail().equals(owner.getEmail())) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
 
-        Page<Waiting> waitingPage = waitingRepository.findPageByRestaurantId(restaurantId,
-            pageable);
+        Page<Waiting> waitingPage = waitingRepository.findPageByRestaurantId(
+            restaurantId,
+            pageable
+        );
 
         List<WaitingResponseDto> waitingResponseDtos = waitingPage.stream()
             .map(WaitingResponseDto::from).toList();
+
         return new PageImpl<>(waitingResponseDtos, pageable, waitingPage.getTotalElements());
     }
 
@@ -167,8 +177,10 @@ public class WaitingService {
             Sort.by(Sort.Direction.DESC, "createdAt")  // 최신순으로 정렬
         );
 
-        Page<Waiting> waitingPage = waitingRepository.findPageByCustomerId(user.getId(),
-            sortedPageable);
+        Page<Waiting> waitingPage = waitingRepository.findPageByCustomerId(
+            user.getId(),
+            sortedPageable
+        );
 
         List<WaitingResponseDto> waitingResponseDtos = waitingPage.stream()
             .map(WaitingResponseDto::from).toList();

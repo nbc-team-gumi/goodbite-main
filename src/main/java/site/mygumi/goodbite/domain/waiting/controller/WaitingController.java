@@ -8,12 +8,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -63,16 +61,6 @@ public class WaitingController {
         return ResponseUtil.findOk(waitingService.getWaiting(waitingId, userDetails.getUser()));
     }
 
-    // 가게 주인이 웨이팅 ID 하나 선택 후 웨이팅 줄이기
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
-    @PutMapping("/{waitingId}")
-    public ResponseEntity<MessageResponseDto> decrementWaitingOrder(
-        @PathVariable Long waitingId, @AuthenticationPrincipal EmailUserDetails userDetails) {
-
-        waitingService.decrementWaitingOrder(waitingId, userDetails.getUser());
-        return ResponseUtil.updateOk();
-    }
-
     // 웨이팅 정보 수정
     @PatchMapping("/{waitingId}")
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> updateWaiting(
@@ -110,15 +98,5 @@ public class WaitingController {
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
         return ResponseUtil.updateOk();
-    }
-
-
-    // 웨이팅 취소
-    @DeleteMapping("/{waitingId}")
-    public ResponseEntity<MessageResponseDto> deleteWaiting(
-        @PathVariable Long waitingId, @AuthenticationPrincipal EmailUserDetails userDetails) {
-
-        waitingService.deleteWaiting(waitingId, userDetails.getUser());
-        return ResponseUtil.deleteOk();
     }
 }

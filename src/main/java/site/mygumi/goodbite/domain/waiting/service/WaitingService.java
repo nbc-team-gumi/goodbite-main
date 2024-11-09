@@ -1,8 +1,6 @@
 package site.mygumi.goodbite.domain.waiting.service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -30,7 +28,6 @@ import site.mygumi.goodbite.domain.waiting.entity.Waiting;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting.WaitingStatus;
 import site.mygumi.goodbite.domain.waiting.exception.WaitingErrorCode;
 import site.mygumi.goodbite.domain.waiting.exception.WaitingException;
-import site.mygumi.goodbite.domain.waiting.exception.detail.WaitingNotFoundException;
 import site.mygumi.goodbite.domain.waiting.repository.WaitingRepository;
 
 /**
@@ -102,62 +99,6 @@ public class WaitingService {
     }
 
     /**
-     * 특정 레스토랑의 모든 대기 순서를 하나씩 줄입니다.
-     *
-     * @param restaurantId 대기 순서를 줄일 레스토랑의 ID
-     * @param user         요청하는 사용자의 인증 정보
-     * @throws AuthException 사용자가 해당 작업에 권한이 없는 경우 발생합니다.
-     */
-    @Transactional
-    public void reduceAllWaitingOrders(Long restaurantId, UserCredentials user) {
-
-        Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
-
-        Owner owner = ownerRepository.findByIdOrThrow(restaurant.getOwner().getId());
-
-        if (!user.getEmail().equals(owner.getEmail())) {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
-        }
-
-        List<Waiting> waitingList = waitingRepository.findALLByRestaurantIdOrThrow(restaurantId);
-
-        List<Waiting> waitingArrayList = new ArrayList<>();
-        for (Waiting waiting : waitingList) {
-            waiting.decrementWaitingOrder();
-            if (waiting.getWaitingOrder() == 0) {
-
-                //--------------
-                // 알람 메서드 위치
-                //--------------
-                String message = "손님, 가게로 입장해 주세요.";
-                notificationController.notifyCustomer(waiting.getId().toString(), message);
-//                waitingRepository.delete(waiting);
-                waiting.enter();
-            } else {
-                waitingArrayList.add(waiting);
-            }
-
-        }
-        // 쿼리가 계속 나감...
-        // 한꺼번에 범위로 줄일 수 있음
-        waitingRepository.saveAll(waitingArrayList);
-    }
-
-    /**
-     * 특정 대기 요청을 삭제하고 뒤의 대기 순서를 줄입니다.
-     *
-     * @param waitingId 삭제할 대기의 ID
-     * @param user      요청하는 사용자의 인증 정보
-     */
-    @Transactional
-    public void decrementWaitingOrder(Long waitingId, UserCredentials user) {
-
-        validateWaitingRequest(user, waitingId);
-
-        reduceWaitingOrders(waitingId, "reduce");
-    }
-
-    /**
      * 특정 대기 요청을 업데이트합니다.
      *
      * @param user                    요청하는 사용자의 인증 정보
@@ -178,37 +119,6 @@ public class WaitingService {
         waitingRepository.save(waiting);
         return WaitingResponseDto.from(waiting);
     }
-
-    /**
-     * 특정 대기 요청을 취소합니다.
-     *
-     * @param user      요청하는 사용자의 인증 정보
-     * @param waitingId 취소할 대기의 ID
-     */
-    @Transactional
-    public void deleteWaiting(Long waitingId, UserCredentials user) {
-
-        validateWaitingRequest(user, waitingId);
-
-        reduceWaitingOrders(waitingId, "delete");
-    }
-
-    /**
-     * 특정 레스토랑의 마지막 대기 순서 번호를 반환합니다.
-     *
-     * @param restaurantId 레스토랑의 ID
-     * @return 마지막 대기 순서 번호
-     */
-//    @Transactional(readOnly = true)
-//    public Long findLastOrderNumber(Long restaurantId) {
-//        if (!waitingRepository.findAllByRestaurantIdDeletedAtIsNull(restaurantId).isEmpty()) {
-//            // 해당하는 레스토랑에 예약이 하나라도 존재한다면
-//            return waitingRepository.findMaxWaitingOrderByRestaurantId(
-//                restaurantId);
-//        }
-//        // 해당하는 레스토랑에 예약이 하나도 없다
-//        return 0L;
-//    }
 
     /**
      * 특정 레스토랑의 대기 요청을 페이지네이션하여 조회합니다.
@@ -264,62 +174,6 @@ public class WaitingService {
             .map(WaitingResponseDto::from).toList();
         return new PageImpl<>(waitingResponseDtos, sortedPageable, waitingPage.getTotalElements());
     }
-
-    /**
-     * 특정 대기를 삭제하거나 순서를 감소시키고, 그 이후 대기의 순서를 조정합니다. 'delete' 타입일 경우 대기를 취소하고, 'reduce' 타입일 경우 대기를 완료
-     * 처리합니다.
-     *
-     * @param waitingId 처리할 대기의 ID
-     * @param type      'delete'는 대기 취소, 'reduce'는 대기 완료를 의미
-     * @throws WaitingNotFoundException 지정된 ID의 대기가 존재하지 않을 경우 발생합니다.
-     */
-    private void reduceWaitingOrders(Long waitingId, String type) {
-        Waiting waitingOne = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
-
-        List<Waiting> waitingList = waitingRepository.findAllByRestaurantIdDeletedAtIsNull(
-            waitingOne.getRestaurant().getId());
-
-        String message = "";
-        boolean flag = false;
-        WaitingStatus waitingStatus = WaitingStatus.WAITING;
-        List<Waiting> waitingArrayList = new ArrayList<>();
-
-        for (Waiting waiting : waitingList) {
-            if (Objects.equals(waiting.getId(), waitingId)) {
-
-                //--------------
-                // 알람 메서드 위치
-                // 현재 기능을 요청한 사람이 오너인지 손님인지 구분하는 메서드가 없음
-                // 이후 구현을 요함
-                //--------------
-
-                if (type.equals("delete")) {
-                    message = "웨이팅이 취소되었습니다.";
-                    waitingStatus = WaitingStatus.CANCELLED;
-                    notificationController.notifyOwner(waiting.getRestaurant().getId().toString(),
-                        message);
-                } else if (type.equals("reduce")) {
-                    message = "손님, 가게로 입장해 주세요.";
-                    waitingStatus = WaitingStatus.ENTERED;
-                }
-
-                notificationController.notifyCustomer(waitingId.toString(), message);
-                waiting.enter();
-
-                flag = true;
-            } else if (flag) {
-                waiting.decrementWaitingOrder();
-                waitingArrayList.add(waiting);
-            }
-        }
-        if (!flag) {
-            throw new WaitingNotFoundException(
-                WaitingErrorCode.WAITING_NOT_FOUND);
-        }
-        // 쿼리 최적화
-        waitingRepository.saveAll(waitingArrayList);
-    }
-
 
     /**
      * 특정 대기에 대한 요청이 유효한지 확인합니다. 요청하는 사용자가 해당 대기의 손님이거나 해당 대기가 속한 레스토랑의 소유자인지 검증합니다.

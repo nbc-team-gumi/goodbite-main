@@ -47,12 +47,12 @@ public class WaitingController {
 
     // 손님이 보는 웨이팅 목록 조회
     @PreAuthorize("hasRole('CUSTOMER')")
-    @GetMapping
-    public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getWaitings(
+    @GetMapping("/me")
+    public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getMyWaitings(
         @AuthenticationPrincipal EmailUserDetails userDetails,
         @PageableDefault(size = Waiting.DEFAULT_PAGE_SIZE) Pageable pageable) {
 
-        return ResponseUtil.createOk(waitingService.getWaitings(userDetails.getUser(), pageable));
+        return ResponseUtil.createOk(waitingService.getMyWaitings(userDetails.getUser(), pageable));
     }
 
     // 웨이팅 단일 조회

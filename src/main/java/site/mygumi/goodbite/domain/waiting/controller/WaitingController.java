@@ -84,6 +84,7 @@ public class WaitingController {
         @PathVariable Long waitingId,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
+        waitingService.enterWaiting(waitingId, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -93,6 +94,7 @@ public class WaitingController {
         @PathVariable Long waitingId,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
+        waitingService.noShowWaiting(waitingId, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 
@@ -102,6 +104,7 @@ public class WaitingController {
         @PathVariable Long waitingId,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
+        waitingService.cancelWaiting(waitingId, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 }

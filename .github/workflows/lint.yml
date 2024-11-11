@@ -37,8 +37,21 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: checkstyle-report
-          path: |
-            build/reports/checkstyle/goodbite-checkstyle-result.html
+          path: build/reports/checkstyle/goodbite-checkstyle-result.html
+
+      - name: Deploy to GitHub Pages
+        if: success() || failure()
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git fetch origin gh-pages
+          git checkout gh-pages
+
+          cp build/reports/checkstyle/goodbite-checkstyle-result.html index.html
+
+          git add index.html
+          git commit -m "📋 docs: Report Checkstyle results in HTML"
+          git push origin gh-pages
 
       - name: Parse Checkstyle Summary
         id: parse_checkstyle
@@ -48,6 +61,7 @@ jobs:
           TOTAL_FILES=$(xmllint --xpath "count(//file)" $FILE)
           TOTAL_VIOLATIONS=$(xmllint --xpath "count(//error)" $FILE)
           FILES_WITH_VIOLATIONS=$(xmllint --xpath "count(//file[error])" $FILE)
+          GITHUB_PAGES_URL="https://nbc-team-gumi.github.io/goodbite-main/"
 
           echo "# 🔍 Checkstyle Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -59,7 +73,7 @@ jobs:
           echo "| Files with violations | $FILES_WITH_VIOLATIONS |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🔗 Additional Information" >> $GITHUB_STEP_SUMMARY
-          echo "Check the full [Checkstyle HTML report](./path/to/checkstyle-report.html) or download the [XML report](./path/to/checkstyle-report.xml) for details." >> $GITHUB_STEP_SUMMARY
+          echo "Check the full [Checkstyle HTML report](${GITHUB_PAGES_URL}) for details." >> $GITHUB_STEP_SUMMARY
           
           echo "total_files=$TOTAL_FILES" >> $GITHUB_ENV
           echo "total_violations=$TOTAL_VIOLATIONS" >> $GITHUB_ENV

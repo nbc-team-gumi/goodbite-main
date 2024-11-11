@@ -36,7 +36,7 @@ jobs:
       - name: Send Slack notification on Checkstyle Tool Failure
         if: failure()
         env:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          SLACK_TOKEN: ${{ secrets.SLACK_API_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
         run: |
           curl -X POST -H 'Content-type: application/json' \
@@ -60,7 +60,7 @@ jobs:
       - name: Upload Checkstyle results to Slack on Success
         if: success()
         env:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          SLACK_TOKEN: ${{ secrets.SLACK_API_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
         run: |
           curl -F file=@build/reports/checkstyle/goodbite-checkstyle-result.xml \

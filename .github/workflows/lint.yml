@@ -116,37 +116,39 @@ jobs:
         run: |
           ACTIONS_RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           
-          curl -X POST -H 'Content-type: application/json' \
+          curl -X POST -H "Content-Type: application/json; charset=utf-8" \
             -H "Authorization: Bearer $SLACK_API_TOKEN" \
-            --data '{
-              "channel": "'"$SLACK_CHANNEL_ID"'",
-              "text": "✅ Checkstyle 실행에 성공하였습니다. 결과 파일을 확인하세요.",
-              "attachments": [
-                {
-                  "color": "#36a64f",
-                  "fields": [
-                    { "title": "Repository", "value": "${{ github.repository }}", "short": true },
-                    { "title": "Branch", "value": "${{ github.ref }}", "short": true },
-                    { "title": "Commit Message", "value": "${{ github.event.head_commit.message }}", "short": false },
-                    { "title": "Actions URL", "value": "'"$ACTIONS_RUN_URL"'", "short": false }
-                  ]
-                },
-                {
-                  "color": "#36a64f",
-                  "fields": [
-                    { "title": "Total files checked", "value": "'"$TOTAL_FILES"'", "short": true },
-                    { "title": "Total violations", "value": "'"$TOTAL_VIOLATIONS"'", "short": true },
-                    { "title": "Files with violations", "value": "'"$FILES_WITH_VIOLATIONS"'", "short": true }
-                  ]
+              --data @- https://slack.com/api/chat.postMessage <<EOF
+          {
+            "channel": "$SLACK_CHANNEL_ID",
+            "text": "✅ Checkstyle 실행에 성공하였습니다. 결과 파일을 확인하세요.",
+            "attachments": [
+              {
+                "color": "#36a64f",
+                "fields": [
+                  { "title": "Repository", "value": "${{ github.repository }}", "short": true },
+                  { "title": "Branch", "value": "${{ github.ref }}", "short": true },
+                  { "title": "Commit Message", "value": "${{ github.event.head_commit.message }}", "short": false },
+                  { "title": "Actions URL", "value": "$ACTIONS_RUN_URL", "short": false }
+                ]
+              },
+              {
+                "color": "#36a64f",
+                "fields": [
+                  { "title": "Total files checked", "value": "$TOTAL_FILES", "short": true },
+                  { "title": "Total violations", "value": "$TOTAL_VIOLATIONS", "short": true },
+                  { "title": "Files with violations", "value": "$FILES_WITH_VIOLATIONS", "short": true }
+                ]
+              }
+            ],
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "업로드된 Checkstyle 결과 파일을 보려면 <$ACTIONS_RUN_URL|여기>를 클릭하세요. GitHub Actions 페이지에서 다운로드할 수 있습니다."
                 }
-              ],
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "업로드된 Checkstyle 결과 파일을 보려면 <"$ACTIONS_RUN_URL"|여기>를 클릭하세요. GitHub Actions 페이지에서 다운로드할 수 있습니다."
-                  }
-                }
-              ]
-            }' https://slack.com/api/chat.postMessage
+              }
+            ]
+          }
+          EOF

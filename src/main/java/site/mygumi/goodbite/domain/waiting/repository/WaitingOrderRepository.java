@@ -12,6 +12,8 @@ import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.stereotype.Repository;
+import site.mygumi.goodbite.domain.waiting.exception.WaitingErrorCode;
+import site.mygumi.goodbite.domain.waiting.exception.detail.WaitingNotFoundException;
 
 /**
  * 레스토랑의 웨이팅 순서를 Redis를 통해 관리하는 Repository입니다. ZSet(Sorted Set)을 사용하여 웨이팅 번호 (waitingNumber) 기준으로 자동
@@ -67,6 +69,24 @@ public class WaitingOrderRepository {
             waitingId.toString()
         );
         return rank != null ? rank.intValue() : null;
+    }
+
+    /**
+     * 레스토랑의 첫번째 웨이팅 ID를 조회합니다.
+     *
+     * @param restaurantId 레스토랑 ID
+     * @return waitingNumber 순으로 정렬된 웨이팅 ID Set
+     */
+    public String getFirstWaitingId(Long restaurantId) {
+        Set<String> firstId = redisTemplate.opsForZSet().range(
+            getKey(restaurantId),
+            0,
+            0
+        );
+        if (firstId == null || firstId.isEmpty()) {
+            throw new WaitingNotFoundException(WaitingErrorCode.WAITING_NOT_FOUND);
+        }
+        return firstId.iterator().next();
     }
 
     /**

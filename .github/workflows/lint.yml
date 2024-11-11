@@ -68,15 +68,20 @@ jobs:
             https://slack.com/api/files.getUploadURLExternal)
           
           echo "Slack API response: $response"
-          echo "::set-output name=upload_url::$(echo $response | jq -r '.file.upload_url')"
-          echo "::set-output name=file_id::$(echo $response | jq -r '.file.id')"
+          upload_url=$(echo $response | jq -r '.file.upload_url')
+          file_id=$(echo $response | jq -r '.file.id')
+
+          # GitHub Actions 환경 파일을 사용하여 환경 변수 설정
+          echo "upload_url=$upload_url" >> $GITHUB_ENV
+          echo "file_id=$file_id" >> $GITHUB_ENV
 
       - name: Upload Checkstyle result to Slack URL
         if: success()
         env:
           SLACK_API_TOKEN: ${{ secrets.SLACK_API_TOKEN }}
+          UPLOAD_URL: ${{ env.upload_url }}
         run: |
-          curl -X POST "${{ steps.get_upload_url.outputs.upload_url }}" \
+          curl -X POST "$UPLOAD_URL" \
           -F file=@build/reports/checkstyle/goodbite-checkstyle-result.xml \
           -H "Authorization: Bearer $SLACK_API_TOKEN"
 

@@ -31,12 +31,27 @@ jobs:
 
       - name: Upload Checkstyle Report as Artifacts
         if: success() || failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: checkstyle-report
           path: |
-            build/reports/checkstyle/goodbite-checkstyle-result.xml
             build/reports/checkstyle/goodbite-checkstyle-result.html
+
+      - name: Parse Checkstyle Summary
+        id: parse_checkstyle
+        if: success() || failure()
+        run: |
+          FILE="build/reports/checkstyle/goodbite-checkstyle-result.xml"
+          TOTAL_FILES=$(xmllint --xpath "count(//file)" $FILE)
+          TOTAL_VIOLATIONS=$(xmllint --xpath "count(//error)" $FILE)
+          FILES_WITH_VIOLATIONS=$(xmllint --xpath "count(//file[error])" $FILE)
+          echo "Total files checked: $TOTAL_FILES" >> $GITHUB_STEP_SUMMARY
+          echo "Total violations: $TOTAL_VIOLATIONS" >> $GITHUB_STEP_SUMMARY
+          echo "Files with violations: $FILES_WITH_VIOLATIONS" >> $GITHUB_STEP_SUMMARY
+          
+          echo "::set-output name=total_files::$TOTAL_FILES"
+          echo "::set-output name=total_violations::$TOTAL_VIOLATIONS"
+          echo "::set-output name=files_with_violations::$FILES_WITH_VIOLATIONS"
 
       - name: Send Slack notification on Checkstyle Failure
         if: failure()
@@ -67,6 +82,9 @@ jobs:
         env:
           SLACK_API_TOKEN: ${{ secrets.SLACK_API_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+          TOTAL_FILES: ${{ steps.parse_checkstyle.outputs.total_files }}
+          TOTAL_VIOLATIONS: ${{ steps.parse_checkstyle.outputs.total_violations }}
+          FILES_WITH_VIOLATIONS: ${{ steps.parse_checkstyle.outputs.files_with_violations }}
         run: |
           ACTIONS_RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           
@@ -83,6 +101,14 @@ jobs:
                     { "title": "Branch", "value": "${{ github.ref }}", "short": true },
                     { "title": "Commit Message", "value": "${{ github.event.head_commit.message }}", "short": false },
                     { "title": "Actions URL", "value": "'"$ACTIONS_RUN_URL"'", "short": false }
+                  ]
+                },
+                {
+                  "color": "#36a64f",
+                  "fields": [
+                    { "title": "Total files checked", "value": "'"$TOTAL_FILES"'", "short": true },
+                    { "title": "Total violations", "value": "'"$TOTAL_VIOLATIONS"'", "short": true },
+                    { "title": "Files with violations", "value": "'"$FILES_WITH_VIOLATIONS"'", "short": true }
                   ]
                 }
               ],

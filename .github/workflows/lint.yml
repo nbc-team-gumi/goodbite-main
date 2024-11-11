@@ -102,6 +102,7 @@ jobs:
         env:
           SLACK_API_TOKEN: ${{ secrets.SLACK_API_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+          FILE_ID: ${{ env.FILE_ID }}
         run: |
           curl -X POST -H 'Content-type: application/json' \
             -H "Authorization: Bearer $SLACK_API_TOKEN" \
@@ -117,6 +118,15 @@ jobs:
                     { "title": "Commit Message", "value": "${{ github.event.head_commit.message }}", "short": false },
                     { "title": "Actions URL", "value": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}", "short": false }
                   ]
+                }
+              ],
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "업로드된 파일을 보려면 <https://slack.com/files/${SLACK_CHANNEL_ID}/files/${FILE_ID}|여기>를 클릭하세요."
+                  }
                 }
               ]
             }' https://slack.com/api/chat.postMessage

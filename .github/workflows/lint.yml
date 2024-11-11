@@ -94,7 +94,7 @@ jobs:
           curl -s -X POST \
           -H "Authorization: Bearer $SLACK_API_TOKEN" \
           -H "Content-Type: application/x-www-form-urlencoded" \
-          --data-urlencode "file_id=$FILE_ID" \
+          --data-urlencode "files=[{\"id\":\"$FILE_ID\", \"title\":\"goodbite-checkstyle-result.xml\"}]" \
           https://slack.com/api/files.completeUploadExternal
 
       - name: Send Slack notification with success message

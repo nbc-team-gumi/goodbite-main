@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -129,8 +130,7 @@ public class RestaurantController {
     @GetMapping("/{restaurantId}/last-waiting")
     public ResponseEntity<DataResponseDto<Long>> getWaitingLastNumber(
         @PathVariable Long restaurantId) {
-
-        return ResponseUtil.findOk(waitingService.findLastOrderNumber(restaurantId));
+        return ResponseUtil.findOk(waitingService.getCurrentWaitingCount(restaurantId));
     }
 
     @GetMapping("/{restaurantId}/reviews")
@@ -194,11 +194,12 @@ public class RestaurantController {
 
     // 가게 주인용 가게 전체 하나씩 웨이팅 줄이기 메서드 호출
     @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
-    @PutMapping("/{restaurantId}/admittance")
-    public ResponseEntity<MessageResponseDto> admitWaitingCustomer(
-        @PathVariable Long restaurantId, @AuthenticationPrincipal EmailUserDetails userDetails) {
-
-        waitingService.reduceAllWaitingOrders(restaurantId, userDetails.getUser());
+    @PatchMapping("/{restaurantId}/admittance")
+    public ResponseEntity<MessageResponseDto> admitFirstWaiting(
+        @PathVariable Long restaurantId,
+        @AuthenticationPrincipal EmailUserDetails userDetails
+    ) {
+        waitingService.enterFirstWaiting(restaurantId, userDetails.getUser());
         return ResponseUtil.updateOk();
     }
 

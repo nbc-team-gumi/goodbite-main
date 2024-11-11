@@ -227,6 +227,11 @@ public class WaitingService {
         return new PageImpl<>(waitingResponseDtos, sortedPageable, waitingPage.getTotalElements());
     }
 
+    @Transactional(readOnly = true)
+    public Long getCurrentWaitingCount(Long restaurantId) {
+        return (long) waitingOrderRepository.getWaitingIds(restaurantId).size();
+    }
+
     @Transactional
     public void enterFirstWaiting(Long restaurantId, UserCredentials user) {
         Long waitingId = Long.valueOf(waitingOrderRepository.getFirstWaitingId(restaurantId));

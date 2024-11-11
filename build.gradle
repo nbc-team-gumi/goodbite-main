@@ -86,5 +86,6 @@ clean {
 }
 
 checkstyle {
-    configFile = file("google_checks.xml")
+    toolVersion = "10.20.1"
+    configFile = file("config/checkstyle/google_checks.xml")
 }

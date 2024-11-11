@@ -25,15 +25,14 @@ import site.mygumi.goodbite.domain.waiting.dto.WaitingResponseDto;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting;
 import site.mygumi.goodbite.domain.waiting.service.WaitingService;
 
-@RestController
 @RequiredArgsConstructor
-@RequestMapping("/waitings")
-public class WaitingController {
+@PreAuthorize("hasRole('CUSTOMER')")
+@RequestMapping("/customers/waitings")
+@RestController
+public class CustomerWaitingController {
 
     private final WaitingService waitingService;
 
-    // 손님만 등록
-    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> createWaiting(
         @Valid @RequestBody CreateWaitingRequestDto createWaitingRequestDto,
@@ -43,8 +42,6 @@ public class WaitingController {
             waitingService.createWaiting(createWaitingRequestDto, userDetails.getUser()));
     }
 
-    // 손님이 보는 웨이팅 목록 조회
-    @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/me")
     public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getMyWaitings(
         @AuthenticationPrincipal EmailUserDetails userDetails,
@@ -53,16 +50,16 @@ public class WaitingController {
         return ResponseUtil.createOk(waitingService.getMyWaitings(userDetails.getUser(), pageable));
     }
 
-    // 웨이팅 단일 조회
     @GetMapping("/{waitingId}")
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> getWaiting(
         @PathVariable Long waitingId,
         @AuthenticationPrincipal EmailUserDetails userDetails
     ) {
-        return ResponseUtil.findOk(waitingService.getWaiting(waitingId, userDetails.getUser()));
+        return ResponseUtil.findOk(
+            waitingService.customerGetWaiting(waitingId, userDetails.getUser())
+        );
     }
 
-    // 웨이팅 정보 수정
     @PatchMapping("/{waitingId}")
     public ResponseEntity<DataResponseDto<WaitingResponseDto>> updateWaiting(
         @PathVariable Long waitingId,
@@ -78,27 +75,6 @@ public class WaitingController {
         );
     }
 
-    @PreAuthorize("hasRole('OWNER')")
-    @PatchMapping("/{waitingId}/entrance")
-    public ResponseEntity<MessageResponseDto> enterWaiting(
-        @PathVariable Long waitingId,
-        @AuthenticationPrincipal EmailUserDetails userDetails
-    ) {
-        waitingService.enterWaiting(waitingId, userDetails.getUser());
-        return ResponseUtil.updateOk();
-    }
-
-    @PreAuthorize("hasRole('OWNER')")
-    @PatchMapping("/{waitingId}/no-show")
-    public ResponseEntity<MessageResponseDto> noShowWaiting(
-        @PathVariable Long waitingId,
-        @AuthenticationPrincipal EmailUserDetails userDetails
-    ) {
-        waitingService.noShowWaiting(waitingId, userDetails.getUser());
-        return ResponseUtil.updateOk();
-    }
-
-    @PreAuthorize("hasRole('CUSTOMER')")
     @PatchMapping("/{waitingId}/cancellation")
     public ResponseEntity<MessageResponseDto> cancelWaiting(
         @PathVariable Long waitingId,

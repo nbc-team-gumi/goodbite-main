@@ -14,7 +14,7 @@ public record WaitingResponseDto(
     Long customerId,
     String nickname,
     Long partySize,
-    LocalDateTime createAt,
+    LocalDateTime createdAt,
     LocalDateTime deletedAt) {
 
     public static WaitingResponseDto from(Waiting waiting) {

@@ -27,7 +27,7 @@ jobs:
       - name: Run Checkstyle
         id: checkstyle
         continue-on-error: true
-        run: ./gradlew checkstyleMain -Dcheckstyle.output.file=build/reports/checkstyle/checkstyle-result.xml -Dcheckstyle.output.format=xml
+        run: ./gradlew checkstyleMain
 
       # Checkstyle 결과 파일이 정상적으로 생성되었는지 확인하는 단계 추가
       - name: List Checkstyle Result
@@ -63,8 +63,8 @@ jobs:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
         run: |
-          curl -F file=@build/reports/checkstyle/checkstyle-result.xml \
-               -F "initial_comment=Checkstyle 실행이 성공하였습니다. 결과 파일을 확인하세요." \
+          curl -F file=@build/reports/checkstyle/goodbite-checkstyle-result.xml \
+               -F "initial_comment=Checkstyle 실행에 성공하였습니다. 결과 파일을 확인하세요." \
                -F channels=$SLACK_CHANNEL_ID \
                -H "Authorization: Bearer $SLACK_TOKEN" \
                https://slack.com/api/files.upload

@@ -29,6 +29,15 @@ jobs:
         continue-on-error: true
         run: ./gradlew checkstyleMain
 
+      - name: Upload Checkstyle Report as Artifacts
+        if: success() || failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: checkstyle-report
+          path: |
+            build/reports/checkstyle/goodbite-checkstyle-result.xml
+            build/reports/checkstyle/goodbite-checkstyle-result.html
+
       - name: Send Slack notification on Checkstyle Failure
         if: failure()
         env:
@@ -53,57 +62,14 @@ jobs:
               ]
             }' https://slack.com/api/chat.postMessage
 
-      - name: Get Upload URL from Slack
-        if: success()
-        id: get_upload_url
-        env:
-          SLACK_API_TOKEN: ${{ secrets.SLACK_API_TOKEN }}
-        run: |
-          FILE_SIZE=$(stat -c%s "build/reports/checkstyle/goodbite-checkstyle-result.xml")
-          response=$(curl -s -X POST \
-            -H "Authorization: Bearer $SLACK_API_TOKEN" \
-            -H "Content-Type: application/x-www-form-urlencoded" \
-            --data-urlencode "filename=goodbite-checkstyle-result.xml" \
-            --data-urlencode "length=$FILE_SIZE" \
-            https://slack.com/api/files.getUploadURLExternal)
-          
-          echo "Slack API response: $response"
-          upload_url=$(echo $response | jq -r '.upload_url')
-          file_id=$(echo $response | jq -r '.file_id')
-
-          # GitHub Actions 환경 파일을 사용하여 환경 변수 설정
-          echo "UPLOAD_URL=$upload_url" >> $GITHUB_ENV
-          echo "FILE_ID=$file_id" >> $GITHUB_ENV
-
-      - name: Upload Checkstyle result to Slack URL
-        if: success()
-        env:
-          SLACK_API_TOKEN: ${{ secrets.SLACK_API_TOKEN }}
-          UPLOAD_URL: ${{ env.UPLOAD_URL }}
-        run: |
-          curl -X POST "$UPLOAD_URL" \
-          -F file=@build/reports/checkstyle/goodbite-checkstyle-result.xml \
-          -H "Authorization: Bearer $SLACK_API_TOKEN"
-
-      - name: Complete Upload in Slack
-        if: success()
-        env:
-          SLACK_API_TOKEN: ${{ secrets.SLACK_API_TOKEN }}
-          FILE_ID: ${{ env.FILE_ID }}
-        run: |
-          curl -s -X POST \
-          -H "Authorization: Bearer $SLACK_API_TOKEN" \
-          -H "Content-Type: application/x-www-form-urlencoded" \
-          --data-urlencode "files=[{\"id\":\"$FILE_ID\", \"title\":\"goodbite-checkstyle-result.xml\"}]" \
-          https://slack.com/api/files.completeUploadExternal
-
-      - name: Send Slack notification with success message
+      - name: Send Slack notification with success message and Artifact Link
         if: success()
         env:
           SLACK_API_TOKEN: ${{ secrets.SLACK_API_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
-          FILE_ID: ${{ env.FILE_ID }}
         run: |
+          ACTIONS_RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          
           curl -X POST -H 'Content-type: application/json' \
             -H "Authorization: Bearer $SLACK_API_TOKEN" \
             --data '{
@@ -116,7 +82,7 @@ jobs:
                     { "title": "Repository", "value": "${{ github.repository }}", "short": true },
                     { "title": "Branch", "value": "${{ github.ref }}", "short": true },
                     { "title": "Commit Message", "value": "${{ github.event.head_commit.message }}", "short": false },
-                    { "title": "Actions URL", "value": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}", "short": false }
+                    { "title": "Actions URL", "value": "'"$ACTIONS_RUN_URL"'", "short": false }
                   ]
                 }
               ],
@@ -125,7 +91,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "업로드된 파일을 보려면 <https://slack.com/files/${SLACK_CHANNEL_ID}/files/${FILE_ID}|여기>를 클릭하세요."
+                    "text": "업로드된 Checkstyle 결과 파일을 보려면 <"$ACTIONS_RUN_URL"|여기>를 클릭하세요. GitHub Actions 페이지에서 다운로드할 수 있습니다."
                   }
                 }
               ]

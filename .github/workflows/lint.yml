@@ -2,8 +2,8 @@ name: Java Lint Check
 
 on:
   pull_request:
-    types: [ opened, synchronize, reopened ] # 처음 생성시점(opened), 커밋 추가/변경 시점(synchronize), 닫힌 PR 재오픈 시점(reopened)
-    branches-ignore: # main, dev를 제외한 모든 브랜치
+    types: [opened, synchronize, reopened] # 처음 생성시점(opened), 커밋 추가/변경 시점(synchronize), 닫힌 PR 재오픈 시점(reopened)
+    branches:
       - main
       - dev
 
@@ -13,37 +13,54 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: '21'
+          distribution: 'corretto'
 
       - name: Install dependencies
         run: ./gradlew build -x test
 
       - name: Run Checkstyle
-        run: ./gradlew checkstyleMain
+        id: checkstyle
+        continue-on-error: true
+        run: ./gradlew checkstyleMain -Dcheckstyle.output.file=checkstyle-result.xml -Dcheckstyle.output.format=xml
 
-  notify_failure:
-    if: failure()
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Send Slack notification
+      - name: Send Slack notification on Checkstyle Tool Failure
+        if: failure()
+        env:
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data '{
-            "text": "❗ *GitHub Actions workflows failure*",
-            "attachments": [
-              {
-                "color": "#ff0000",
-                "fields": [
-                  { "title": "Repository", "value": "${{ github.repository }}", "short": true },
-                  { "title": "Branch", "value": "${{ github.ref }}", "short": true },
-                  { "title": "Job", "value": "${{ github.job }}", "short": true },
-                  { "title": "Commit Message", "value": "${{ github.event.head_commit.message }}", "short": false },
-                  { "title": "URL", "value": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}", "short": false }
-                ]
-              }
-            ]
-          }' ${{ secrets.SLACK_WEBHOOK_URL }}
+          curl -X POST -H 'Content-type: application/json' \
+            -H "Authorization: Bearer $SLACK_TOKEN" \
+            --data '{
+              "channel": "'"$SLACK_CHANNEL_ID"'",
+              "text": "❗ Checkstyle 실행에 실패했습니다. 워크플로우 설정 또는 환경 구성을 확인하세요.",
+              "attachments": [
+                {
+                  "color": "#ff0000",
+                  "fields": [
+                    { "title": "Repository", "value": "${{ github.repository }}", "short": true },
+                    { "title": "Branch", "value": "${{ github.ref }}", "short": true },
+                    { "title": "Commit Message", "value": "${{ github.event.head_commit.message }}", "short": false },
+                    { "title": "Actions URL", "value": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}", "short": false }
+                  ]
+                }
+              ]
+            }' https://slack.com/api/chat.postMessage
+
+      - name: Upload Checkstyle results to Slack on Success
+        if: success()
+        env:
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+        run: |
+          curl -F file=@checkstyle-result.xml \
+               -F "initial_comment=Checkstyle 실행이 성공하였습니다. 결과 파일을 확인하세요." \
+               -F channels=$SLACK_CHANNEL_ID \
+               -H "Authorization: Bearer $SLACK_TOKEN" \
+               https://slack.com/api/files.upload

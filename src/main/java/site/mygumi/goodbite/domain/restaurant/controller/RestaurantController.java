@@ -69,47 +69,48 @@ public class RestaurantController {
     public ResponseEntity<MessageResponseDto> createRestaurant(
         @Valid @RequestPart RestaurantRequestDto restaurantRequestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails,
-        @RequestPart MultipartFile image) {
-
+        @RequestPart MultipartFile image
+    ) {
         restaurantService.createRestaurant(restaurantRequestDto, userDetails.getUser(), image);
         return ResponseUtil.createOk();
     }
 
     @GetMapping("/{restaurantId}")
     public ResponseEntity<DataResponseDto<RestaurantResponseDto>> getRestaurant(
-        @PathVariable Long restaurantId) {
-
+        @PathVariable Long restaurantId
+    ) {
         return ResponseUtil.findOk(restaurantService.getRestaurant(restaurantId));
     }
 
     @PreAuthorize("hasRole('OWNER')")
-    @GetMapping("/my")
+    @GetMapping("/me")
     public ResponseEntity<DataResponseDto<RestaurantIdResponseDto>> getMyRestaurant(
-        @AuthenticationPrincipal EmailUserDetails userDetails) {
-
+        @AuthenticationPrincipal EmailUserDetails userDetails
+    ) {
         return ResponseUtil.findOk(restaurantService.getMyRestaurant(userDetails.getUser()));
     }
 
     @GetMapping
     public ResponseEntity<DataResponseDto<Page<RestaurantResponseDto>>> getAllRestaurants(
-        @PageableDefault(size = Restaurant.DEFAULT_PAGE_SIZE, sort = "name") Pageable pageable) {
-
+        @PageableDefault(size = Restaurant.DEFAULT_PAGE_SIZE, sort = "name") Pageable pageable
+    ) {
         return ResponseUtil.findOk(restaurantService.getAllRestaurants(pageable));
     }
 
     @GetMapping("/{restaurantId}/operating-hours")
     public ResponseEntity<DataResponseDto<List<OperatingHourResponseDto>>> getAllOperatingHoursByRestaurantId(
-        @PathVariable Long restaurantId) {
-
+        @PathVariable Long restaurantId
+    ) {
         return ResponseUtil.findOk(
-            operatingHourService.getAllOperatingHoursByRestaurantId(restaurantId));
+            operatingHourService.getAllOperatingHoursByRestaurantId(restaurantId)
+        );
     }
 
     @GetMapping("/{restaurantId}/menus")
     public ResponseEntity<DataResponseDto<Page<MenuResponseDto>>> getAllMenusByRestaurantId(
         @PathVariable Long restaurantId,
-        @PageableDefault(size = Menu.DEFAULT_PAGE_SIZE) Pageable pageable) {
-
+        @PageableDefault(size = Menu.DEFAULT_PAGE_SIZE) Pageable pageable
+    ) {
         return ResponseUtil.findOk(menuService.getAllMenusByRestaurantId(restaurantId, pageable));
     }
 
@@ -119,25 +120,29 @@ public class RestaurantController {
     public ResponseEntity<DataResponseDto<Page<WaitingResponseDto>>> getAllWaitingsByRestaurantId(
         @PathVariable Long restaurantId,
         @AuthenticationPrincipal EmailUserDetails userDetails,
-        @PageableDefault(size = Waiting.DEFAULT_PAGE_SIZE) Pageable pageable) {
-
+        @PageableDefault(size = Waiting.DEFAULT_PAGE_SIZE) Pageable pageable
+    ) {
         return ResponseUtil.createOk(
-            waitingService.getWaitingsByRestaurantId(restaurantId, userDetails.getUser(),
-                pageable));
+            waitingService.getWaitingsByRestaurantId(
+                restaurantId,
+                userDetails.getUser(),
+                pageable)
+        );
     }
 
     // 가게의 마지막 웨이팅 번호 조회
     @GetMapping("/{restaurantId}/last-waiting")
     public ResponseEntity<DataResponseDto<Long>> getWaitingLastNumber(
-        @PathVariable Long restaurantId) {
+        @PathVariable Long restaurantId
+    ) {
         return ResponseUtil.findOk(waitingService.getCurrentWaitingCount(restaurantId));
     }
 
     @GetMapping("/{restaurantId}/reviews")
     public ResponseEntity<DataResponseDto<Page<ReviewResponseDto>>> getAllReviewsByRestaurantId(
         @PathVariable Long restaurantId,
-        @PageableDefault(size = Review.DEFAULT_PAGE_SIZE) Pageable pageable) {
-
+        @PageableDefault(size = Review.DEFAULT_PAGE_SIZE) Pageable pageable
+    ) {
         List<ReviewResponseDto> reservationReviews = reservationReviewService.getAllReviewsByRestaurantId(
             restaurantId);
         List<ReviewResponseDto> waitingReviews = waitingReviewService.getAllReviewsByRestaurantId(
@@ -145,27 +150,34 @@ public class RestaurantController {
 
         return ResponseUtil.findOk(
             totalReviewService.getAllReviewsSortedAndPaged(pageable, reservationReviews,
-                waitingReviews));
+                waitingReviews)
+        );
     }
 
     @PreAuthorize("hasRole('OWNER')")
     @GetMapping("/{restaurantId}/reservations")
     public ResponseEntity<DataResponseDto<Page<ReservationResponseDto>>> getAllReservationsByRestaurantId(
-        @PathVariable Long restaurantId, @AuthenticationPrincipal EmailUserDetails userDetails,
-        @PageableDefault(size = Reservation.DEFAULT_PAGE_SIZE) Pageable pageable) {
-
-        return ResponseUtil.findOk(reservationService.getAllReservationsByRestaurantId(restaurantId,
-            userDetails.getUser(), pageable));
+        @PathVariable Long restaurantId,
+        @AuthenticationPrincipal EmailUserDetails userDetails,
+        @PageableDefault(size = Reservation.DEFAULT_PAGE_SIZE) Pageable pageable
+    ) {
+        return ResponseUtil.findOk(
+            reservationService.getAllReservationsByRestaurantId(
+                restaurantId,
+                userDetails.getUser(),
+                pageable)
+        );
     }
 
     @GetMapping("/{restaurantId}/capacity")
     public ResponseEntity<DataResponseDto<Integer>> getAvailableCapacity(
         @PathVariable Long restaurantId,
         @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-        @RequestParam("time") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime time) {
-
+        @RequestParam("time") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime time
+    ) {
         return ResponseUtil.findOk(
-            reservationService.getAvailableCapacity(restaurantId, date, time));
+            reservationService.getAvailableCapacity(restaurantId, date, time)
+        );
     }
 
     @GetMapping("/filter")
@@ -174,10 +186,11 @@ public class RestaurantController {
         @RequestParam(required = false) String sigungu,
         @RequestParam(required = false) Category category,
         @RequestParam(required = false) Double rating,
-        @PageableDefault(size = Restaurant.DEFAULT_PAGE_SIZE) Pageable pageable) {
-
+        @PageableDefault(size = Restaurant.DEFAULT_PAGE_SIZE) Pageable pageable
+    ) {
         return ResponseUtil.findOk(
-            restaurantService.getFilteredRestaurants(sido, sigungu, category, rating, pageable));
+            restaurantService.getFilteredRestaurants(sido, sigungu, category, rating, pageable)
+        );
     }
 
     @PreAuthorize("hasRole('OWNER')")
@@ -185,10 +198,14 @@ public class RestaurantController {
     public ResponseEntity<MessageResponseDto> updateRestaurant(@PathVariable Long restaurantId,
         @RequestPart RestaurantRequestDto restaurantRequestDto,
         @AuthenticationPrincipal EmailUserDetails userDetails,
-        @RequestPart(required = false) MultipartFile image) {
-
-        restaurantService.updateRestaurant(restaurantId, restaurantRequestDto,
-            userDetails.getUser(), image);
+        @RequestPart(required = false) MultipartFile image
+    ) {
+        restaurantService.updateRestaurant(
+            restaurantId,
+            restaurantRequestDto,
+            userDetails.getUser(),
+            image
+        );
         return ResponseUtil.updateOk();
     }
 
@@ -205,9 +222,10 @@ public class RestaurantController {
 
     @PreAuthorize("hasRole('OWNER')")
     @DeleteMapping("/{restaurantId}")
-    public ResponseEntity<MessageResponseDto> deleteRestaurant(@PathVariable Long restaurantId,
-        @AuthenticationPrincipal EmailUserDetails userDetails) {
-
+    public ResponseEntity<MessageResponseDto> deleteRestaurant(
+        @PathVariable Long restaurantId,
+        @AuthenticationPrincipal EmailUserDetails userDetails
+    ) {
         restaurantService.deleteRestaurant(restaurantId, userDetails.getUser());
         return ResponseUtil.deleteOk();
     }

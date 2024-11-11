@@ -1,6 +1,7 @@
 package site.mygumi.goodbite.domain.waiting.service;
 
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -15,8 +16,6 @@ import site.mygumi.goodbite.common.aspect.lock.RedisLock;
 import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import site.mygumi.goodbite.domain.restaurant.repository.RestaurantRepository;
 import site.mygumi.goodbite.domain.user.customer.entity.Customer;
-import site.mygumi.goodbite.domain.user.customer.exception.CustomerErrorCode;
-import site.mygumi.goodbite.domain.user.customer.exception.CustomerException;
 import site.mygumi.goodbite.domain.user.customer.repository.CustomerRepository;
 import site.mygumi.goodbite.domain.user.entity.UserCredentials;
 import site.mygumi.goodbite.domain.user.owner.entity.Owner;
@@ -27,7 +26,8 @@ import site.mygumi.goodbite.domain.waiting.dto.WaitingResponseDto;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting;
 import site.mygumi.goodbite.domain.waiting.entity.Waiting.WaitingStatus;
 import site.mygumi.goodbite.domain.waiting.exception.WaitingErrorCode;
-import site.mygumi.goodbite.domain.waiting.exception.WaitingException;
+import site.mygumi.goodbite.domain.waiting.exception.detail.WaitingNotFoundException;
+import site.mygumi.goodbite.domain.waiting.repository.WaitingOrderRepository;
 import site.mygumi.goodbite.domain.waiting.repository.WaitingRepository;
 
 /**
@@ -40,6 +40,7 @@ import site.mygumi.goodbite.domain.waiting.repository.WaitingRepository;
 public class WaitingService {
 
     private final WaitingRepository waitingRepository;
+    private final WaitingOrderRepository waitingOrderRepository;
     private final RestaurantRepository restaurantRepository;
     private final CustomerRepository customerRepository;
     private final OwnerRepository ownerRepository;
@@ -78,24 +79,67 @@ public class WaitingService {
             .build();
 
         waitingRepository.save(waiting);
+        waitingOrderRepository.addWaiting(
+            restaurant.getId(),
+            waiting.getId(),
+            waiting.getWaitingNumber()
+        );
 
         return WaitingResponseDto.from(waiting);
     }
 
     /**
-     * 특정 ID의 대기 정보를 조회합니다.
+     * 고객이 특정 ID의 대기 정보를 조회합니다.
      *
      * @param waitingId 조회할 대기의 ID
      * @param user      대기 정보를 조회하는 사용자의 인증 정보
      * @return 조회된 대기 정보를 담은 DTO
      */
     @Transactional(readOnly = true)
-    public WaitingResponseDto getWaiting(Long waitingId, UserCredentials user) {
-
-        validateWaitingRequest(user, waitingId);
-
+    public WaitingResponseDto customerGetWaiting(Long waitingId, UserCredentials user) {
         Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
+        validateWaitingOwnership(waiting, user);
         return WaitingResponseDto.from(waiting);
+    }
+
+    /**
+     * 식당 주인이 특정 ID의 대기 정보를 조회합니다.
+     *
+     * @param waitingId 조회할 대기의 ID
+     * @param user      대기 정보를 조회하는 사용자의 인증 정보
+     * @return 조회된 대기 정보를 담은 DTO
+     */
+    @Transactional(readOnly = true)
+    public WaitingResponseDto ownerGetWaiting(Long waitingId, UserCredentials user) {
+        Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
+        validateRestaurantOwnership(waiting.getRestaurant(), user);
+        return WaitingResponseDto.from(waiting);
+    }
+
+    /**
+     * 특정 웨이팅의 현재 순서를 조회합니다.
+     *
+     * @param waitingId 조회할 웨이팅 ID
+     * @param user      요청하는 사용자의 인증 정보
+     * @return 현재 웨이팅 순서 (1부터 시작)
+     */
+    @Transactional(readOnly = true)
+    public int getWaitingOrder(Long waitingId, UserCredentials user) {
+        Waiting waiting = waitingRepository.findByIdOrThrow(waitingId);
+
+        validateWaitingOwnership(waiting, user);
+
+        Integer order = waitingOrderRepository.getWaitingOrder(
+            waiting.getRestaurant().getId(),
+            waitingId
+        );
+
+        if (order == null) {
+            throw new WaitingNotFoundException(WaitingErrorCode.WAITING_NOT_FOUND);
+        }
+
+        // Redis는 0부터 시작하므로 1을 더해서 반환
+        return order + 1;
     }
 
     /**
@@ -113,9 +157,9 @@ public class WaitingService {
         UserCredentials user
     ) {
 
-        validateWaitingRequest(user, waitingId);
-
         Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
+
+        validateWaitingOwnership(waiting, user);
 
         waiting.update(updateWaitingRequestDto.getPartySize(), updateWaitingRequestDto.getDemand());
 
@@ -137,12 +181,9 @@ public class WaitingService {
         UserCredentials user,
         Pageable pageable
     ) {
-
         Restaurant restaurant = restaurantRepository.findByIdOrThrow(restaurantId);
 
-        Owner owner = ownerRepository.findById(restaurant.getOwner().getId()).orElseThrow(() ->
-            new AuthException(AuthErrorCode.UNAUTHORIZED)
-        );
+        Owner owner = ownerRepository.findByIdOrThrow(restaurant.getOwner().getId());
 
         // api 요청한 유저가 해당 레스토랑의 '오너'와 같지 않다면
         if (!user.getEmail().equals(owner.getEmail())) {
@@ -169,7 +210,6 @@ public class WaitingService {
      */
     @Transactional(readOnly = true)
     public Page<WaitingResponseDto> getMyWaitings(UserCredentials user, Pageable pageable) {
-
         // 기존 pageable에 최신순 정렬을 추가
         Pageable sortedPageable = PageRequest.of(
             pageable.getPageNumber(),
@@ -187,42 +227,54 @@ public class WaitingService {
         return new PageImpl<>(waitingResponseDtos, sortedPageable, waitingPage.getTotalElements());
     }
 
-    /**
-     * 특정 대기에 대한 요청이 유효한지 확인합니다. 요청하는 사용자가 해당 대기의 손님이거나 해당 대기가 속한 레스토랑의 소유자인지 검증합니다.
-     *
-     * @param user      요청하는 사용자의 인증 정보
-     * @param waitingId 검증할 대기의 ID
-     * @throws AuthException     사용자가 해당 작업에 권한이 없는 경우 발생합니다.
-     * @throws WaitingException  해당 레스토랑에 유효한 대기가 존재하지 않을 경우 발생합니다.
-     * @throws CustomerException 대기 등록한 손님 정보가 존재하지 않을 경우 발생합니다.
-     */
-    private void validateWaitingRequest(UserCredentials user, Long waitingId) {
+    @Transactional
+    public void enterWaiting(Long waitingId, UserCredentials user) {
+        Waiting waiting = waitingRepository.findByIdOrThrow(waitingId);
 
-        Waiting waiting = waitingRepository.findNotDeletedByIdOrThrow(waitingId);
+        validateRestaurantOwnership(waiting.getRestaurant(), user);
 
-        Restaurant restaurant = restaurantRepository.findByIdOrThrow(
-            waiting.getRestaurant().getId());
+        waiting.enter();
 
-        Customer customer = customerRepository.findById(waiting.getCustomer().getId())
-            .orElseThrow(() -> new CustomerException(CustomerErrorCode.CUSTOMER_NOT_FOUND));
+        waitingOrderRepository.removeWaiting(waiting.getRestaurant().getId(), waitingId);
+    }
 
-        Owner owner = ownerRepository.findById(restaurant.getOwner().getId())
-            .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED));
+    @Transactional
+    public void noShowWaiting(Long waitingId, UserCredentials user) {
+        Waiting waiting = waitingRepository.findByIdOrThrow(waitingId);
 
-        // api 요청한 유저가 해당 레스토랑의 '오너'와 같던가 혹은 웨이팅 등록한 '손님'과 같던가
-        if (user.getClass().equals(Owner.class) && !user.getEmail()
-            .equals(owner.getEmail())) {
+        validateRestaurantOwnership(waiting.getRestaurant(), user);
+
+        waiting.noShow();
+
+        waitingOrderRepository.removeWaiting(waiting.getRestaurant().getId(), waitingId);
+    }
+
+    @Transactional
+    public void cancelWaiting(Long waitingId, UserCredentials user) {
+        Waiting waiting = waitingRepository.findByIdOrThrow(waitingId);
+
+        validateWaitingOwnership(waiting, user);
+
+        waiting.cancel();
+
+        waitingOrderRepository.removeWaiting(waiting.getRestaurant().getId(), waitingId);
+    }
+
+    private void validateWaitingOwnership(Waiting waiting, UserCredentials customer) {
+        if (!(customer instanceof Customer)) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
-        if (user.getClass().equals(Customer.class) && !user.getEmail()
-            .equals(customer.getEmail())) {
+        if (!Objects.equals(waiting.getCustomer().getId(), customer.getId())) {
             throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
+    }
 
-        List<Waiting> waitingList = waitingRepository.findAllByRestaurantIdDeletedAtIsNull(
-            restaurant.getId());
-        if (waitingList.isEmpty()) {
-            throw new WaitingException(WaitingErrorCode.WAITING_NOT_FOUND);
+    private void validateRestaurantOwnership(Restaurant restaurant, UserCredentials owner) {
+        if (!(owner instanceof Owner)) {
+            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
+        }
+        if (!Objects.equals(restaurant.getOwner().getId(), owner.getId())) {
+            throw new AuthException(AuthErrorCode.UNAUTHORIZED);
         }
     }
 }

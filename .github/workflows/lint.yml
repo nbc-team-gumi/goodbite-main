@@ -62,12 +62,11 @@ jobs:
           FILE_SIZE=$(stat -c%s "build/reports/checkstyle/goodbite-checkstyle-result.xml")
           response=$(curl -s -X POST \
             -H "Authorization: Bearer $SLACK_API_TOKEN" \
-            -H "Content-Type: application/json; charset=utf-8" \
-            -d '{
-                  "filename": "goodbite-checkstyle-result.xml",
-                  "length": '"$FILE_SIZE"'
-                }' \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            --data-urlencode "filename=goodbite-checkstyle-result.xml" \
+            --data-urlencode "length=$FILE_SIZE" \
             https://slack.com/api/files.getUploadURLExternal)
+          
           echo "Slack API response: $response"
           echo "::set-output name=upload_url::$(echo $response | jq -r '.file.upload_url')"
           echo "::set-output name=file_id::$(echo $response | jq -r '.file.id')"

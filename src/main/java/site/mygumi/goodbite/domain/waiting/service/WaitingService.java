@@ -228,6 +228,16 @@ public class WaitingService {
     }
 
     @Transactional
+    public void enterFirstWaiting(Long restaurantId, UserCredentials user) {
+        Long waitingId = Long.valueOf(waitingOrderRepository.getFirstWaitingId(restaurantId));
+        Waiting waiting = waitingRepository.findByIdOrThrow(waitingId);
+
+        validateRestaurantOwnership(waiting.getRestaurant(), user);
+
+        waiting.enter();
+    }
+
+    @Transactional
     public void enterWaiting(Long waitingId, UserCredentials user) {
         Waiting waiting = waitingRepository.findByIdOrThrow(waitingId);
 

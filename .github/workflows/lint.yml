@@ -48,14 +48,17 @@ jobs:
           FILE_NAME="checkstyle-result_$TIMESTAMP.html"
           aws s3 cp build/reports/checkstyle/goodbite-checkstyle-result.html s3://$S3_BUCKET_NAME/$FILE_NAME
           
-          echo "S3_URL=https://${S3_BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${FILE_NAME}" >> $GITHUB_ENV
+          echo "S3_BUCKET_NAME is: $S3_BUCKET_NAME"
+          echo "AWS_REGION is: $AWS_REGION"
+          S3_URL="https://${S3_BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${FILE_NAME}"
+          echo "S3_URL=$S3_URL"
+          echo "S3_URL=$S3_URL" >> $GITHUB_ENV
           echo "Checkstyle 결과 파일이 S3 버킷에 성공적으로 배포되었습니다. 파일명: $FILE_NAME"
 
       - name: Parse Checkstyle Summary
         id: parse_checkstyle
         if: always()
         run: |
-          echo "S3_URL: $S3_URL"
           if [[ -f "build/reports/checkstyle/goodbite-checkstyle-result.xml" ]]; then
             FILE="build/reports/checkstyle/goodbite-checkstyle-result.xml"
             TOTAL_FILES=$(xmllint --xpath "count(//file)" $FILE)

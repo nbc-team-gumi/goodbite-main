@@ -48,7 +48,7 @@ jobs:
           FILE_NAME="checkstyle-result_$TIMESTAMP.html"
           aws s3 cp build/reports/checkstyle/goodbite-checkstyle-result.html s3://$S3_BUCKET_NAME/$FILE_NAME
           
-          S3_URL="https://$S3_BUCKET_NAME.s3.$AWS_REGION.amazonaws.com/$FILE_NAME"
+          S3_URL=https://$S3_BUCKET_NAME.s3.$AWS_REGION.amazonaws.com/$FILE_NAME
           echo "S3_URL=$S3_URL" >> $GITHUB_ENV
           echo "Checkstyle 결과 파일이 S3 버킷에 성공적으로 배포되었습니다. 파일명: $FILE_NAME"
 

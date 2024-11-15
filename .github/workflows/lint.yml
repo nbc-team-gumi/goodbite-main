@@ -29,57 +29,57 @@ jobs:
 
       - name: Run Checkstyle
         id: checkstyle
-        continue-on-error: true
+        continue-on-error: true # 린팅 실패 여부와 관계없이 Slack 알림
         run: ./gradlew checkstyleMain
 
-      - name: Upload Checkstyle Report as Artifacts
-        if: success() || failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: checkstyle-report
-          path: build/reports/checkstyle/goodbite-checkstyle-result.html
-
-      - name: Deploy to GitHub Pages
-        if: success() || failure()
+      - name: Deploy to S3
+        if: success()
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_KEY }}
+          AWS_REGION: ${{ secrets.S3_REGION }}
+          S3_BUCKET_NAME: ${{ secrets.S3_CHECKSTYLE_REPORT_BUCKET_NAME }}
         run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
-          git fetch origin gh-pages
-          git checkout gh-pages
-
-          cp build/reports/checkstyle/goodbite-checkstyle-result.html index.html
-
-          git add index.html
-          git commit -m "📋 docs: Report Checkstyle results in HTML"
-          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git" gh-pages
+          aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
+          aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+          aws configure set default.region "$AWS_REGION"
+          
+          TIMESTAMP=$(date +'%Y-%m-%d_%H-%M-%S')
+          FILE_NAME="checkstyle-result_$TIMESTAMP.html"
+          aws s3 cp build/reports/checkstyle/goodbite-checkstyle-result.html s3://$S3_BUCKET_NAME/$FILE_NAME
+          
+          S3_URL="https://$S3_BUCKET_NAME.s3.$AWS_REGION.amazonaws.com/$FILE_NAME"
+          echo "S3_URL=$S3_URL" >> $GITHUB_ENV
+          echo "Checkstyle 결과 파일이 S3 버킷에 성공적으로 배포되었습니다. 파일명: $FILE_NAME"
 
       - name: Parse Checkstyle Summary
         id: parse_checkstyle
-        if: success() || failure()
+        if: always()
         run: |
-          FILE="build/reports/checkstyle/goodbite-checkstyle-result.xml"
-          TOTAL_FILES=$(xmllint --xpath "count(//file)" $FILE)
-          TOTAL_VIOLATIONS=$(xmllint --xpath "count(//error)" $FILE)
-          FILES_WITH_VIOLATIONS=$(xmllint --xpath "count(//file[error])" $FILE)
-          GITHUB_PAGES_URL="https://nbc-team-gumi.github.io/goodbite-main/"
-
-          echo "# 🔍 Checkstyle Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## 📊 Summary" >> $GITHUB_STEP_SUMMARY
-          echo "| **Metric**            | **Value**     |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------------------|---------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Total files checked   | $TOTAL_FILES  |" >> $GITHUB_STEP_SUMMARY
-          echo "| Total violations      | $TOTAL_VIOLATIONS |" >> $GITHUB_STEP_SUMMARY
-          echo "| Files with violations | $FILES_WITH_VIOLATIONS |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 🔗 Additional Information" >> $GITHUB_STEP_SUMMARY
-          echo "Check the full [Checkstyle HTML report](${GITHUB_PAGES_URL}) for details." >> $GITHUB_STEP_SUMMARY
+          if [[ -f "build/reports/checkstyle/goodbite-checkstyle-result.xml" ]]; then
+            FILE="build/reports/checkstyle/goodbite-checkstyle-result.xml"
+            TOTAL_FILES=$(xmllint --xpath "count(//file)" $FILE)
+            TOTAL_VIOLATIONS=$(xmllint --xpath "count(//error)" $FILE)
+            FILES_WITH_VIOLATIONS=$(xmllint --xpath "count(//file[error])" $FILE)
+            REPORT_URL="${{ env.S3_URL }}"
           
-          echo "total_files=$TOTAL_FILES" >> $GITHUB_ENV
-          echo "total_violations=$TOTAL_VIOLATIONS" >> $GITHUB_ENV
-          echo "files_with_violations=$FILES_WITH_VIOLATIONS" >> $GITHUB_ENV
+            echo "# 🔍 Checkstyle Results" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "## 📊 Summary" >> $GITHUB_STEP_SUMMARY
+            echo "| **Metric**            | **Value**     |" >> $GITHUB_STEP_SUMMARY
+            echo "|-----------------------|---------------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Total files checked   | $TOTAL_FILES  |" >> $GITHUB_STEP_SUMMARY
+            echo "| Total violations      | $TOTAL_VIOLATIONS |" >> $GITHUB_STEP_SUMMARY
+            echo "| Files with violations | $FILES_WITH_VIOLATIONS |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 🔗 Checkstyle Report URL" >> $GITHUB_STEP_SUMMARY
+            echo "[View Checkstyle HTML Report](${REPORT_URL})" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "# 🔍 Checkstyle Results" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "## ❌ Checkstyle Execution Failed" >> $GITHUB_STEP_SUMMARY
+            echo "Checkstyle execution failed. No report was generated. Please check the logs for details." >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Send Slack notification on Checkstyle Failure
         if: failure()
@@ -105,7 +105,7 @@ jobs:
               ]
             }' https://slack.com/api/chat.postMessage
 
-      - name: Send Slack notification with success message and Artifact Link
+      - name: Send Slack notification with success message
         if: success()
         env:
           SLACK_API_TOKEN: ${{ secrets.SLACK_API_TOKEN }}
@@ -113,6 +113,7 @@ jobs:
           TOTAL_FILES: ${{ env.total_files }}
           TOTAL_VIOLATIONS: ${{ env.total_violations }}
           FILES_WITH_VIOLATIONS: ${{ env.files_with_violations }}
+          S3_URL: ${{ env.S3_URL }}
         run: |
           ACTIONS_RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           
@@ -130,6 +131,7 @@ jobs:
                   { "title": "Branch", "value": "${{ github.ref }}", "short": true },
                   { "title": "Commit Message", "value": "${{ github.event.head_commit.message }}", "short": false },
                   { "title": "Actions URL", "value": "$ACTIONS_RUN_URL", "short": false }
+                  { "title": "Lint Report URL", "value": "$S3_URL", "short": false }
                 ]
               },
               {
@@ -146,7 +148,7 @@ jobs:
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "업로드된 Checkstyle 결과 파일을 보려면 <$ACTIONS_RUN_URL|여기>를 클릭하세요. GitHub Actions 페이지에서 다운로드할 수 있습니다."
+                  "text": "업로드된 Checkstyle 결과 파일을 보려면 <$S3_URL|여기>를 클릭하세요."
                 }
               }
             ]

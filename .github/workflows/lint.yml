@@ -55,6 +55,7 @@ jobs:
         id: parse_checkstyle
         if: always()
         run: |
+          echo "S3_URL: $S3_URL"
           if [[ -f "build/reports/checkstyle/goodbite-checkstyle-result.xml" ]]; then
             FILE="build/reports/checkstyle/goodbite-checkstyle-result.xml"
             TOTAL_FILES=$(xmllint --xpath "count(//file)" $FILE)

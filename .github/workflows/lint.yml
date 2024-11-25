@@ -68,8 +68,10 @@ jobs:
             echo "### 🔗 Checkstyle Report URL" >> $GITHUB_STEP_SUMMARY
             echo "[View Checkstyle HTML Report](https://${{ secrets.S3_CHECKSTYLE_REPORT_BUCKET_NAME }}.s3.${{ secrets.S3_REGION }}.amazonaws.com/back-report-${{ github.run_id }}-${{ github.run_number }}-${{ github.event.pull_request.number }}.html)" >> $GITHUB_STEP_SUMMARY
             
-            echo "https://${{ secrets.S3_CHECKSTYLE_REPORT_BUCKET_NAME }}.s3.${{ secrets.S3_REGION }}.amazonaws.com/back-report-${{ github.run_id }}-${{ github.run_number }}-${{ github.event.pull_request.number }}.html"
-            echo "${{ secrets.S3_CHECKSTYLE_REPORT_BUCKET_NAME }}"
+            S3_BUCKET_NAME=$(echo "${{ secrets.S3_CHECKSTYLE_REPORT_BUCKET_NAME }}" | awk '{print}')
+            S3_REGION=$(echo "${{ secrets.S3_REGION }}" | awk '{print}')
+            echo "$S3_BUCKET_NAME"
+            echo "$S3_REGION"
           
           else
             echo "# 🔍 Checkstyle Results" >> $GITHUB_STEP_SUMMARY

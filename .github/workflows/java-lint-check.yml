@@ -40,9 +40,7 @@ jobs:
           aws configure set aws_access_key_id "${{ secrets.S3_ACCESS_KEY }}"
           aws configure set aws_secret_access_key "${{ secrets.S3_SECRET_KEY }}"
           aws configure set default.region "${{ vars.S3_REGION }}"
-          
           aws s3 cp build/reports/checkstyle/goodbite-checkstyle-result.html s3://${{ vars.S3_CHECKSTYLE_REPORT_BUCKET_NAME }}/back-report-${{ github.run_id }}-${{ github.run_number }}-${{ github.event.pull_request.number }}.html
-          echo "Checkstyle 결과 파일이 S3 버킷에 성공적으로 배포되었습니다. ${{ env.S3_URL }}"
 
       - name: Parse Checkstyle Summary
         id: parse_checkstyle
@@ -76,21 +74,42 @@ jobs:
             echo "Checkstyle execution failed. No report was generated. Please check the logs for details." >> $GITHUB_STEP_SUMMARY
           fi
 
-      - name: Send Slack notification on Checkstyle Failure
-        if: failure()
+      - name: Prepare Event Details
+        id: prepare_event_details
         run: |
           ACTIONS_RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           EVENT_NAME="${{ github.event_name }}"
           
           if [ "$EVENT_NAME" = "push" ]; then
-          MESSAGE="${{ github.event.head_commit.message }}"
+            MESSAGE="${{ github.event.head_commit.message }}"
           elif [ "$EVENT_NAME" = "pull_request" ]; then
-          MESSAGE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits" | jq -r '.[-1].commit.message')
+            PAGE=1
+            LATEST_COMMIT_MESSAGE=""
+          
+            while true; do
+              COMMITS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits?per_page=100&page=$PAGE")
+
+              LENGTH=$(echo "$COMMITS" | jq length)
+              if [ "$LENGTH" -eq 0 ]; then
+                break
+              fi
+
+              LATEST_COMMIT_MESSAGE=$(echo "$COMMITS" | jq -r '.[-1].commit.message')
+              PAGE=$((PAGE + 1))
+            done
+
+            MESSAGE=$LATEST_COMMIT_MESSAGE
           else
-          MESSAGE="이벤트 정보 없음"
+            MESSAGE="이벤트 정보 없음"
           fi
           
+          echo "ACTIONS_RUN_URL=$ACTIONS_RUN_URL" >> $GITHUB_ENV
+          echo "MESSAGE=$MESSAGE" >> $GITHUB_ENV
+
+      - name: Send Slack notification on Checkstyle Failure
+        if: failure()
+        run: |
           curl -X POST -H 'Content-type: application/json' \
             -H "Authorization: Bearer ${{ secrets.SLACK_API_TOKEN }}" \
             --data '{
@@ -128,33 +147,6 @@ jobs:
       - name: Send Slack notification with success message
         if: success()
         run: |
-          ACTIONS_RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          EVENT_NAME="${{ github.event_name }}"
-          
-          if [ "$EVENT_NAME" = "push" ]; then
-            MESSAGE="${{ github.event.head_commit.message }}"
-          elif [ "$EVENT_NAME" = "pull_request" ]; then
-            PAGE=1
-            LATEST_COMMIT_MESSAGE=""
-          
-            while true; do
-              COMMITS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits?per_page=100&page=$PAGE")
-
-              LENGTH=$(echo "$COMMITS" | jq length)
-              if [ "$LENGTH" -eq 0 ]; then
-                break
-              fi
-
-              LATEST_COMMIT_MESSAGE=$(echo "$COMMITS" | jq -r '.[-1].commit.message')
-              PAGE=$((PAGE + 1))
-            done
-
-            MESSAGE=$LATEST_COMMIT_MESSAGE
-          else
-            MESSAGE="이벤트 정보 없음"
-          fi
-          
           curl -X POST -H "Content-Type: application/json; charset=utf-8" \
             -H "Authorization: Bearer ${{ secrets.SLACK_API_TOKEN }}" \
               --data @- https://slack.com/api/chat.postMessage <<EOF

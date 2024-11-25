@@ -86,7 +86,7 @@ jobs:
           MESSAGE="${{ github.event.head_commit.message }}"
           elif [ "$EVENT_NAME" = "pull_request" ]; then
           MESSAGE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits" | jq -r '.[].commit.message')
+          "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits" | jq -r '.[-1].commit.message')
           else
           MESSAGE="이벤트 정보 없음"
           fi
@@ -135,7 +135,7 @@ jobs:
             MESSAGE="${{ github.event.head_commit.message }}"
           elif [ "$EVENT_NAME" = "pull_request" ]; then
             MESSAGE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits" | jq -r '.[].commit.message')
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits" | jq -r '.[-1].commit.message')
           else
             MESSAGE="이벤트 정보 없음"
           fi

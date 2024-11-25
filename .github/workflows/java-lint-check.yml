@@ -122,7 +122,7 @@ jobs:
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "*[Backend]*\n\n*📊 린팅 작업 요약*\n\n- *Total files checked*: $TOTAL_FILES\n- *Total violations*: $TOTAL_VIOLATIONS\n- *Files with violations*: $FILES_WITH_VIOLATIONS\n\n🔗 *[검사 결과 URL]*\n\n\n${{ env.S3_URL }}\n"
+                  "text": "*[Backend]*\n\n*📊 린팅 작업 요약*\n\n- *Total files checked*: $TOTAL_FILES\n- *Total violations*: $TOTAL_VIOLATIONS\n- *Files with violations*: $FILES_WITH_VIOLATIONS\n\n🔗 *[검사 결과 URL]*\n${{ env.S3_URL }}\n\n\n"
                 }
               }
             ],

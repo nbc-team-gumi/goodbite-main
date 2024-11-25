@@ -101,6 +101,15 @@ jobs:
         if: success()
         run: |
           ACTIONS_RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          EVENT_NAME="${{ github.event_name }}"
+          
+          if [ "$EVENT_NAME" = "push" ]; then
+            MESSAGE="${{ github.event.head_commit.message }}"
+          elif [ "$EVENT_NAME" = "pull_request" ]; then
+            MESSAGE="${{ github.event.pull_request.title }}"
+          else
+            MESSAGE="이벤트 정보 없음"
+          fi
           
           curl -X POST -H "Content-Type: application/json; charset=utf-8" \
             -H "Authorization: Bearer ${{ secrets.SLACK_API_TOKEN }}" \
@@ -108,25 +117,24 @@ jobs:
           {
             "channel": "${{ secrets.SLACK_CHANNEL_ID }}",
             "text": "✅ Checkstyle 실행에 성공하였습니다. 결과 파일을 확인하세요.",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*[Backend]*\n*📊 린팅 작업 요약*\n\n- *Total files checked*: $TOTAL_FILES\n- *Total violations*: $TOTAL_VIOLATIONS\n- *Files with violations*: $FILES_WITH_VIOLATIONS\n\n🔗 *[검사 결과 URL]*\n${{ env.S3_URL }}\n"
+                }
+              }
+            ],
             "attachments": [
               {
                 "color": "#36a64f",
                 "fields": [
                   { "title": "Repository", "value": "${{ github.repository }}", "short": true },
                   { "title": "Branch", "value": "${{ github.ref }}", "short": true },
-                  { "title": "Commit Message", "value": "${{ github.event.head_commit.message }}", "short": false },
-                  { "title": "Actions URL", "value": "$ACTIONS_RUN_URL", "short": false },
-                  { "title": "Lint Report URL", "value": "${{ env.S3_URL }}", "short": false }
+                  { "title": "Message", "value": "$MESSAGE", "short": false },
+                  { "title": "Actions URL", "value": "$ACTIONS_RUN_URL", "short": false }
                 ]
-              }
-            ],
-            "blocks": [
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "*📊 린팅 작업 요약*\n\n- *Total files checked*: $TOTAL_FILES\n- *Total violations*: $TOTAL_VIOLATIONS\n- *Files with violations*: $FILES_WITH_VIOLATIONS\n\n🔗 *[Lint Report 확인하기](${{ env.S3_URL }})*"
-                }
               }
             ]
           }

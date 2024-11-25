@@ -10,14 +10,13 @@ on:
 env:
   S3_BUCKET_NAME: ${{ secrets.S3_CHECKSTYLE_REPORT_BUCKET_NAME }}
   S3_REGION: ${{ secrets.S3_REGION }}
-  WORKFLOW_ID: ${{ github.run_id }}-${{ github.run_number }}-${{ github.event.pull_request.number }}
-  FILE_NAME: back-report-${{ env.WORKFLOW_ID }}.html
-  S3_URL: https://${{ env.S3_BUCKET_NAME }}.s3.${{ env.S3_REGION }}.amazonaws.com/${{ env.FILE_NAME }}
+  FILE_NAME: back-report-${{ github.run_id }}-${{ github.run_number }}-${{ github.event.pull_request.number }}.html
 
 jobs:
   lint:
     runs-on: ubuntu-20.04
-
+    env:
+      S3_URL: https://${{ env.S3_BUCKET_NAME }}.s3.${{ env.S3_REGION }}.amazonaws.com/${{ env.FILE_NAME }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

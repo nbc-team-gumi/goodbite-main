@@ -134,8 +134,23 @@ jobs:
           if [ "$EVENT_NAME" = "push" ]; then
             MESSAGE="${{ github.event.head_commit.message }}"
           elif [ "$EVENT_NAME" = "pull_request" ]; then
-            MESSAGE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits" | jq -r '.[-1].commit.message')
+            PAGE=1
+            LATEST_COMMIT_MESSAGE=""
+          
+            while true; do
+              COMMITS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits?per_page=100&page=$PAGE")
+
+              LENGTH=$(echo "$COMMITS" | jq length)
+              if [ "$LENGTH" -eq 0 ]; then
+                break
+              fi
+
+              LATEST_COMMIT_MESSAGE=$(echo "$COMMITS" | jq -r '.[-1].commit.message')
+              PAGE=$((PAGE + 1))
+            done
+
+            MESSAGE=$LATEST_COMMIT_MESSAGE
           else
             MESSAGE="이벤트 정보 없음"
           fi

@@ -79,19 +79,47 @@ jobs:
       - name: Send Slack notification on Checkstyle Failure
         if: failure()
         run: |
+          ACTIONS_RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          EVENT_NAME="${{ github.event_name }}"
+          
+          if [ "$EVENT_NAME" = "push" ]; then
+          MESSAGE="${{ github.event.head_commit.message }}"
+          elif [ "$EVENT_NAME" = "pull_request" ]; then
+          MESSAGE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits" | jq -r '.[].commit.message')
+          else
+          MESSAGE="이벤트 정보 없음"
+          fi
+          
           curl -X POST -H 'Content-type: application/json' \
             -H "Authorization: Bearer ${{ secrets.SLACK_API_TOKEN }}" \
             --data '{
               "channel": "${{ secrets.SLACK_CHANNEL_ID }}",
-              "text": "❗ Checkstyle 실행에 실패했습니다. 워크플로우 설정 또는 환경 구성을 확인하세요.",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "⚙️ Backend",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*📊 린팅 작업 요약*\n\n❗ Checkstyle 실행에 실패했습니다. 워크플로우 설정 또는 환경 구성을 확인하세요.\n\n\n"
+                  }
+                }
+              ],
               "attachments": [
                 {
                   "color": "#ff0000",
                   "fields": [
                     { "title": "Repository", "value": "${{ github.repository }}", "short": true },
                     { "title": "Branch", "value": "${{ github.ref }}", "short": true },
-                    { "title": "Commit Message", "value": "${{ github.event.head_commit.message }}", "short": false },
-                    { "title": "Actions URL", "value": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}", "short": false }
+                    { "title": "Message", "value": "$MESSAGE", "short": false },
+                    { "title": "Actions URL", "value": "$ACTIONS_RUN_URL", "short": false }
                   ]
                 }
               ]
@@ -106,7 +134,8 @@ jobs:
           if [ "$EVENT_NAME" = "push" ]; then
             MESSAGE="${{ github.event.head_commit.message }}"
           elif [ "$EVENT_NAME" = "pull_request" ]; then
-            MESSAGE="${{ github.event.pull_request.title }}"
+            MESSAGE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits" | jq -r '.[].commit.message')
           else
             MESSAGE="이벤트 정보 없음"
           fi
@@ -116,13 +145,20 @@ jobs:
               --data @- https://slack.com/api/chat.postMessage <<EOF
           {
             "channel": "${{ secrets.SLACK_CHANNEL_ID }}",
-            "text": "✅ Checkstyle 실행에 성공하였습니다. 결과 파일을 확인하세요.",
             "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "⚙️ Backend",
+                  "emoji": true
+                }
+              },
               {
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "*[Backend]*\n\n*📊 린팅 작업 요약*\n\n- *Total files checked*: $TOTAL_FILES\n- *Total violations*: $TOTAL_VIOLATIONS\n- *Files with violations*: $FILES_WITH_VIOLATIONS\n\n🔗 *[검사 결과 URL]*\n${{ env.S3_URL }}\n\n\n"
+                  "text": "*📊 린팅 작업 요약*\n\n- *Total files checked*: $TOTAL_FILES\n- *Total violations*: $TOTAL_VIOLATIONS\n- *Files with violations*: $FILES_WITH_VIOLATIONS\n\n🔗 *[검사 결과 URL]*\n${{ env.S3_URL }}\n\n\n"
                 }
               }
             ],

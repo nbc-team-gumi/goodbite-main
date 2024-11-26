@@ -2,7 +2,7 @@ name: Java Lint Check
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened] # 처음 생성시점(opened), 커밋 추가/변경 시점(synchronize), 닫힌 PR 재오픈 시점(reopened)
+    types: [opened, synchronize, reopened]
     branches:
       - main
       - dev
@@ -113,7 +113,7 @@ jobs:
           curl -X POST -H 'Content-type: application/json' \
             -H "Authorization: Bearer ${{ secrets.SLACK_API_TOKEN }}" \
             --data '{
-              "channel": "${{ secrets.SLACK_CHANNEL_ID }}",
+              "channel": "${{ secrets.SLACK_TEST_CHANNEL_ID }}",
               "blocks": [
                 {
                   "type": "header",
@@ -151,7 +151,7 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.SLACK_API_TOKEN }}" \
               --data @- https://slack.com/api/chat.postMessage <<EOF
           {
-            "channel": "${{ secrets.SLACK_CHANNEL_ID }}",
+            "channel": "${{ secrets.SLACK_TEST_CHANNEL_ID }}",
             "blocks": [
               {
                 "type": "header",

@@ -2,8 +2,10 @@ name:
   Java Build and Deploy to AWS EC2
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
+
 
 env:
   DOCKER_IMAGE_TAG_NAME: good-bite

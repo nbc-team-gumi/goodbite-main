@@ -49,6 +49,9 @@ jobs:
           echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
           echo "KAKAO_API_KEY=${{ secrets.KAKAO_API_KEY }}" >> .env
           echo "PUBLIC_DATA_KEY=${{ secrets.PUBLIC_DATA_KEY }}" >> .env
+          
+          cat .env
+          cat ${{ github.workspace }}/.env
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
@@ -107,9 +110,6 @@ jobs:
           host: ${{ env.instance_ips }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
-          script: |
-            cat .env
-            cat ${{ github.workspace }}/.env
 
       - name: Deploy to each EC2
         uses: appleboy/ssh-action@v1.0.3

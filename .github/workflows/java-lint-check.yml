@@ -80,7 +80,7 @@ jobs:
           EVENT_NAME="${{ github.event_name }}"
           
           if [ "$EVENT_NAME" = "push" ]; then
-            MESSAGE="${{ github.event.head_commit.message }}"
+            MESSAGE=$(echo "${{ github.event.head_commit.message }}" | awk 'NR==1')
           elif [ "$EVENT_NAME" = "pull_request" ]; then
             PAGE=1
             LATEST_COMMIT_MESSAGE=""
@@ -98,7 +98,7 @@ jobs:
               PAGE=$((PAGE + 1))
             done
 
-            MESSAGE=$LATEST_COMMIT_MESSAGE
+            MESSAGE=$(echo "$LATEST_COMMIT_MESSAGE" | awk 'NR==1')
           else
             MESSAGE="이벤트 정보 없음"
           fi

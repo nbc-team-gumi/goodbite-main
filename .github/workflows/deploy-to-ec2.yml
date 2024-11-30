@@ -107,7 +107,7 @@ jobs:
         with:
           source: "${{ github.workspace }}/.env"
           target: "~/dist/"
-          host: ${{ env.instance_ips }}
+          host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
 

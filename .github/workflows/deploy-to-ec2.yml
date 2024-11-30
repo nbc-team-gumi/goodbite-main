@@ -100,7 +100,7 @@ jobs:
           echo "instance_ips=$(echo $IP_ADDRESSES | tr -s ' ' | tr ' ' ',')" >> $GITHUB_ENV
 
       - name: Upload .env file to EC2
-        uses: appleboy/scp-action@v1.1.0
+        uses: appleboy/scp-action@v0.1.7
         with:
           source: .env
           target: /home/ubuntu/.env

@@ -49,19 +49,6 @@ jobs:
           echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
           echo "KAKAO_API_KEY=${{ secrets.KAKAO_API_KEY }}" >> .env
           echo "PUBLIC_DATA_KEY=${{ secrets.PUBLIC_DATA_KEY }}" >> .env
-          
-          echo "Generated .env file:"
-          cat .env
-
-      - name: Verify .env file before upload
-        run: |
-          if [ -f .env ]; then
-            echo ".env file exists:"
-            cat .env
-          else
-            echo ".env file does not exist!"
-            exit 1
-          fi
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
@@ -116,7 +103,7 @@ jobs:
         uses: appleboy/scp-action@v0.1.7
         with:
           source: ${{ github.workspace }}/.env
-          target: /home/ubuntu/.env
+          target: /home/ubuntu
           host: ${{ env.instance_ips }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}

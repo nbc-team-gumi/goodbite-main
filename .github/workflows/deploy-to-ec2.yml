@@ -102,7 +102,7 @@ jobs:
       - name: Upload .env file to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
-          source: ${{ github.workspace }}/.env
+          source: .env
           target: /home/ubuntu
           host: ${{ env.instance_ips }}
           username: ${{ secrets.EC2_USER }}

@@ -5,7 +5,6 @@ on:
   push:
     branches: [ 278-script-cicd-스크립트-추가 ]
 
-
 env:
   DOCKER_IMAGE_TAG_NAME: good-bite
 
@@ -24,9 +23,6 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-
-      - name: Decode keystore and save
-        run: echo "${{ secrets.PKCS12_BASE64 }}" | base64 --decode > src/main/resources/api.goodbite.site.p12
 
       - name: Generate .env file from secrets and vars
         run: |
@@ -53,7 +49,6 @@ jobs:
           echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
           echo "KAKAO_API_KEY=${{ secrets.KAKAO_API_KEY }}" >> .env
           echo "PUBLIC_DATA_KEY=${{ secrets.PUBLIC_DATA_KEY }}" >> .env
-          echo "SSL_KEY=${{ secrets.SSL_KEY }}" >> .env
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
@@ -104,6 +99,15 @@ jobs:
           
           echo "instance_ips=$(echo $IP_ADDRESSES | tr -s ' ' | tr ' ' ',')" >> $GITHUB_ENV
 
+      - name: Upload .env file to EC2
+        uses: appleboy/scp-action@v1.1.0
+        with:
+          source: .env
+          target: /home/ubuntu/.env
+          host: ${{ env.instance_ips }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+
       - name: Deploy to each EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -116,7 +120,7 @@ jobs:
             sudo usermod -aG docker $USER
             newgrp docker
             
-            CONTAINER_ID=$(sudo docker ps -q --filter "publish=443-443")
+            CONTAINER_ID=$(sudo docker ps -q --filter "publish=443-443" --filter "publish=80-8080")
             
             if [ ! -z "$CONTAINER_ID" ]; then
             sudo docker stop $CONTAINER_ID
@@ -125,5 +129,7 @@ jobs:
             
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
             
-            sudo docker run -d -p 443:443 --env-file .env \
+            sudo docker run -d -p 80:8080 --env-file /home/ubuntu/.env \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
+            
+            rm -f /home/ubuntu/.env

@@ -28,11 +28,6 @@ cloud:
     stack:
       auto: false
 
-server:
-  port: 8080
-  ssl:
-    enabled: false
-
 logging:
   level:
     root: INFO

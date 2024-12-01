@@ -102,15 +102,6 @@ jobs:
           
           echo "instance_ips=$(echo $IP_ADDRESSES | tr -s ' ' | tr ' ' ',')" >> $GITHUB_ENV
 
-      - name: Upload .env file to EC2
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          source: "${{ github.workspace }}/.env"
-          target: "~/dist/"
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-
       - name: Deploy to each EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -118,6 +109,10 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
+            cat << 'EOF' > /home/ubuntu/.env
+            $(cat ${{ github.workspace }}/.env)
+            EOF
+            
             sudo apt-get update
             sudo apt-get install -y docker.io
             sudo usermod -aG docker $USER

@@ -77,9 +77,6 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
           no-cache: true
 
-      - name: Clean up .env file
-        run: rm -f .env
-
   deploy-to-ec2:
     needs: build-and-docker-push
     runs-on: ubuntu-20.04

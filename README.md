@@ -118,6 +118,48 @@ S3_SECRET_KEY={secret_key}
 > - 예약 관리: 수락, 취소
 > - 알림: 신규 웨이팅, 예약, 취소 알림
 
+# <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> 주요 기능 시연
+
+### 회원가입
+- 일반 사용자와 사업자 중 한 가지를 선택하여 회원가입합니다. 
+- 사업자 회원가입 시 사업자 등록 번호를 입력해야 합니다.
+
+<div align="center">
+        <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/goodbite+%ED%9A%8C%EC%9B%90%EA%B0%80%EC%9E%85.gif" alt="signup"/>
+</div>
+
+### 가게 목록과 상세 페이지
+- 메인 화면에서 조건을 설정하여 가게 목록을 확인할 수 있습니다.
+- 가게를 선택하여 가게의 상세 정보를 확인할 수 있습니다.
+
+<div align="center">
+        <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/goodbite+%EB%A9%94%EC%9D%B8%EA%B3%BC+%EA%B0%80%EA%B2%8C+%EC%83%81%EC%84%B8+%ED%8E%98%EC%9D%B4%EC%A7%80.gif" alt="main"/>
+</div>
+
+### 손님(일반 사용자) 로그인
+- 원하는 가게에 웨이팅과 예약을 할 수 있습니다.
+
+<div align="center">
+        <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/goodbite+%EC%9B%A8%EC%9D%B4%ED%8C%85+%EB%93%B1%EB%A1%9D.gif" alt="waiting"/>
+</div>
+
+
+- 웨이팅 및 예약을 이용하여 방문을 완료한 가게에 리뷰를 작성할 수 있습니다.
+
+<div align="center">
+        <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/goodbite+%EB%A6%AC%EB%B7%B0+%EB%93%B1%EB%A1%9D.gif" alt="review"/>
+</div>
+
+### 사업자 로그인
+- 사업자로 로그인 시 대시보드에서 웨이팅과 예약 내역을 확인하고 관리할 수 있습니다.
+
+<div align="center">
+        <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/goodbite+%EC%82%AC%EC%97%85%EC%9E%90%EB%A1%9C%EA%B7%B8%EC%9D%B8.gif" alt="login"/>
+</div>
+<div align="center">
+        <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/goodbite+%EC%9B%A8%EC%9D%B4%ED%8C%85+%EC%88%98%EB%9D%BD%2C+%EA%B1%B0%EC%A0%88.gif" alt="dashboard"/>
+</div>
+
 # <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> API 명세서
 
 🔗API 명세서 노션 페이지 링크

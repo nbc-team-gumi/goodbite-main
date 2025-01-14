@@ -1,8 +1,5 @@
 package site.mygumi.goodbite.domain.waiting.entity;
 
-import site.mygumi.goodbite.common.entity.ExtendedTimestamped;
-import site.mygumi.goodbite.domain.user.customer.entity.Customer;
-import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,17 +8,27 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import site.mygumi.goodbite.common.entity.ExtendedTimestamped;
+import site.mygumi.goodbite.domain.restaurant.entity.Restaurant;
+import site.mygumi.goodbite.domain.user.customer.entity.Customer;
 
-@Getter
-@NoArgsConstructor
 @Entity
+@Table(indexes = {
+    @Index(name = "idx_waiting_restaurant_status_created",
+        columnList = "restaurant_id,status,created_at")
+})
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Waiting extends ExtendedTimestamped {
 
     public static final int DEFAULT_PAGE_SIZE = 5;
@@ -38,7 +45,8 @@ public class Waiting extends ExtendedTimestamped {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    private Long waitingOrder;
+    @Column(nullable = false)
+    private Integer waitingNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -46,22 +54,16 @@ public class Waiting extends ExtendedTimestamped {
 
     private Long partySize;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private WaitingType waitingType;
-
     private String demand;
 
     @Builder
-    public Waiting(Restaurant restaurant, Customer customer, Long waitingOrder,
-        WaitingStatus status, Long partySize, WaitingType waitingType,
-        String demand) {
+    public Waiting(Restaurant restaurant, Customer customer, Integer waitingNumber,
+        WaitingStatus status, Long partySize, String demand) {
         this.restaurant = restaurant;
         this.customer = customer;
-        this.waitingOrder = waitingOrder;
+        this.waitingNumber = waitingNumber;
         this.status = status;
         this.partySize = partySize;
-        this.waitingType = waitingType;
         this.demand = demand;
     }
 
@@ -70,32 +72,31 @@ public class Waiting extends ExtendedTimestamped {
         this.demand = demand;
     }
 
-    public void delete(LocalDateTime deletedAt, WaitingStatus status) {
-        this.waitingOrder = null;
-        this.deletedAt = deletedAt;
-        this.status = status;
+    public void enter() {
+        this.deletedAt = LocalDateTime.now();
+        this.status = WaitingStatus.ENTERED;
     }
 
-    public void reduceWaitingOrder() {
-        --this.waitingOrder;
+    public void noShow() {
+        this.deletedAt = LocalDateTime.now();
+        this.status = WaitingStatus.NO_SHOW;
+    }
+
+    public void cancel() {
+        this.deletedAt = LocalDateTime.now();
+        this.status = WaitingStatus.CANCELLED;
     }
 
     public boolean canSubmitReview() {
-        return this.status == WaitingStatus.SEATED && this.deletedAt != null
+        return this.status == WaitingStatus.ENTERED && this.deletedAt != null
             && ChronoUnit.MINUTES.between(deletedAt, LocalDateTime.now()) <= 60 * 24 * 3;
     }
 
     public enum WaitingStatus {
-
         WAITING,
-        SEATED,
-        CANCELLED
+        ENTERED,
+        CANCELLED,
+        NO_SHOW,
+        EXPIRED
     }
-
-    public enum WaitingType {
-
-        OFFLINE,
-        ONLINE
-    }
-
 }

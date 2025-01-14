@@ -27,7 +27,6 @@ Authorization:{{Authorization}}
 {
   "restaurantId": 1,
   "partySize": 123,
-  "waitingType": "OFFLINE",
   "demand": "널널한 자리로 주세요~"
 }
 

@@ -13,6 +13,7 @@
 ## <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> 프로젝트 소개
 
 가게에서 손님의 대기 순번을 관리하고, 차례가 되었을 때 그 손님들에게 알려줄 수 있는 시스템을 개발합니다.
+
 이 시스템은 손님들이 대기 시간을 효율적으로 관리할 수 있도록 도와주며, 가게 운영자와 관리자에게도 편리한 도구를 제공합니다.
 손님은 대기 순번을 실시간으로 확인할 수 있으며, 자신의 차례가 다가오면 알림을 받게 됩니다.
 가게 측에서는 손님의 대기 순번을 체계적으로 관리하고, 손님들에게 원활한 서비스를 제공할 수 있습니다.
@@ -25,7 +26,7 @@
 >   - 2024.08.05: 중간 발표회
 >   - 2024.08.21: 최종 발표회
 
-# <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/My-Gummy-logo-removebg2.png" width="60"/>팀 마이구미 [<img src="https://img.icons8.com/?size=100&id=CexFs1lac6J7&format=png&color=000000" width="30">](https://github.com/nbc-team-gumi)
+# <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/My-Gummy-logo-simplify-removebg.png" width=35/>팀 마이구미 [<img src="https://img.icons8.com/?size=100&id=CexFs1lac6J7&format=png&color=000000" width="30">](https://github.com/nbc-team-gumi)
 
 |                                        강현지                                        |                                        김정민                                        |                                       김현성                                       |                                       양소영                                       |                                       이하은                                        |                                                                                                              
 |:---------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------:|
@@ -39,8 +40,8 @@
 
 For building and running the application you need:
 
-- JDK 21: Amazon Corretto 21.0.4
-- Gradle 8.8
+- JDK 21: Amazon Corretto 21.0.4 recommended
+- Gradle 8.8 recommended
 
 ## Environment arguments
 
@@ -162,8 +163,8 @@ S3_SECRET_KEY={secret_key}
 
 # <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> API 명세서
 
-🔗API 명세서 노션 페이지 링크
-</br>
+🔗 API 명세서 노션 페이지 링크
+
 <a href="https://teamsparta.notion.site/3eb86cddac8f4123bf9a677f34e30671?v=08d7113eab5b4f0488b30fd0e76f5f2c">
 <img src="https://img.shields.io/badge/Notion-%23000000.svg?style=for-the-badge&logo=notion&logoColor=white" width="100"/>
 </a>
@@ -171,7 +172,7 @@ S3_SECRET_KEY={secret_key}
 # <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> 서비스 아키텍처
 
 <div align="center">
-        <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/architecture.png" alt="architecture"/>
+        <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/goodbite_infra.png" alt="architecture"/>
 </div>
 
 # <img src="https://goodbite-bucket.s3.ap-northeast-2.amazonaws.com/%EA%B4%80%EB%A6%AC%EC%9E%90+%EC%9D%B4%EB%AF%B8%EC%A7%80/good-bite-logo-simplify-removebg.png" width="25"/> ERD

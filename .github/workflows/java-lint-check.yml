@@ -1,0 +1,183 @@
+name: Java Lint Check
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  lint:
+    runs-on: ubuntu-20.04
+    env:
+      S3_URL: https://${{ vars.S3_CHECKSTYLE_REPORT_BUCKET_NAME }}.s3.${{ vars.S3_REGION }}.amazonaws.com/back-report-${{ github.run_id }}-${{ github.run_number }}-${{ github.event.pull_request.number }}.html
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: Install dependencies
+        run: ./gradlew build -x test
+
+      - name: Install xmllint
+        run: sudo apt-get update && sudo apt-get install -y libxml2-utils
+
+      - name: Run Checkstyle
+        id: checkstyle
+        continue-on-error: true # 린팅 실패 여부와 관계없이 Slack 알림
+        run: ./gradlew checkstyleMain
+
+      - name: Deploy to S3
+        if: success()
+        run: |
+          aws configure set aws_access_key_id "${{ secrets.S3_ACCESS_KEY }}"
+          aws configure set aws_secret_access_key "${{ secrets.S3_SECRET_KEY }}"
+          aws configure set default.region "${{ vars.S3_REGION }}"
+          aws s3 cp build/reports/checkstyle/goodbite-checkstyle-result.html s3://${{ vars.S3_CHECKSTYLE_REPORT_BUCKET_NAME }}/back-report-${{ github.run_id }}-${{ github.run_number }}-${{ github.event.pull_request.number }}.html
+
+      - name: Parse Checkstyle Summary
+        id: parse_checkstyle
+        if: always()
+        run: |
+          if [[ -f "build/reports/checkstyle/goodbite-checkstyle-result.xml" ]]; then
+            FILE="build/reports/checkstyle/goodbite-checkstyle-result.xml"
+            TOTAL_FILES=$(xmllint --xpath "count(//file)" $FILE)
+            TOTAL_VIOLATIONS=$(xmllint --xpath "count(//error)" $FILE)
+            FILES_WITH_VIOLATIONS=$(xmllint --xpath "count(//file[error])" $FILE)
+          
+            echo "TOTAL_FILES=$TOTAL_FILES" >> $GITHUB_ENV
+            echo "TOTAL_VIOLATIONS=$TOTAL_VIOLATIONS" >> $GITHUB_ENV
+            echo "FILES_WITH_VIOLATIONS=$FILES_WITH_VIOLATIONS" >> $GITHUB_ENV
+
+            echo "# 🔍 Checkstyle Results" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "## 📊 Summary" >> $GITHUB_STEP_SUMMARY
+            echo "| **Metric**            | **Value**     |" >> $GITHUB_STEP_SUMMARY
+            echo "|-----------------------|---------------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Total files checked   | $TOTAL_FILES  |" >> $GITHUB_STEP_SUMMARY
+            echo "| Total violations      | $TOTAL_VIOLATIONS |" >> $GITHUB_STEP_SUMMARY
+            echo "| Files with violations | $FILES_WITH_VIOLATIONS |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 🔗 Checkstyle Report URL" >> $GITHUB_STEP_SUMMARY
+            echo "[View Checkstyle HTML Report](${{ env.S3_URL }})" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "# 🔍 Checkstyle Results" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "## ❌ Checkstyle Execution Failed" >> $GITHUB_STEP_SUMMARY
+            echo "Checkstyle execution failed. No report was generated. Please check the logs for details." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Prepare Event Details
+        id: prepare_event_details
+        run: |
+          ACTIONS_RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          EVENT_NAME="${{ github.event_name }}"
+          
+          if [ "$EVENT_NAME" = "push" ]; then
+            MESSAGE=$(echo "${{ github.event.head_commit.message }}" | awk 'NR==1')
+          elif [ "$EVENT_NAME" = "pull_request" ]; then
+            PAGE=1
+            LATEST_COMMIT_MESSAGE=""
+          
+            while true; do
+              COMMITS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits?per_page=100&page=$PAGE")
+
+              LENGTH=$(echo "$COMMITS" | jq length)
+              if [ "$LENGTH" -eq 0 ]; then
+                break
+              fi
+
+              LATEST_COMMIT_MESSAGE=$(echo "$COMMITS" | jq -r '.[-1].commit.message')
+              PAGE=$((PAGE + 1))
+            done
+
+            MESSAGE=$(echo "$LATEST_COMMIT_MESSAGE" | awk 'NR==1')
+          else
+            MESSAGE="이벤트 정보 없음"
+          fi
+          
+          echo "ACTIONS_RUN_URL=$ACTIONS_RUN_URL" >> $GITHUB_ENV
+          echo "MESSAGE=$MESSAGE" >> $GITHUB_ENV
+
+      - name: Send Slack notification on Checkstyle Failure
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            -H "Authorization: Bearer ${{ secrets.SLACK_API_TOKEN }}" \
+            --data '{
+              "channel": "${{ secrets.SLACK_TEST_CHANNEL_ID }}",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "⚙️ Backend",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*📊 린팅 작업 요약*\n\n❗ Checkstyle 실행에 실패했습니다. 워크플로우 설정 또는 환경 구성을 확인하세요.\n\n\n"
+                  }
+                }
+              ],
+              "attachments": [
+                {
+                  "color": "#ff0000",
+                  "fields": [
+                    { "title": "Repository", "value": "${{ github.repository }}", "short": true },
+                    { "title": "Branch", "value": "${{ github.ref }}", "short": true },
+                    { "title": "Message", "value": "$MESSAGE", "short": false },
+                    { "title": "Actions URL", "value": "$ACTIONS_RUN_URL", "short": false }
+                  ]
+                }
+              ]
+            }' https://slack.com/api/chat.postMessage
+
+      - name: Send Slack notification with success message
+        if: success()
+        run: |
+          curl -X POST -H "Content-Type: application/json; charset=utf-8" \
+            -H "Authorization: Bearer ${{ secrets.SLACK_API_TOKEN }}" \
+              --data @- https://slack.com/api/chat.postMessage <<EOF
+          {
+            "channel": "${{ secrets.SLACK_TEST_CHANNEL_ID }}",
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "⚙️ Backend",
+                  "emoji": true
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*📊 린팅 작업 요약*\n\n- *Total files checked*: $TOTAL_FILES\n- *Total violations*: $TOTAL_VIOLATIONS\n- *Files with violations*: $FILES_WITH_VIOLATIONS\n\n🔗 *[검사 결과 URL]*\n${{ env.S3_URL }}\n\n\n"
+                }
+              }
+            ],
+            "attachments": [
+              {
+                "color": "#36a64f",
+                "fields": [
+                  { "title": "Repository", "value": "${{ github.repository }}", "short": true },
+                  { "title": "Branch", "value": "${{ github.ref }}", "short": true },
+                  { "title": "Message", "value": "$MESSAGE", "short": false },
+                  { "title": "Actions URL", "value": "$ACTIONS_RUN_URL", "short": false }
+                ]
+              }
+            ]
+          }
+          EOF
